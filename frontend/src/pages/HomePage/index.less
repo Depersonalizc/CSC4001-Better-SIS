@@ -1,0 +1,362 @@
+.home-page {
+
+  &-header {
+    width: 100%;
+    height: 100rem;
+    position: relative;
+    > div:nth-child(1) {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      > p {
+        color:rgba(255, 255, 255, 1)
+      }
+      > p:nth-child(1) {
+        font-size: 7rem;
+        line-height: 6rem;
+      }
+      > p:nth-child(2) {
+        font-size: 5rem;
+        line-height: 4rem;
+      }
+      .home-page-header-button {
+        width: 18rem;
+        height: 7rem;
+        font-size: 2.75rem;
+        margin-top: 2rem;
+        margin-left: 3rem;
+        margin-right: 3rem;
+        // background-color: rgba(1, 112, 254);
+        opacity: 0.9;
+      }
+    }
+    > img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+.home-page-navigator {
+  position: fixed;
+  top: 0rem;
+  width: 100%;
+  height: 12rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+  &-logo {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 8rem;
+    height: 7rem;
+  }
+  .home-page-navigator-menu {
+    display: inline-block;
+    position: absolute;
+    right: 30rem;
+    top: 50%;
+    width: 70rem;
+    transform: translateY(-50%);
+    // background-color: rgba(255, 255, 255, 0);
+    background: none;
+    width: auto;
+  }
+  // 对于ant design组件不能使用&-选择器，需要全名
+  .home-page-navigator-login {
+    display: inline;
+    position: absolute;
+    right: 5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20rem;
+    font-size: 2.25rem;
+  }
+}
+
+#home-page-course-registration {
+  height: 70rem;
+  position: relative;
+  background-color: rgba(244, 247, 252);
+  > img {
+    position: absolute;
+    top: 15rem;
+    bottom: 15rem;
+    left: 35rem;
+
+    width: 70rem;
+    border-radius: 3rem;
+    box-shadow: 1.4rem 1.4rem 1.4rem rgba(0,0,0,.5);
+
+    /*考虑浏览器兼容性*/
+    -moz-box-shadow: 1.4rem 1.4rem 1.4rem rgba(0,0,0,.5);
+    -webkit-box-shadow: 1.4rem 1.4rem 1.4rem rgba(0,0,0,.5);
+  }
+  > div:nth-child(2) {
+    position: absolute;
+    // top: 15rem;
+    // bottom: 15rem;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 30rem;
+    // border: 2px solid purple;
+    
+    // width: auto;
+
+    > p:nth-child(1) {
+      font-size: 5rem;
+      font-weight: bold;
+    }
+    > ul li {
+      font-size: 3.5rem;
+    }
+    .home-page-course-registration-button {
+      margin-top: 2rem;
+      width: 15rem;
+      height: 6rem;
+      // background-color: rgba(1, 112, 254);
+    }
+  }
+}
+
+#home-page-course-evaluation {
+  height: 70rem;
+  position: relative;
+  background-color: #f0f0f0;
+  > img {
+    position: absolute;
+    top: 12.5rem;
+    bottom: 12.5rem;
+    right: 35rem;
+
+    height: 45rem;
+    border-radius: 3rem;
+    box-shadow: 1.4rem 1.4rem 1.4rem rgba(0,0,0,.5);
+    /*考虑浏览器兼容性*/
+    -moz-box-shadow: 1.4rem 1.4rem 1.4rem rgba(0,0,0,.5);
+    -webkit-box-shadow: 1.4rem 1.4rem 1.4rem rgba(0,0,0,.5);
+  }
+  > div:nth-child(2) {
+    position: absolute;
+    // top: 15rem;
+    // bottom: 15rem;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 35rem;
+    // border: 2px solid purple;
+    
+    // width: auto;
+
+    > p:nth-child(1) {
+      font-size: 5rem;
+      font-weight: bold;
+    }
+    > ul li {
+      font-size: 3.5rem;
+    }
+    .home-page-course-evaluation-button {
+      margin-top: 2rem;
+      width: 15rem;
+      height: 6rem;
+      // background-color: rgba(1, 112, 254);
+    }
+  }
+}
+
+#home-page-course-instructor-info {
+  position: relative;
+  height: 90rem;
+  background-color: #f9f9f9;
+  > img:nth-child(1) {
+    position: absolute;
+    top: 28rem;
+    bottom: 15rem;
+    left: 35rem;
+    width: 60rem;
+    height: 50rem;
+  }
+  > img:nth-child(2) {
+    position: absolute;
+    top: 28rem;
+    bottom: 15rem;
+    right: 35rem;
+    width: 60rem;
+    height: 50rem;
+  }
+  .home-page-course-instructor-info-title {
+    position: absolute;
+    top: 10rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 5rem;
+    font-weight: bold;
+  }
+  .home-page-course-info {
+    position: absolute;
+    top: 28rem;
+    left: 28rem;
+    width: 4rem;
+    font-size: 3.5rem;
+  }
+  .home-page-instructor-info {
+    position: absolute;
+    top: 28rem;
+    right: 98rem;
+    width: 4rem;
+    font-size: 3.5rem;
+  }
+}
+
+#home-page-developers {
+  height: 110rem;
+  position: relative;
+  background-color: rgba(57, 56, 56);
+  padding: 30rem 15rem 15rem 15rem;
+  > p:nth-child(1) {
+    position: absolute;
+    top: 10rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 5rem;
+    color: rgba(255, 255, 255, 1)
+  }
+  > div:nth-child(2) {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: repeat(4, 25%);
+
+    > div {
+      position: relative;
+      > img:nth-child(1) {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30rem;
+        height: 30rem;
+        border-radius: 2rem;
+      }
+      > div:nth-child(2) {
+        position: absolute;
+        top: 35rem;
+        left: 10rem;
+        > p {
+          color: rgba(255, 255, 255, 1);
+          font-size: 3rem;
+        }
+        > p:nth-child(1) {
+          font-size: 4rem;
+          font-weight: bold;
+        }
+      }
+    }
+    .home-page-developer-avatar {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20rem;
+      height: 20rem;
+      text-align: center;
+      vertical-align: middle;
+    }
+  }
+}
+
+#home-page-project-info {
+  height: 120rem;
+  position: relative;
+  padding: 25rem 20rem 15rem 20rem;
+  background-color: rgba(244, 247, 252);
+  > p:nth-child(1) {
+    position: absolute;
+    top: 10rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 5rem;
+    font-weight: bold;
+  }
+  > div:nth-child(2) {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: repeat(2, 50%);
+    column-gap: 8rem;
+    > div {
+      // border: 2px solid orange;
+      box-shadow: 0.5rem 0.5rem 0.5rem 0.5rem #999;
+      position: relative;
+      padding: 10rem 5rem 5rem 5rem;
+      > p:nth-child(1) {
+        position: absolute;
+        top: 3rem;
+        left: 4rem;
+        font-size: 4rem;
+        font-weight: bold;
+      }
+    }
+  }
+}
+.change-log-commit-item {
+  // border: 1px solid gray;
+  box-shadow: 0.5rem 0.5rem 0.5rem #999;
+  margin-bottom: 3rem;
+}
+
+
+#home-page-footer {
+  height: auto;
+  padding: 10rem 50rem 20rem 50rem;
+  background-color: rgba(0,0,0, 1);
+  position: relative;
+  > div {
+    display: grid;
+    height: 40rem;
+    grid-template-rows: 60% 40%;
+    grid-template-columns: 50% 50%;
+    column-gap: 15rem;
+    > div {
+      // border: 2px solid orange;
+      ul {
+        list-style-type: none;
+      }
+      ul > li:nth-child(1) {
+        color: rgba(255, 255, 255, 1);
+        font-size: 3rem;
+        margin-bottom: 2rem;
+      }
+      ul li a {
+        color: rgba(255, 255, 255, 1);
+        font-size: 2.5rem;
+        &:hover {
+          color: rgba(26, 136, 238);
+        }
+      }
+    }
+    > div:nth-child(1) {
+      grid-row-start: 1;
+      grid-row-end: 3;
+    }
+  }
+
+  .home-page-footer-icon {
+    margin-right: 1rem;
+  }
+
+  .home-page-footer-copyright {
+    position: absolute;
+    bottom: 6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 1);
+    width: 100%;
+  }
+}
+

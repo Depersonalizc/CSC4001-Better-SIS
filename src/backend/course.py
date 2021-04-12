@@ -1,191 +1,329 @@
+from typing import List, Set, Tuple
+from utils.time_utils import TimeOfWeek, TimeSlot
 
 
-class Session():
+class Instructor:
+    def __init__(self, name: str, dept: str, is_lecturer: bool):
+        self._name = name
+        self._dept = dept
+        self._is_lecturer = is_lecturer
 
-    # A session of a course, atom of scheculing, contains info: session number,
-    # course code, course name, start time, end time, instructor
+    @property
+    def name(self):
+        return self._name
 
-    def __init__(self,sessionNum,class1,class2=None,instructor='') -> None: # enrollNum=0
-        '''
-            Parameters: 
-            - sessionNum: int, primary key; 
-            - class1,class2: list [startTime, endTime], one for tut, two for lec; 
-            - instructor: string;
-        '''
-        self.__sessionNum = sessionNum
-        # self.__code = code
-        # self.__name = name
-        # self.__start = startTime
-        # self.__end = endTime
-        self.__class1 = class1
-        self.__class2 = class2
-        self.__instructor = instructor
+    @property
+    def dept(self):
+        return self._dept
 
-    def getSessionNum(self):
-        return self.__sessionNum
+    @property
+    def is_lecturer(self):
+        return self._is_lecturer
 
-    def getClass(self):
-        lst = [self.__class1]
-        if self.__class2 != None:
-            lst.append(self.__class2)
-        return lst
 
-    def getInstructor(self):
-        return self.__instructor
+class Session:
 
-    def __lt__(self,other):
-        return self.__sessionNum < other.__sessionNum
-            
-    def __eq__(self,other):
-        return self.__sessionNum == other.__sessionNum
+    # A Session of a course (either lecture or tutorial), atom of scheduling
+    # contains info: course pointer, instructors, session type, time slots of classes (1 and/or 2)
 
-    def toString(self,noHead=False):
-        # if not noHead:
-            # print(self.__code,' ',self.__name)
-        print('Session:\t',self.__class1,' ', self.__class2)
-        
-        print('Instructor: ',self.__instructor)
-        print()
+    def __init__(self,
+                 course,  #: Course
+                 instructors: Set[Instructor],
+                 session_type: str,
+                 class1_ts: TimeSlot,
+                 class2_ts: TimeSlot = None):
+        """
+        :param instructors: set of instructors of the session (type: Set[Instructor])
+        :param class1_ts: time slot for first class in the week (type: TimeSlot)
+        :param class2_ts: time slot for second class in the week, if any (type: TimeSlot)
+        :param session_type: 'lec' for lectures, 'tut' for tutorials (type: str)
+        """
+        session_type = session_type.lower()
+        assert session_type in ['lec', 'tut'], \
+            'Session can only be "lec" or "tut"!'
+        self.__session_type = session_type
+        self.__course = course
+        self.__class1 = class1_ts
+        self.__class2 = class2_ts
+        self.__instructors = instructors
+        self.__session_no = None
 
-class Course():
+    @property
+    def session_no(self):
+        return self.__session_no
 
-# Course:
-    # Attributes: all sessions, course name, course code,instructor, credit
+    @session_no.setter
+    def session_no(self, sno):
+        self.__session_no = sno
+
+    @property
+    def course(self):
+        return self.__course
+
+    @property
+    def class1(self) -> TimeSlot:
+        return self.__class1
+
+    @property
+    def class2(self) -> TimeSlot:
+        return self.__class2
+
+    @property
+    def classes(self) -> List[TimeSlot]:
+        ret = [self.class1]
+        if self.class2 is not None:
+            ret.append(self.class2)
+        return ret
+
+    @property
+    def instructors(self) -> Set[Instructor]:
+        return self.__instructors
+
+    @property
+    def session_type(self) -> str:
+        return self.__session_type
+
+    def overlaps_with_session(self, other) -> List[TimeSlot]:
+        """
+        Return all time conflict with the other session
+        """
+        overlaps = [c1.overlap(c2) for c1 in self.classes
+                                   for c2 in other.classes
+                                   if c1.overlap(c2) is not None]
+        return overlaps
+
+    def sno_to_str(self) -> str:
+        sno = str(self.session_no) if self.session_no is not None else 'XX'
+        return self.session_type.upper() + '-' + sno
+
+    def to_str(self, no_head=True) -> str:
+        head = str() if no_head else \
+            f'{self.course.get_full_code()} {self.course.course_name}\n'
+        sno = self.sno_to_str() + '\n'
+        ins = 'Instructors: ' + ', '.join(i.name for i in self.instructors) + '\n'
+        cls = ''.join(c.__repr__() for c in self.classes)
+        return head + sno + ins + cls
+
+    def __repr__(self):
+        return self.to_str(no_head=False)
+
+    def __lt__(self, other):
+        return self.session_no < other.session_no
+
+    def __gt__(self, other):
+        return self.session_no > other.session_no
+
+    def __eq__(self, other):
+        return self.session_no == other.session_no
+
+
+class Course:
+
+    # Course:
+    # Attributes: all sessions, course name, course code, instructors, credits
     # Methods:
-    # createSession()   add new sessions of the course
-    # selectSession()   return a Session object
-    # showSession()     print session info
-    # toString()        print course info and all sessions
+    # add_session()   add new sessions of the course
+    # ...
 
-    def __init__(self,code,name,instructor,credit=3) -> None:
-        '''
-        Parameters:
-        - code: int, course code;
-        - name: string, course name;
-        - instructor: string;
-        - credit: int;
-        '''
-        self.__lectures = []
-        self.__tutorials = []
-        self.__name = name
-        self.__code = code
-        self.__instructor = instructor
-        self.__credit = credit
-    
-    def createLecture(self, sessionNum,class1, class2=None,instructor='',isLecture=True):
-        '''
-        Parameters:
-        - sessionNum: int, according to lec/tut, time... primary key of sessions;
-        - class1, class2: list, [startTime,endTime]
-        - instructor: string;
-        - isLecture: bool;
-        '''
-        newSession = Session(sessionNum,class1,class2, instructor)
-        if instructor not in self.__instructor:
-            self.__instructor.append(instructor)
-        exist = False
-        if isLecture:
-            if newSession not in self.__lectures:
-                self.__lectures.append(newSession)
-                self.__lectures.sort()
-            else:
-                exist = True
+    def __init__(self,
+                 dept: str,
+                 course_code: int,
+                 course_name: str,
+                 credit_units: int = 3):
+        """
+        :param dept: letter initialization of the offering department (e.g. 'CSC') (type: str)
+        :param course_code: integer course code (type: int)
+        :param course_name: full name of the course (type: str)
+        :param credit_units: units of credit offered (type: int)
+        """
+        self.__lec_sessions: List[Session] = list()
+        self.__tut_sessions: List[Session] = list()
+        self.__lecturers: Set[Instructor] = set()
+        self.__tutors: Set[Instructor] = set()
+        self.__dept = dept
+        self.__course_code = course_code
+        self.__course_name = course_name
+        self.__credit_units = credit_units
+
+    @property
+    def lec_sessions(self) -> List[Session]:
+        return self.__lec_sessions
+
+    @property
+    def tut_sessions(self) -> List[Session]:
+        return self.__tut_sessions
+
+    @property
+    def dept(self) -> str:
+        return self.__dept
+
+    @property
+    def course_code(self) -> int:
+        return self.__course_code
+
+    @property
+    def course_name(self) -> str:
+        return self.__course_name
+
+    @property
+    def credit_units(self) -> int:
+        return self.__credit_units
+
+    @property
+    def lecturers(self) -> Set[Instructor]:
+        return self.__lecturers
+
+    @property
+    def tutors(self) -> Set[Instructor]:
+        return self.__tutors
+
+    def get_full_code(self) -> str:
+        return f'{self.dept}{self.course_code}'
+
+    def add_instructors(self, instructors: Set[Instructor], session_type: str) -> None:
+        assert session_type in ['lec', 'tut'],\
+            "Session type can only be 'lec' or 'tut'!"
+        if session_type == 'lec':
+            self.__lecturers = self.lecturers.union(instructors)
         else:
-            if newSession not in self.__tutorials:
-                self.__tutorials.append(newSession)
-                self.__tutorials.sort()
-            else:
-                exist = True
-        if exist:
-            print('[ERROR] The same session exists:')
-            newSession.toString()
-            print()
-            
+            self.__tutors = self.tutors.union(instructors)
 
-    def selectSession(self,sessionNum,isLecture=True):
-        if isLecture:
-            for l in self.__lectures:
-                if l.getSessionNum() == sessionNum:
-                    return l
-            # error
+    def has_conflict(self, session: Session, verbose: bool = False) -> bool:
+        """
+        Check time conflict with the other session against all existing sessions
+
+        :param session: Session to check for conflict against existing sessions (type: Session)
+        :param session_type: 'lec' or 'tut' (type: str)
+        :param verbose: Whether to display the conflicts (type: bool)
+        :return (bool): Whether conflicts exist
+        """
+        has_conflict = False
+        existing = {'lec': self.lec_sessions, 'tut': self.tut_sessions}
+        for s in existing[session.session_type]:
+            shared_instructors = s.instructors.intersection(session.instructors)
+            overlaps = s.overlaps_with_session(session)
+            # conflict if an instructor is in two concurrent sessions
+            if shared_instructors and overlaps:
+                if verbose:
+                    ins = ', '.join(i.name for i in shared_instructors)
+                    print(f'WARNING: Failed to add session because instructor(s)\n'
+                          f'{ins}\n'
+                          f'has conflicting time slot(s) at:\n')
+                    print(s)
+                    has_conflict = True
+        return has_conflict
+
+    def _add_session(self, session: Session) -> None:
+        # dirty trick for lists only ;)
+        ss = {'lec': self.lec_sessions,
+              'tut': self.tut_sessions}[session.session_type]
+        session.session_no = len(ss)
+        ss.append(session)
+
+    def add_session(self,
+                    instructors: Set[Instructor],
+                    session_type: str,
+                    class1: Tuple[str, str],
+                    class2: Tuple[str, str] = None) -> None:
+        """
+        Add session to list given all related info.
+        Session numbers are given in order of insertions.
+
+        :param instructors: Set of instructors of the session (type: Set[Instructor...])
+        :param session_type: 'lec' or 'tut' (type: str)
+        :param class1: start and end time of first class of the week
+                       in `%d %H:%M` format (type: Tuple[str, str])
+        :param class2: start and end time of second class of the week (if any)
+                       in `%d %H:%M` format (type: Tuple[str, str])
+        """
+        # Parse time slots
+        try:
+            class1_ts = TimeSlot(class1[0], class1[1])
+            class2_ts = TimeSlot(class2[0], class2[1]) if class2 else None
+        except:
+            print('WARNING: Failed to parse times slots.')
         else:
-            for t in self.__tutorials:
-                if t.getSessionNum() == sessionNum:
-                    return t
-            # error        
+            # Create new session
+            new_session = Session(self, instructors, session_type, class1_ts, class2_ts)
+            if self.has_conflict(new_session, verbose=True):
+                return
+            self._add_session(new_session)
+            self.add_instructors(instructors, session_type)
 
-    def selectPackage(self, lecNum, tutNum=None):
-        package = []
-        if self.isLecture(lecNum):
-            for l in self.__lectures:
-                if l.getSessionNum() == lecNum:
-                    package.append(l)
-                    break
-            # error
-        else:
-            pass #error
+    def confirm_sessions(self, lecs: bool = True, tuts: bool = True) -> None:
+        """
+        Confirm results of session adding, sort sessions according
+        to start time of class1 and assign session numbers in sequence.
 
-        if self.isTutorial(tutNum):
-            for t in self.__tutorials:
-                if t.getSessionNum() == tutNum:
-                    package.append(t)
-                    break
-            # error
-        else:
-            pass #error
-        if tutNum != None:
-            if not checkTimeConflict(package[0],package[1]):
-                return package
-            else:
-                pass # error
-        
-    # def deleteSession(self,sessionNum):
-    #     for s in 
-    def isLecture(self,sessionNum):
-        pass
-    def isTutorial(self,sessionNum):
-        pass
-    def showSession(self,sessionNum=None,noHead=False):
-        if sessionNum != None:
-            for s in self.__sessions:
-                if s.getSessionNum() == sessionNum:
-                    s.toString()
-            return
-        else:
-            for s in self.__sessions:
-                s.toString(noHead=noHead)
+        :param lecs: Whether to confirm lecture sessions
+        :param tuts: Whether to confirm tutorial sessions
+        """
+        if lecs:
+            self.lec_sessions.sort(key=lambda sess: sess.class1.start)
+            for i, lec in enumerate(self.lec_sessions):
+                lec.session_no = i
+        if tuts:
+            self.tut_sessions.sort(key=lambda sess: sess.class1.start)
+            for i, tut in enumerate(self.tut_sessions):
+                tut.session_no = i
 
-    def toString(self):
-        print(self.__code,'\t', self.__name) 
-        print('Credit:\t\t',self.__credit)
-        self.showSession(noHead=True)
+    def __repr__(self):
+        name = f'\n{self.get_full_code()} {self.course_name}\n'
+        s_lecturers = '- Lecturer(s): ' + ', '.join((l.name for l in self.lecturers)) + '\n'
+        s_tutors = '- Tutor(s): ' + ', '.join((t.name for t in self.tutors)) + '\n'
+        cred = f'- Credit(s): {self.credit_units}\n\n'
 
+        lecs = '-------------------Lectures-------------------\n'
+        for lec_session in self.lec_sessions:
+            lecs += lec_session.to_str(no_head=True) + '\n'
 
-# Method: checkTimeConflict
-# To check if two sessions have time confict using start/end time
-def checkTimeConflict(session1, session2):
-    assert(type(session1) == Session and type(session2) == Session)
-    time1 = session1.getClass()
-    time2 = session2.getClass()
-    flag = False
-    for t1 in time1:
-        for t2 in time2:
-            if t1[0] < t2[1] and t1[1] > t2[0]:
-                flag = True
-                return flag
-    return flag
+        tuts = '------------------Tutorials-------------------\n'
+        for tut_session in self.tut_sessions:
+            tuts += tut_session.to_str(no_head=True) + '\n'
+
+        return name + s_lecturers + s_tutors + cred + lecs + tuts
 
 
 if __name__ == '__main__':
-    c = Course('CSC4001','Software Engineering', credit=3)
-    c.createSession(3,[1105,1120],[3105,3120],'Jane YOU')
-    c.createSession(1,[1110,1120],[3110,3120],'Jane YOU')
-    c.createSession(1,[1105,1120],[3105,3120],'Jane YOU')
 
-    c.createSession(2,[1085,1100],[3085,3100],'Minming Li')
-    c.toString()
-    s1 = c.selectSession(3)
-    s1.toString()
-    s2 = c.selectSession(1)
-    s1.toString()
-    # print(checkTimeConflict(s2,s1))
+    # Define courses and instructors
+    c = Course('CSC', 4001, 'Software Engineering', credit_units=3)
+    jy = Instructor('Jane YOU',     'CSC', is_lecturer=True)
+    jm = Instructor('Jane ME',      'CSC', is_lecturer=True)
+    t1 = Instructor('Shiping ZHU',  'CSC', is_lecturer=False)
+    t2 = Instructor('Yangsheng XU', 'CSC', is_lecturer=False)
+
+    # Add lecture sessions
+    c.add_session({jy}, 'lec', ('1 08:30', '1 09:50'), ('3 10:30', '3 12:50'))
+    c.add_session({jy}, 'lec', ('2 08:30', '2 09:50'), ('4 10:30', '4 12:50'))
+    c.add_session({jy}, 'lec', ('3 08:30', '3 09:50'), ('5 10:30', '5 12:50'))  # Conflicts with the session below
+    c.add_session({jm}, 'lec', ('3 09:00', '3 10:20'), ('5 11:30', '5 13:50'))  # Conflicts with the session above
+
+    # Add tutorial sessions
+    c.add_session({t1, t2}, 'tut', ('2 19:30', '2 20:30'))
+    c.add_session({t1, t2}, 'tut', ('3 19:30', '3 20:30'))
+
+    # Should raise an error because tutor t1 is in two sessions at the same time
+    c.add_session({t1}, 'tut', ('3 19:20', '3 20:50'))
+
+    # Confirm sessions
+    c.confirm_sessions()
+
+    # Display course sessions
+    print(c)
+
+    # Demo for conflict checking
+    print('Conflict checking...')
+    l0 = c.lec_sessions[0]
+    l1 = c.lec_sessions[1]
+    l2 = c.lec_sessions[2]
+    l3 = c.lec_sessions[3]
+    for l in l0, l1, l2:
+        overlaps = l.overlaps_with_session(l3)
+        if overlaps:  # List[TimeSlot]
+            print("Conflicts found at:")
+            print(
+                ''.join(ts.__repr__() for ts in overlaps)
+            )
+        else:  # Empty list
+            print('No conflicts found!')

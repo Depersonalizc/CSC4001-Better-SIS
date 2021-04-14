@@ -5,3 +5,6 @@ Course project for CSC4001 Software Engineering
 
 - 2021/4/11 12:38
 调整了一下文件结构，不知道好不好
+
+- 2021/4/14
+写了一下schedule，还需要测试和完成自定义设置(不要早课之类的), 李泽宇去做数据库了, 可能要点时间来从SIS扒数据。schedule.py 尽量别改, 有问题问我, 暂时不写了。 --lyh

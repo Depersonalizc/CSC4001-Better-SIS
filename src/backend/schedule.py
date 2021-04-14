@@ -1,7 +1,9 @@
 from course import Course,Instructor,Session
 from typing import List
 
-
+# TODO
+# 1. custom options
+# 2. conflict test
 
 
 class Schedule():
@@ -9,21 +11,44 @@ class Schedule():
                  stuid: int, 
                  coursePackages:List=None,
                  courseList:List[Course]=None) -> None:
+
         self.__stuid = stuid
-        self.__coursePackages = coursePackages # [course, lec_sess, tut_sess]
-        self.__courseList = courseList
-        self.__noFridayClass = False        # custom options
+        self.__coursePackages = coursePackages    # [course, lec_sess, tut_sess]
+        self.__courseList = courseList            # [course1,...]
+
+        self.__noFridayClass = False              # custom options TODO
         self.__noMorningClass = False
         self.__noNoonClass = False
+
+        # Initialization
         if not self.__courseList and self.__coursePackages:
             self.__courseList = [c[0] for c in self.__coursePackages]
+        if self.__courseList and not self.__coursePackages:
+            if not self.autoSchedule(0):
+                self.coursePackages = []
+                print('[WARNING] Fail to auto schedule, current course list: ')
+                print(self.courseList_tostr())
+                print('  Pls check conflicts or schedule manually!')
+                return
         self.listSchedule()
 
     @property
-    def coursePackage(self):
+    def coursePackage(self) -> List:
         return self.__coursePackages
-    
-    def has_conflicts(self) -> bool:
+    @coursePackage.setter
+    def coursePackage(self,any):
+        self.__coursePackages = any
+    @property
+    def courseList(self) -> List:
+        return self.__courseList
+
+    def courseList_tostr(self) -> str:
+        s = ''
+        for c in self.courseList:
+            s += c.get_full_code()+' '
+        return s
+
+    def has_conflicts(self) -> List:
         length = len(self.coursePackage)
         for i in range(length):
             s1 = self.coursePackage[i][1]
@@ -49,24 +74,24 @@ class Schedule():
                             conflicts = a.has_conflicts(b)
                             if conflicts:
                                 print(f'[ERROR] Time conflicts: {conflicts[0]} - {conflicts[1]}')
-                                return False
-        return True
+                                return conflicts
 
-    def has_conflicts(self,session:Session) -> bool:
-        length = len(self.coursePackage)
-        for i in range(length):
-            s1 = self.coursePackage[i][1]
-            s2 = None
-            if len(self.coursePackage[i]) > 2:
-                s2 = self.coursePackage[i][2]
-            course_Session = [s1]
-            if s2:
-                course_Session.append(s2) 
-            for sess in course_Session:
-                if sess.has_conflicts(session):
-                    return sess.has_conflicts(session)
+    def has_conflicts(self,session:Session) -> List:
+        if self.coursePackage:
+            length = len(self.coursePackage)
+            for i in range(length):
+                s1 = self.coursePackage[i][1]
+                s2 = None
+                if len(self.coursePackage[i]) > 2:
+                    s2 = self.coursePackage[i][2]
+                course_Session = [s1]
+                if s2:
+                    course_Session.append(s2) 
+                for sess in course_Session:
+                    if sess.has_conflicts(session):
+                        return sess.has_conflicts(session)
 
-    def addCoursePackage(self, coursePackage:List) -> None:
+    def addCoursePackage(self, coursePackage:List):
         course = coursePackage[0]
         lec_sess = coursePackage[1]
         tut_sess = None
@@ -130,17 +155,46 @@ class Schedule():
             if c.get_full_code == courseFullCode:
                 self.__courseList.remove(c)
                 break
+
     def changeCourseSession(self,courseFullCode:str,session_no:int, session_type:str=None):
         for i in len(self.coursePackage):
             if self.coursePackage[i][0].get_full_code() == courseFullCode:
-                s = self.coursePackage[i][0].findSess(session_no)
+                s = self.coursePackage[i][0].session(session_no)
                 if s.session_type == 'lec':
                     self.coursePackage[i][1] = s
                 elif s.session_type == 'tut':
                     self.coursePackage[i][2] = s
         print('[ERROR] <changeCourseSession> No such course in the schedule!')
-                    
 
+
+    # TODO Need Test                
+    def autoSchedule(self,courseIdx:int) -> True: # backtracking
+        # def backtrack(路径, 选择列表):
+        #     if 满足结束条件:
+        #         result.add(路径)
+        #         return
+        # ​
+        #     for 选择 in 选择列表:
+        #         做选择
+        #         backtrack(路径, 选择列表)
+        #         撤销选择
+        if self.coursePackage:
+            print('courseIdx:',courseIdx,self.coursePackage[-1][0].get_full_code())
+        if courseIdx == len(self.courseList):
+            return True
+        course = self.courseList[courseIdx]
+        for lec in course.lec_sessions:
+            if self.has_conflicts(lec):
+                continue
+            for tut in course.tut_sessions:
+                if self.has_conflicts(tut):
+                    continue
+                if not self.coursePackage:
+                    self.coursePackage = []
+                self.coursePackage.append([course,lec,tut])
+                if self.autoSchedule(courseIdx+1):
+                    return True
+                self.coursePackage = self.coursePackage[:-1]
 
 
 if __name__ == '__main__':
@@ -154,9 +208,9 @@ if __name__ == '__main__':
 
     # Add lecture sessions
     CSC4001.add_session(1501,{jy}, 'lec', ('1 08:30', '1 09:50'), ('3 08:30', '3 09:50'))
-    CSC4001.add_session(1502,{jy}, 'lec', ('2 08:30', '2 09:50'), ('4 10:30', '4 12:50'))
-    CSC4001.add_session(1503,{jy}, 'lec', ('3 08:30', '3 09:50'), ('5 10:30', '5 12:50'))  # Conflicts with the session below
-    CSC4001.add_session(1504,{jm}, 'lec', ('3 09:00', '3 10:20'), ('5 11:30', '5 13:50'))  # Conflicts with the session above
+    # CSC4001.add_session(1502,{jy}, 'lec', ('2 08:30', '2 09:50'), ('4 10:30', '4 12:50'))
+    # CSC4001.add_session(1503,{jy}, 'lec', ('3 08:30', '3 09:50'), ('5 10:30', '5 12:50'))  # Conflicts with the session below
+    # CSC4001.add_session(1504,{jm}, 'lec', ('3 09:00', '3 10:20'), ('5 11:30', '5 13:50'))  # Conflicts with the session above
 
     # Add tutorial sessions
     CSC4001.add_session(1511,{t1, t2}, 'tut', ('2 19:30', '2 20:30'))
@@ -174,8 +228,8 @@ if __name__ == '__main__':
     t1 = Instructor('Haijin WANG',  'CSC', is_lecturer=False)
     t2 = Instructor('Songyang Ge', 'CSC', is_lecturer=False)
 
-    CSC3170.add_session(1601,{cl},'lec',('1 10:30','1 11:50'),('3 10:30','3 11:50'))
-    CSC3170.add_session(1602,{cl},'lec',('1 13:30','1 14:50'),('3 13:30','3 14:50'))
+    CSC3170.add_session(1601,{cl},'lec',('1 8:30','1 8:50'),('3 8:30','3 8:50'))
+    # CSC3170.add_session(1602,{cl},'lec',('2 9:30','2 9:50'),('4 9:30','4 9:50'))
     CSC3170.add_session(1611,{t1,t2},'tut',('1 18:00','1 18:50'))
     CSC3170.add_session(1612,{t1,t2},'tut',('1 19:00','1 19:50'))
     CSC3170.add_session(1613,{t1,t2},'tut',('2 18:00','2 18:50'))
@@ -201,13 +255,13 @@ if __name__ == '__main__':
     CSC4008.add_session(1812,{t1,t2},'tut',('2 19:00','2 19:50'))
     CSC4008.add_session(1813,{t1,t2},'tut',('3 19:00','3 19:50'))
 
+    sche = Schedule(118010154,courseList=[CSC4001,CSC3170,DDA4250,CSC4008])
+    # sche = Schedule(118010154,[[CSC4001,CSC4001.session(1501),CSC4001.session(1511)],
+    # [CSC3170,CSC3170.session(1601),CSC3170.session(1614)]])
+    # print('\n\n')
+    # sche.addCoursePackage([DDA4250,DDA4250.session(1701),DDA4250.session(1711)])
 
-    sche = Schedule(118010154,[[CSC4001,CSC4001.findSess(1501),CSC4001.findSess(1511)],
-    [CSC3170,CSC3170.findSess(1601),CSC3170.findSess(1614)]])
-    print('\n\n')
-    sche.addCoursePackage([DDA4250,DDA4250.findSess(1701),DDA4250.findSess(1711)])
-
-    sche.addCoursePackage([CSC4008,CSC4008.findSess(1802),CSC4008.findSess(1811)]) # conflict
-    sche.addCoursePackage([CSC4008,CSC4008.findSess(1801),CSC4008.findSess(1811)])
-    sche.addCoursePackage([CSC4008,CSC4008.findSess(1802),CSC4008.findSess(1811)])
+    # sche.addCoursePackage([CSC4008,CSC4008.session(1802),CSC4008.session(1811)]) # conflict
+    # sche.addCoursePackage([CSC4008,CSC4008.session(1801),CSC4008.session(1811)])
+    # sche.addCoursePackage([CSC4008,CSC4008.session(1802),CSC4008.session(1811)])
 

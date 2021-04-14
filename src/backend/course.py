@@ -285,7 +285,7 @@ class Course:
             # for i, tut in enumerate(self.tut_sessions):
             #     tut.session_no = i
 
-    def findSess(self, session_no:int) -> Session:
+    def session(self, session_no:int) -> Session:
         for s in self.lec_sessions:
             if s.session_no == session_no:
                 return s

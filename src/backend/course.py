@@ -21,6 +21,9 @@ class Instructor:
         return self._is_lecturer
 
 
+# TODO
+# Add venue: TB102...
+
 class Session:
 
     # A Session of a course (either lecture or tutorial), atom of scheduling
@@ -96,7 +99,7 @@ class Session:
 
     def has_conflicts(self, other) -> bool:
         if self.overlaps_with_session(other):
-            return [self.session_no,other.session_no]
+            return [self.session_no, self.classes ,other.session_no,other.classes]
         # return True if self.overlaps_with_session(self, other) != None else False
 
     def sno_to_str(self) -> str:
@@ -104,7 +107,7 @@ class Session:
         return sno.zfill(4) + '-' + self.session_type.upper()
 
     def to_str(self, no_head=True) -> str:
-        head = str() if no_head else \
+        head = '' if no_head else \
             f'{self.course_info[0]} {self.course_info[1]}\n'
         sno = self.sno_to_str() + '\n'
         ins = 'Instructors: ' + ', '.join(i.name for i in self.instructors) + '\n'
@@ -282,7 +285,7 @@ class Course:
             # for i, tut in enumerate(self.tut_sessions):
             #     tut.session_no = i
 
-    def searchSession(self, session_no:int) -> Session:
+    def findSess(self, session_no:int) -> Session:
         for s in self.lec_sessions:
             if s.session_no == session_no:
                 return s

@@ -1,0 +1,78 @@
+.course-registration {
+  width: 100%;
+  position: relative;
+
+  &-body {
+    position: absolute;
+    top: 20rem;
+    left: 35rem;
+    width: 130rem;
+    height: 80rem;
+    border: 2px solid cyan;
+  }
+}
+
+.navigator {
+  position: fixed;
+  top: 0rem;
+  width: 100%;
+  height: 12rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+  border: 1px solid orange;
+
+  &-logo {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 8rem;
+    height: 7rem;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .navigator-time {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 70rem;
+    font-size: 3rem;
+    > span {
+      margin-right: 1rem;
+    }
+    > span:nth-child(2) {
+      margin-right: 2rem;
+    }
+  }
+  .navigator-content {
+    display: inline-block;
+    position: absolute;
+    right: 30rem;
+    top: 50%;
+    width: 70rem;
+    transform: translateY(-50%);
+    // background-color: rgba(255, 255, 255, 0);
+    background: none;
+    width: auto;
+  }
+  .navigator-user-info {
+    display: inline-block;
+    position: absolute;
+    right: 4rem;
+    width: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.course-registration-menu {
+  position: absolute;
+  top: 12rem;
+  left: 0rem;
+  width: 30rem;
+}
+
+.registration-progress {
+  margin-bottom: 5rem;
+}

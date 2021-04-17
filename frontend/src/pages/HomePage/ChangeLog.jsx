@@ -25,6 +25,9 @@ export default function ChangeLog(props) {
 				// here, json is an array type
 				let outputArray = [];
 				for (let index in json) {
+					if (!json[index]["author"]) {
+						continue;
+					}
 					let obj = json[index]["commit"]
 					outputArray.push( {
 						author: obj["author"]["name"],

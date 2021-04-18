@@ -31,7 +31,7 @@ class Session:
 
     def __init__(self,
                  session_no: int, # primary ksy of a session
-                 course_code:str,  #: Course
+                 course_code:str,  #: CSC4001
                  course_name:str,
                  instructors: Set[Instructor],
                  session_type: str,

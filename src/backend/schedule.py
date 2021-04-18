@@ -10,15 +10,24 @@ class Schedule():
     def __init__(self, 
                  stuid: int, 
                  coursePackages:List=None,
-                 courseList:List[Course]=None) -> None:
+                 courseList:List[Course]=None,
+                 **kargs) -> None:
 
         self.__stuid = stuid
         self.__coursePackages = coursePackages    # [course, lec_sess, tut_sess]
         self.__courseList = courseList            # [course1,...]
-
-        self.__noFridayClass = False              # custom options TODO
-        self.__noMorningClass = False
-        self.__noNoonClass = False
+        try:
+            self.__noFridayClass = kargs['fri']
+        except:
+            self.__noFridayClass = False          # custom options TODO
+        try:
+            self.__noMorningClass = kargs['mor']
+        except:
+            self.__noMorningClass = False
+        try:
+            self.__noNoonClass = kargs['noon']
+        except:
+            self.__noNoonClass = False
 
         # Initialization
         if not self.__courseList and self.__coursePackages:
@@ -26,7 +35,9 @@ class Schedule():
         if self.__courseList and not self.__coursePackages:
             if not self.autoSchedule(0):
                 self.coursePackages = []
-                print('[WARNING] Fail to auto schedule, current course list: ')
+                print('[WARNING] Fail to auto schedule with custom options: ')
+                print(f'No morning class - {self.__noMorningClass}, No noon class - {self.__noNoonClass}, No Friday class - {self.__noFridayClass}')
+                print('Current course list: ')
                 print(self.courseList_tostr())
                 print('  Pls check conflicts or schedule manually!')
                 return
@@ -169,25 +180,14 @@ class Schedule():
 
     # TODO Need Test                
     def autoSchedule(self,courseIdx:int) -> True: # backtracking
-        # def backtrack(路径, 选择列表):
-        #     if 满足结束条件:
-        #         result.add(路径)
-        #         return
-        # ​
-        #     for 选择 in 选择列表:
-        #         做选择
-        #         backtrack(路径, 选择列表)
-        #         撤销选择
-        if self.coursePackage:
-            print('courseIdx:',courseIdx,self.coursePackage[-1][0].get_full_code())
         if courseIdx == len(self.courseList):
             return True
         course = self.courseList[courseIdx]
         for lec in course.lec_sessions:
-            if self.has_conflicts(lec):
+            if self.has_conflicts(lec) or self.violateCustomOption(lec):
                 continue
             for tut in course.tut_sessions:
-                if self.has_conflicts(tut):
+                if self.has_conflicts(tut) or self.violateCustomOption(tut):
                     continue
                 if not self.coursePackage:
                     self.coursePackage = []
@@ -196,6 +196,26 @@ class Schedule():
                     return True
                 self.coursePackage = self.coursePackage[:-1]
 
+    def violateCustomOption(self,sess):
+        if self.__noFridayClass:
+            for c in sess.classes:
+                if c.isFriday():
+                    return True
+
+        if self.__noMorningClass:
+            for c in sess.classes:
+                if c.isMorning():
+                    return True
+            
+        if self.__noNoonClass:
+            for c in sess.classes:
+                if c.isNoon():
+                    return True
+
+        # Add more...
+
+        return False
+        
 
 if __name__ == '__main__':
 
@@ -229,7 +249,7 @@ if __name__ == '__main__':
     t2 = Instructor('Songyang Ge', 'CSC', is_lecturer=False)
 
     CSC3170.add_session(1601,{cl},'lec',('1 8:30','1 8:50'),('3 8:30','3 8:50'))
-    # CSC3170.add_session(1602,{cl},'lec',('2 9:30','2 9:50'),('4 9:30','4 9:50'))
+    CSC3170.add_session(1602,{cl},'lec',('2 9:30','2 9:50'),('4 9:30','4 9:50'))
     CSC3170.add_session(1611,{t1,t2},'tut',('1 18:00','1 18:50'))
     CSC3170.add_session(1612,{t1,t2},'tut',('1 19:00','1 19:50'))
     CSC3170.add_session(1613,{t1,t2},'tut',('2 18:00','2 18:50'))
@@ -255,7 +275,7 @@ if __name__ == '__main__':
     CSC4008.add_session(1812,{t1,t2},'tut',('2 19:00','2 19:50'))
     CSC4008.add_session(1813,{t1,t2},'tut',('3 19:00','3 19:50'))
 
-    sche = Schedule(118010154,courseList=[CSC4001,CSC3170,DDA4250,CSC4008])
+    sche = Schedule(118010154,courseList=[CSC4001,CSC3170,DDA4250,CSC4008],noon=True)
     # sche = Schedule(118010154,[[CSC4001,CSC4001.session(1501),CSC4001.session(1511)],
     # [CSC3170,CSC3170.session(1601),CSC3170.session(1614)]])
     # print('\n\n')

@@ -108,6 +108,16 @@ class TimeSlot:
             return TimeSlot(max_start, min_end)
         return None
 
+    def isFriday(self):
+        return self.start.time.isoweekday() == 5
+    def isMorning(self):
+        return self.start.time.hour < 10
+    def isNoon(self):
+        return (self.start.time.hour >= 12 and self.start.time.hour < 14) or (self.end.time.hour >= 12 and self.end.time.hour < 14)
+    
+
+
+    
     def __repr__(self):
         ts = f'[{self.start} -- {self.end}]'
         dur = f'({self.duration})'
@@ -119,14 +129,14 @@ if __name__ == "__main__":
     ts1 = TimeSlot('1 8:30', '1 9:50')
     ts2 = TimeSlot('1 9:49', '1 10:10')
     ts3 = TimeSlot('1 10:00', '1 12:00')
+    # print(ts1.isMorning())
+    # print(f'#1 {ts1}')
+    # print(f'#2 {ts2}')
+    # print(f'#3 {ts3}')
+    # print(ts1.overlap(ts2))
+    # print(ts2.overlap(ts3))
+    # print(ts1.overlap(ts3))
 
-    print(f'#1 {ts1}')
-    print(f'#2 {ts2}')
-    print(f'#3 {ts3}')
-    print(ts1.overlap(ts2))
-    print(ts2.overlap(ts3))
-    print(ts1.overlap(ts3))
-
-    ts3.start = '1 8:00'
-    print(f'#3 {ts3}')
-    print(ts1.overlap(ts3))
+    # ts3.start = '1 8:00'
+    # print(f'#3 {ts3}')
+    # print(ts1.overlap(ts3))

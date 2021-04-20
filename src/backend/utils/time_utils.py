@@ -22,7 +22,7 @@ class TimeOfWeek:
     def time(self, time_str: str = None):
             self._time = datetime.strptime(time_str, '%d %H:%M')
 
-    def __repr__(self):
+    def __str__(self):
         return self.time.strftime('%a %H:%M')
 
     def __lt__(self, other):
@@ -101,27 +101,26 @@ class TimeSlot:
         :return Union(TimeSlot, None): Overlapping time slot if
                 there is an overlap, otherwise return None.
         """
-        TD0 = timedelta(0)
         max_start = max(self.start, other.start)
         min_end = min(self.end, other.end)
         if max_start < min_end:
             return TimeSlot(max_start, min_end)
         return None
 
-    def isFriday(self):
+    def is_friday(self):
         return self.start.time.isoweekday() == 5
-    def isMorning(self):
+
+    def is_morning(self):
         return self.start.time.hour < 10
-    def isNoon(self):
-        return (self.start.time.hour >= 12 and self.start.time.hour < 14) or (self.end.time.hour >= 12 and self.end.time.hour < 14)
-    
 
+    def is_noon(self):
+        return 12 <= self.start.time.hour < 14 \
+               or 12 <= self.end.time.hour < 14
 
-    
-    def __repr__(self):
+    def __str__(self):
         ts = f'[{self.start} -- {self.end}]'
         dur = f'({self.duration})'
-        return ts + '  ' + dur + '\n'
+        return ts + '  ' + dur
 
 
 if __name__ == "__main__":

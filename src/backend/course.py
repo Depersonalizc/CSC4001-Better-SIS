@@ -1,4 +1,4 @@
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Dict
 from utils import *
 
 # Global Constant
@@ -16,7 +16,7 @@ GEB_COURSES = {}
 GEC_COURSES = {}
 GED_COURSES = {}
 SCHOOL = ['SDS', 'SSE', 'SME', 'HSS', 'LHS']
-Major = ['CSE', 'DS', 'STA', 'MKT', 'ACT', 'EIE', 'MAT', 'BIM'] # too many and I don't know the name
+Major = ['CSE', 'DS', 'STA', 'MKT', 'ACT', 'EIE', 'MAT', 'BIM']  # too many and I don't know the name
 
 # 以上学校的分类要求复杂，可以考虑简化
 
@@ -149,15 +149,6 @@ class Session:
     def __str__(self):
         return self.to_str()
 
-    # def __lt__(self, other):
-    #     return self.session_no < other.session_no
-    #
-    # def __gt__(self, other):
-    #     return self.session_no > other.session_no
-    #
-    # def __eq__(self, other):
-    #     return self.session_no == other.session_no
-
 
 class Course:
 
@@ -171,7 +162,8 @@ class Course:
                  dept: str,
                  course_code: int,
                  course_name: str,
-                 credit_units: int = 3):
+                 credit_units: int = 3,
+                 prereqs: Set = None):
         """
         :param dept: letter initialization of the offering department (e.g. 'CSC') (type: str)
         :param course_code: integer course code (type: int)
@@ -182,6 +174,7 @@ class Course:
         self.__tut_sessions: List[Session] = list()
         self.__lecturers: Set[Instructor] = set()
         self.__tutors: Set[Instructor] = set()
+        self.__prereqs: Set[Course] = set() if prereqs is None else prereqs
         self.__dept = dept
         self.__course_code = course_code
         self.__course_name = course_name
@@ -220,6 +213,10 @@ class Course:
         return self.__tutors
 
     @property
+    def prereqs(self):  # -> Set[Course]
+        return self.__prereqs
+
+    @property
     def full_code(self) -> str:
         return f'{self.dept}{self.course_code}'
 
@@ -233,31 +230,6 @@ class Course:
             self.__lecturers = self.lecturers.union(instructors)
         else:
             self.__tutors = self.tutors.union(instructors)
-
-    # def has_conflict(self, session: Session, verbose: bool = False) -> bool:
-    #     """
-    #     Check time conflict with the other session against all existing sessions
-    #
-    #     :param session: Session to check for conflict against existing sessions (type: Session)
-    #     :param session_type: 'lec' or 'tut' (type: str)
-    #     :param verbose: Whether to display the conflicts (type: bool)
-    #     :return (bool): Whether conflicts exist
-    #     """
-    #     has_conflict = False
-    #     existing = {'lec': self.lec_sessions, 'tut': self.tut_sessions}
-    #     for s in existing[session.session_type]:
-    #         shared_instructors = s.instructors.intersection(session.instructors)
-    #         overlaps = s.overlaps_with_session(session)
-    #         # conflict if an instructor is in two concurrent sessions
-    #         if shared_instructors and overlaps:
-    #             has_conflict = True
-    #             if verbose:
-    #                 ins = ', '.join(i.name for i in shared_instructors)
-    #                 print(f'WARNING: Failed to add session because instructor(s)\n'
-    #                       f'{ins}\n'
-    #                       f'has conflicting time slot(s) at:\n')
-    #                 print(s)
-    #     return has_conflict
 
     def _add_session(self, session: Session) -> None:
         # dirty trick for lists only ;)
@@ -301,6 +273,9 @@ class Course:
             self._add_session(new_session)
             self.add_instructors(instructors, session_type)
 
+    def add_prereq(self, prereq_course):
+        self.__prereqs.add(prereq_course)
+
     def sort_sessions(self, lecs: bool = True, tuts: bool = True) -> None:
         """
         Sort sessions according to session numbers.
@@ -322,6 +297,7 @@ class Course:
             if s.session_no == session_no:
                 return idx
         return -1
+
 
     def __str__(self):
         name = f'{self.full_code} {self.course_name}'

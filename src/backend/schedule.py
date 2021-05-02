@@ -1,6 +1,8 @@
 from course import Course, Instructor, Session
 from typing import List
 from utils.printing import iter_to_str
+from student import Student
+
 
 # TODO
 # 1. more custom options
@@ -9,33 +11,6 @@ from utils.printing import iter_to_str
 # GLOCAL_CONST
 MIN_CREDIT = 9                      # Min credit each semester
 MAX_CREDIT = 18                     # Max credit each semester
-
-class Preference:
-    def __init__(self,
-                 course_wishlist: List[Course] = None,
-                 no_morning=False,
-                 no_noon=False,
-                 no_friday=False):
-
-        self.course_wishlist = list()
-        if course_wishlist is not None:
-            self.course_wishlist = course_wishlist
-        self.no_morning = no_morning
-        self.no_noon = no_noon
-        self.no_friday = no_friday
-
-    def __str__(self):
-        wishlist = 'Wish list - ' + '[' + \
-                   ', '.join(c.full_code for c in self.course_wishlist) + ']'
-        no_class = f'No morning classes - {self.no_morning}\n'  \
-                   f'No noon classes - {self.no_noon}\n'        \
-                   f'No Friday classes - {self.no_friday}\n'
-        return wishlist + '\n' + no_class
-
-    def add_to_wishlist(self, courses: List[Course]):
-        self.course_wishlist.extend(
-            c for c in courses if c not in self.course_wishlist
-        )
 
 
 class Package:
@@ -62,24 +37,22 @@ class Package:
 
 class Schedule:
     def __init__(self,
-                 stuid: int,
-                 pref: Preference = None) -> None:
+                 student: Student) -> None:
         """
-        :param stuid (int): student ID
-        :param pref (Preference): Preference for auto-scheduling system
+        :param student (Student): User student
         """
 
-        # Student ID (to be replaced by Student object in the future)
-        self._stuid = stuid
-        # Currently selected packages by the student
+        # User student, contains personal info and preferences
+        self._student = student
+        # Currently selected packages in the schedule
         self._selected_pkgs = list()
         # Buffer area for autosched packages.
-        # Note that packages selected will NOT be in the buffer
+        # Note that packages already selected will NOT be in the buffer
         self._buffer_pkgs = list()
-        # Preference containing: Course wish list + personal setting
-        self._preference = pref if pref is not None else Preference()
-        # Perform an auto-scheduling
-        self.auto_schedule(verbose=True)
+
+    @property
+    def student(self) -> Student:
+        return self._student
 
     @property
     def selected_pkgs(self) -> List[Package]:
@@ -95,17 +68,17 @@ class Schedule:
 
     @property
     def preference(self):
-        return self._preference
+        return self.student.preference
 
     def __str__(self):
         selected = 'Selected:\n' + iter_to_str(self.selected_pkgs, sep='\n\n')
         auto_schedule = 'Auto-scheduled:\n' + iter_to_str(self.buffer_pkgs, sep='\n\n')
-        pref = 'Preference:\n' + self._preference.__str__()
+        pref = 'Preference:\n' + self.student.preference.__str__()
         return '\n'.join([selected, auto_schedule, pref])
 
     def session_violates_preference(self, sess: Session) -> bool:
         """
-        Check if any class of a session violates any of `preference.no_xx`
+        Check if any class of a session violates any of `student.preference.no_xx`
         """
         pref = self.preference
         if pref.no_friday and any(True for c in sess.classes if c.is_friday()):
@@ -285,6 +258,22 @@ class Schedule:
             print(e)
             return False
 
+    def add_course_to_wishlist(self, course: Course):
+        # course_code = course.full_code
+        wishes = self.preference.course_wishlist
+        assert course not in wishes, \
+            f"ERROR: Course {course.full_code} already in wish list!"
+
+        prereq_fails = [p.full_code for p in course.prereqs
+                        if not self.student.has_taken(p.full_code)]
+        if prereq_fails:
+            print(f"ERROR: Cannot add course {course.full_code} to wish list as prerequisites"
+                  f" {prereq_fails} are not satisfied!")
+            return -1
+        self.preference.course_wishlist.append(course)
+        return 0
+
+
     # TODO: Need Test
     def _auto_schedule(self, course_idx: int) -> bool:
         """
@@ -378,13 +367,14 @@ if __name__ == '__main__':
     CSC3170.add_session(1613, {t3, t4}, 'TB202', 'tut', ('2 18:00', '2 18:50'))
     CSC3170.add_session(1614, {t3, t4}, 'TB202', 'tut', ('2 19:00', '2 19:50'))
 
-    FIN4060 = Course('FIN', 4060, 'Supermarket Theory', credit_units=3)
+    FIN4060 = Course('FIN', 4060, 'Supermarket Theory', credit_units=3, prereqs={CSC3170})
     FIN4060.add_session(2000, {jw}, 'TC414', 'lec', ('2 13:30', '2 14:50'), ('4 13:30', '4 14:50'))
     FIN4060.add_session(2001, {jw}, 'TC414', 'lec', ('2 15:30', '2 16:50'), ('4 15:30', '4 16:50'))
     FIN4060.add_session(2020, {t8}, 'CD101', 'tut', ('1 18:00', '1 18:50'))
     FIN4060.add_session(2021, {t9}, 'CD101', 'tut', ('1 19:00', '1 19:50'))
 
-    DDA4250 = Course('DDA', 4250, 'Mathematical Introduction to Deep Learning', credit_units=3)
+    DDA4250 = Course('DDA', 4250, 'Mathematical Introduction to Deep Learning',
+                     credit_units=3, prereqs={CSC4001, CSC3170})
     DDA4250.add_session(1701, {aj}, 'ZOOM', 'lec', ('2 15:30', '2 17:20'), ('5 20:00', '5 21:50'))
     DDA4250.add_session(1711, {t5}, 'ZOOM', 'tut', ('4 19:00', '4 19:50'))
 
@@ -395,13 +385,19 @@ if __name__ == '__main__':
     CSC4008.add_session(1812, {t6, t7}, 'TD101', 'tut', ('2 19:00', '2 19:50'))
     CSC4008.add_session(1813, {t6, t7}, 'TD101', 'tut', ('3 19:00', '3 19:50'))
 
+    print("Student login")
+    stud = Student(stuid=118020158,
+                   name='Test Student',
+                   school='SDS', major='CSE', year=3,
+                   tot_credit=100, studied_courses={'CSC3170'})
     print('Init schedule...')
-    sche = Schedule(118020158)
-    sche.preference.course_wishlist += [FIN4060, CSC4008]
+    sche = Schedule(stud)
+    sche.add_course_to_wishlist(FIN4060)
+    sche.add_course_to_wishlist(DDA4250)
+    sche.add_course_to_wishlist(CSC4008)
+    sche.preference.no_friday = True
 
     # Auto-scheduling
-    sche.preference.no_friday = True
-    sche.preference.no_morning = True
     print('Auto-scheduling...')
     sche.auto_schedule()
     print('Auto-scheduling DONE!')

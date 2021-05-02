@@ -1,6 +1,24 @@
 from typing import List, Set, Tuple
 from utils import *
 
+# Global Constant
+CRE_TO_GRAD = 120                   # Credit number to graduate
+MIN_CREDIT = 9                      # Min credit each semester
+MAX_CREDIT = 18                     # Max credit each semester
+MAJOR_CREDIT = 72                   # Major course credits
+GE_CREDIT = 36                      # GE course credits
+FREE_CREDIT = 12                    # Free course credits
+MAJOR_REQUIRED = {}                 # Major required course: a) query in db, b) store in dictionary, I prefer a)
+MAJOR_ELECTIVE = {}                 # Major elective course
+SCHOOL_PACKAGE = {}                 # School package course: ENG, PED, ITE, GEH, GEN
+GEA_COURSES = {}
+GEB_COURSES = {}
+GEC_COURSES = {}
+GED_COURSES = {}
+SCHOOL = ['SDS', 'SSE', 'SME', 'HSS', 'LHS']
+Major = ['CSE', 'DS', 'STA', 'MKT', 'ACT', 'EIE', 'MAT', 'BIM'] # too many and I don't know the name
+
+# 以上学校的分类要求复杂，可以考虑简化
 
 class Instructor:
     def __init__(self, name: str, dept: str, is_lecturer: bool):

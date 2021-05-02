@@ -6,6 +6,10 @@ from utils.printing import iter_to_str
 # 1. more custom options
 
 
+# GLOCAL_CONST
+MIN_CREDIT = 9                      # Min credit each semester
+MAX_CREDIT = 18                     # Max credit each semester
+
 class Preference:
     def __init__(self,
                  course_wishlist: List[Course] = None,

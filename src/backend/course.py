@@ -20,6 +20,52 @@ Major = ['CSE', 'DS', 'STA', 'MKT', 'ACT', 'EIE', 'MAT', 'BIM']  # too many and 
 
 # 以上学校的分类要求复杂，可以考虑简化
 
+class Comment():
+    def __init__(self, stuid: str, stuName: str, rating: int, comment: str = None, keywords: Set(str) = None):
+        self.__stuid = stuid                # We don't show id publicly
+        self.__stuName = stuName
+        self.__rating = rating
+        self.__comment = comment if comment else 'No comment'
+        self.__keywords = keywords if keywords else None
+
+    @property
+    def stuid(self) -> str:
+        return self.__stuid
+
+    @property
+    def stuName(self) -> str:
+        return self.__stuName[0] + '**'     # privacy
+
+    @property
+    def rating(self) -> int:
+        return self.__rating
+
+    @rating.setter
+    def rating(self,rating: int):
+        self.__rating = int(rating)
+
+    @property
+    def comment(self) -> str:
+        return self.__comment
+
+    @comment.setter
+    def comment(self,comment: str):
+        self.__comment = comment[:200]
+
+    @property
+    def keywords(self) -> Set(str):
+        return self.__keywords
+
+    @keywords.setter
+    def keywords(self,keywords: Set(str)):
+        self.__keywords = keywords
+
+    def search_keyword(self, keyword):
+        return keyword in self.keywords
+
+    def search_word(self, word):
+        return self.comment.find(word) > -1
+
 class Instructor:
     def __init__(self, name: str, dept: str, is_lecturer: bool):
         self._name = name
@@ -163,7 +209,8 @@ class Course:
                  course_code: int,
                  course_name: str,
                  credit_units: int = 3,
-                 prereqs: Set = None):
+                 prereqs: Set = None,
+                 comment: List[Comment] = None):
         """
         :param dept: letter initialization of the offering department (e.g. 'CSC') (type: str)
         :param course_code: integer course code (type: int)
@@ -179,6 +226,7 @@ class Course:
         self.__course_code = course_code
         self.__course_name = course_name
         self.__credit_units = credit_units
+        self.__comment: List[Comment] = comment if comment else []
 
     @property
     def lec_sessions(self) -> List[Session]:
@@ -219,6 +267,10 @@ class Course:
     @property
     def full_code(self) -> str:
         return f'{self.dept}{self.course_code}'
+
+    @property
+    def comment(self) -> List[Comment]:
+        return self.__comment
 
     def add_instructors(self, instructors: Set[Instructor], session_type: str) -> None:
         """
@@ -275,6 +327,23 @@ class Course:
 
     def add_prereq(self, prereq_course):
         self.__prereqs.add(prereq_course)
+
+    def add_comment(self, comment: Comment):
+        self.__comment.append(comment)
+
+    def show_my_comment(self, stuid: str):
+        lst = []
+        for c in self.comment:
+            if c.stuid == stuid:
+                lst.append(c)
+        return lst
+
+    def search_comment_by_keyword(self, keyword):
+        lst = []
+        for c in self.comment:
+            if c.search_keyword:
+                lst.append(c)
+        return lst
 
     def sort_sessions(self, lecs: bool = True, tuts: bool = True) -> None:
         """

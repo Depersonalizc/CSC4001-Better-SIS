@@ -42,7 +42,7 @@ class Student:
     Class of student, contains the basic info of a student
     """
     def __init__(self, 
-                 stuid: int, 
+                 stuid: str, 
                  name: str, 
                  school: str, 
                  major: str, 
@@ -50,11 +50,10 @@ class Student:
                  tot_credit: int,                # Maybe add major_tot_credit, GE_tot_credit ...
                  studied_courses: Set[str],      # Use (full) course code for reducing complexity and memory
                  preference: Preference = None
-                 # schedule: Schedule = None
                  ):
         """
         Class Student:
-        :param stuid int: student id
+        :param stuid str: student id
         :param name str: student name
         :param school str: school name
         :param major str: major abbr
@@ -107,10 +106,6 @@ class Student:
     @property
     def preference(self):
         return self.__preference
-
-    # @property
-    # def schedule(self):
-    #     return self.__schedule
 
     @school.setter
     def school(self, school: str):

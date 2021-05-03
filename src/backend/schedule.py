@@ -469,7 +469,7 @@ if __name__ == '__main__':
     print('Selecting package...')
     incomplete = sche.select_buffer_pkgs()
     if incomplete:
-        print(f"Fails to select sessions in buffer as it contains incomplete packages")
+        print(f"Fails to select sessions in buffer as it contains incomplete packages.")
     else:
         print("Successful!")
     # Now it is complete
@@ -477,7 +477,7 @@ if __name__ == '__main__':
     print('Selecting package...')
     incomplete = sche.select_buffer_pkgs()
     if incomplete:
-        print(f"Fails to select sessions in buffer as it contains incomplete packages")
+        print(f"Fails to select sessions in buffer as it contains incomplete packages.")
     else:
         print("Successful!")
 

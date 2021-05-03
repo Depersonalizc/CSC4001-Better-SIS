@@ -21,7 +21,7 @@ Major = ['CSE', 'DS', 'STA', 'MKT', 'ACT', 'EIE', 'MAT', 'BIM']  # too many and 
 # 以上学校的分类要求复杂，可以考虑简化
 
 class Comment():
-    def __init__(self, stuid: str, stuName: str, rating: int, comment: str = None, keywords: Set(str) = None):
+    def __init__(self, stuid: str, stuName: str, rating: int, comment: str = None, keywords: Set[str] = None):
         self.__stuid = stuid                # We don't show id publicly
         self.__stuName = stuName
         self.__rating = rating
@@ -53,11 +53,11 @@ class Comment():
         self.__comment = comment[:200]
 
     @property
-    def keywords(self) -> Set(str):
+    def keywords(self) -> Set[str]:
         return self.__keywords
 
     @keywords.setter
-    def keywords(self,keywords: Set(str)):
+    def keywords(self,keywords: Set[str]):
         self.__keywords = keywords
 
     def search_keyword(self, keyword):
@@ -65,6 +65,7 @@ class Comment():
 
     def search_word(self, word):
         return self.comment.find(word) > -1
+
 
 class Instructor:
     def __init__(self, name: str, dept: str, is_lecturer: bool):

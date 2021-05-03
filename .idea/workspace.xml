@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="654224b9-ecd6-4125-85df-3a45798e0c99" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/backend/course.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/course.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/backend/schedule.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/schedule.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/backend/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/student.py" afterDir="false" />
@@ -22,17 +20,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/backend/course.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8640">
-              <caret line="321" selection-start-line="321" selection-end-line="321" />
+            <state relative-caret-position="1647">
+              <caret line="68" lean-forward="true" selection-start-line="68" selection-end-line="68" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/backend/schedule.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="205">
-              <caret line="485" lean-forward="true" selection-start-line="485" selection-end-line="485" />
+            <state relative-caret-position="1291">
+              <caret line="471" column="86" selection-start-line="471" selection-start-column="86" selection-end-line="471" selection-end-column="86" />
               <folding>
                 <element signature="e#0#46#0" expanded="true" />
               </folding>
@@ -40,11 +38,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/backend/student.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="864">
-              <caret line="34" selection-start-line="34" selection-end-line="34" />
+            <state relative-caret-position="135">
+              <caret line="62" column="45" selection-start-line="62" selection-start-column="45" selection-end-line="62" selection-end-column="45" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -134,7 +132,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>repr__</find>
       <find>====</find>
       <find>Session(</find>
       <find>overlaps_wi</find>
@@ -164,6 +161,7 @@
       <find>is_comple</find>
       <find>qu</find>
       <find>remove_pkg</find>
+      <find>del</find>
     </findStrings>
     <replaceStrings>
       <replace>, {</replace>
@@ -195,8 +193,8 @@
         <option value="$PROJECT_DIR$/src/backend/utils/printing.py" />
         <option value="$PROJECT_DIR$/src/backend/utils/time_utils.py" />
         <option value="$PROJECT_DIR$/src/backend/course.py" />
-        <option value="$PROJECT_DIR$/src/backend/student.py" />
         <option value="$PROJECT_DIR$/src/backend/schedule.py" />
+        <option value="$PROJECT_DIR$/src/backend/student.py" />
       </list>
     </option>
   </component>
@@ -373,15 +371,15 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.7625272" visible="true" weight="0.27114093" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.76337117" weight="0.27114093" />
       <window_info id="Structure" order="1" sideWeight="0.23688969" side_tool="true" weight="0.27114093" />
-      <window_info id="Favorites" order="2" sideWeight="0.23747277" side_tool="true" visible="true" weight="0.27114093" />
+      <window_info id="Favorites" order="2" sideWeight="0.2358643" side_tool="true" weight="0.27114093" />
       <window_info id="Project Explorer" order="3" />
       <window_info id="DB Browser" order="4" />
       <window_info id="Job Explorer" order="5" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.325" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.22647059" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -397,6 +395,31 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="JuliaSciView" order="3" />
     </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.76337117" visible="true" weight="0.27114093" />
+      <window_info id="Structure" order="1" sideWeight="0.23688969" side_tool="true" weight="0.27114093" />
+      <window_info id="Favorites" order="2" sideWeight="0.2358643" side_tool="true" visible="true" weight="0.27114093" />
+      <window_info id="Project Explorer" order="3" />
+      <window_info id="DB Browser" order="4" />
+      <window_info id="Job Explorer" order="5" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.09264706" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32941177" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32941177" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.23382352" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Python Console" order="10" weight="0.32941177" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.32941177" />
+      <window_info anchor="bottom" id="DB Execution Console" order="12" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="JuliaSciView" order="3" />
+    </layout-to-restore>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="true" />
@@ -417,23 +440,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="189">
           <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/backend/course.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8640">
-          <caret line="321" selection-start-line="321" selection-end-line="321" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/backend/student.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="864">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -494,12 +500,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/backend/course.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1647">
+          <caret line="68" lean-forward="true" selection-start-line="68" selection-end-line="68" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/backend/schedule.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="205">
-          <caret line="485" lean-forward="true" selection-start-line="485" selection-end-line="485" />
+        <state relative-caret-position="1291">
+          <caret line="471" column="86" selection-start-line="471" selection-start-column="86" selection-end-line="471" selection-end-column="86" />
           <folding>
             <element signature="e#0#46#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/backend/student.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="62" column="45" selection-start-line="62" selection-start-column="45" selection-end-line="62" selection-end-column="45" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>

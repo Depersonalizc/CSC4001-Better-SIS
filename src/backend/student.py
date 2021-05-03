@@ -59,8 +59,8 @@ class Student:
         :param major str: major abbr
         :param year int: year of study
         :param tot_credit int: current total credit units
-        :param studied_courses List[str]: list of studied courses, use course code
-        :param preference: Preference config
+        :param studied_courses List[str]: list of studied courses, full course code
+        :param preference: Preference configs
         # :param schedule Schedule: schedule of the student this semester
         """
         self.__stuid = stuid

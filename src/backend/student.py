@@ -10,9 +10,11 @@ class Preference:
                  no_noon=False,
                  no_friday=False):
 
+        # Wish List
         self.course_wishlist = list()
         if course_wishlist is not None:
             self.course_wishlist = course_wishlist
+        # Constraints
         self.no_morning = no_morning
         self.no_noon = no_noon
         self.no_friday = no_friday
@@ -20,20 +22,19 @@ class Preference:
     def __str__(self):
         wishlist = 'Wish list - ' + '[' + \
                    ', '.join(c.full_code for c in self.course_wishlist) + ']'
-        no_class = f'No morning classes - {self.no_morning}\n'  \
-                   f'No noon classes - {self.no_noon}\n'        \
-                   f'No Friday classes - {self.no_friday}\n'
-        return wishlist + '\n' + no_class
+        constraints = f'No morning classes - {self.no_morning}\n'  \
+                      f'No noon classes - {self.no_noon}\n'        \
+                      f'No Friday classes - {self.no_friday}\n'
+        return wishlist + '\n' + constraints
 
-    # def add_to_wishlist(self, courses: List[Course]):
-    #     """
-    #     Check-free method for adding courses to wish list. NOTE: Most of the time
-    #     this function should not be called directly as it does not check student's
-    #     prerequisites status. Instead, use Schedule.add_course_to_wishlist()
-    #     """
-    #     self.course_wishlist.extend(
-    #         c for c in courses if c not in self.course_wishlist
-    #     )
+    def empty_wish_list(self):
+        self.course_wishlist = list()
+
+    def all_constraints(self):
+        self.no_morning = self.no_noon = self.no_friday = True
+
+    def no_constraints(self):
+        self.no_morning = self.no_noon = self.no_friday = False
 
 
 class Student:

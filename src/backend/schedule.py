@@ -1,5 +1,5 @@
 from course import Course, Instructor, Session
-from typing import List
+from typing import List, Union
 from utils.printing import iter_to_str
 from student import Student
 
@@ -8,30 +8,54 @@ from student import Student
 # 1. more custom options
 
 
-# GLOCAL_CONST
+# GLOBAL CONST
 MIN_CREDIT = 9                      # Min credit each semester
 MAX_CREDIT = 18                     # Max credit each semester
 
 
+def sessions_compatible(lec_sess: Union[Session, None],
+                        tut_sess: Union[Session, None]):
+    """
+    Check whether two sessions can form a package
+    """
+    if lec_sess is None and tut_sess is None:
+        return True
+    if lec_sess is None:
+        return tut_sess.session_type == 'tut'
+    elif tut_sess is None:
+        return lec_sess.session_type == 'lec'
+    else:
+        return lec_sess.session_type == 'lec' and \
+               tut_sess.session_type == 'tut' and \
+               lec_sess.course.eq_course(tut_sess.course)
+
+
 class Package:
-    def __init__(self, lec_session: Session, tut_session: Session):
-        assert lec_session.session_type == 'lec' and \
-               tut_session.session_type == 'tut' and \
-               lec_session.course == tut_session.course, \
-               'ERROR: Invalid package!'
+    def __init__(self,
+                 lec_session: Session = None,
+                 tut_session: Session = None):
+        assert sessions_compatible(lec_session, tut_session), \
+            'ERROR: Sessions cannot form a package!'
         self.lec_sess = lec_session
         self.tut_sess = tut_session
 
     @property
     def course(self):
-        return self.lec_sess.course
+        if self.lec_sess is None and self.tut_sess is None:
+            return None
+        return self.lec_sess.course if self.lec_sess is not None \
+            else self.tut_sess.course
 
-    # def is_valid(self):
-    #     return self.lec_session.course == self.tut_session.course
+    def is_complete(self):
+        return self.lec_sess is not None and \
+               self.tut_sess is not None
+
     def __str__(self):
         sep = '------------------------------------'
-        lec = self.lec_sess.to_str()
-        tut = self.tut_sess.to_str(no_head=True)
+        lec = self.lec_sess.to_str() \
+            if self.lec_sess is not None else 'Lec: [None]'
+        tut = self.tut_sess.to_str(no_head=True) \
+            if self.tut_sess is not None else 'Tut: [None]'
         return '\n'.join([sep, lec, tut, sep])
 
 
@@ -44,8 +68,9 @@ class Schedule:
 
         # User student, contains personal info and preferences
         self._student = student
-        # Currently selected packages in the schedule
+        # Currently selected packages and their credit sum
         self._selected_pkgs = list()
+        self._selected_credits = 0
         # Buffer area for autosched packages.
         # Note that packages already selected will NOT be in the buffer
         self._buffer_pkgs = list()
@@ -57,6 +82,14 @@ class Schedule:
     @property
     def selected_pkgs(self) -> List[Package]:
         return self._selected_pkgs
+
+    @property
+    def selected_credits(self) -> int:
+        return self._selected_credits
+
+    @selected_credits.setter
+    def selected_credits(self, c):
+        self._selected_credits = c
 
     # @selected_pkgs.setter
     # def selected_pkgs(self, pkgs):
@@ -71,14 +104,38 @@ class Schedule:
         return self.student.preference
 
     def __str__(self):
-        selected = 'Selected:\n' + iter_to_str(self.selected_pkgs, sep='\n\n')
-        auto_schedule = 'Auto-scheduled:\n' + iter_to_str(self.buffer_pkgs, sep='\n\n')
-        pref = 'Preference:\n' + self.student.preference.__str__()
-        return '\n'.join([selected, auto_schedule, pref])
+        selected = f'SELECTED ({len(self.selected_pkgs)} packages, ' \
+                   f'{self.selected_credits} units):\n' + \
+                   iter_to_str(self.selected_pkgs, sep='\n\n')
+        buffer = 'BUFFER:\n' + iter_to_str(self.buffer_pkgs, sep='\n\n')
+        pref = 'PREFERENCE:\n' + self.student.preference.__str__()
+        return '\n'.join([selected, buffer, pref])
 
-    def session_violates_preference(self, sess: Session) -> bool:
+    def empty_buffer(self):
+        self._buffer_pkgs = list()
+
+    def init_buffer(self):
         """
-        Check if any class of a session violates any of `student.preference.no_xx`
+        Initialize package selection by filling the buffer with an empty package.
+        Should be called each time a course page is opened
+        """
+        self._buffer_pkgs = [Package()]
+
+    def empty_selected(self):
+        self._selected_pkgs = list()
+
+    def empty_wish_list(self):
+        self.preference.empty_wish_list()
+
+    def all_constraints(self):
+        self.preference.all_constraints()
+
+    def no_constraints(self):
+        self.preference.no_constraints()
+
+    def session_violates_constraints(self, sess: Session) -> bool:
+        """
+        Check if any class of a session violates any of constraints
         """
         pref = self.preference
         if pref.no_friday and any(True for c in sess.classes if c.is_friday()):
@@ -101,15 +158,16 @@ class Schedule:
         for pkgs in (self.selected_pkgs,
                      self.buffer_pkgs if check_buffer else []):
             for pkg in pkgs:
-                lec, tut = pkg.lec_sess, pkg.tut_sess
-                if sess.overlaps_with_session(lec) or sess.overlaps_with_session(tut):
-                    return True
+                for ss in pkg.lec_sess, pkg.tut_sess:
+                    if ss is not None and sess.overlaps_with_session(ss):
+                        return True
         return False
 
     def find_selected_pkg(self, full_code: str) -> int:
         """
         Return index of selected package by comparing full code of course.
         Return -1 if not found.
+        Use selected_pkgs[i] to access the package
 
         :param full_code: (str) Full code of course, e.g., 'CSC4001'
         :return: Package index if found, -1 otherwise
@@ -117,85 +175,8 @@ class Schedule:
         for i, pkg in enumerate(self.selected_pkgs):
             if pkg.course.full_code == full_code:
                 return i
-        print(f'Package of course {full_code} cannot be found!')
+        print(f'Package of the course {full_code} cannot be found!')
         return -1
-
-    """
-    TODO:
-        Conflict checking in this method should be ensured by proper interface design 
-        using `session_time_conflicts`. Separate the logic out?
-        That is, users should not be able to form a package consisting of a session for
-        which `session_time_conflicts` returning True.)
-    """
-    # def select_pkg(self, course_package: List):
-    #     course = course_package[0]
-    #     lec_sess = course_package[1]
-    #     tut_sess = None
-    #     if len(course_package) > 2:
-    #         tut_sess = course_package[2]
-    #
-    #     if course.get_full_code() in [c[0].get_full_code() for c in self.course_package]:
-    #         print('[ERROR] You have choose a package of the course:',
-    #               course.get_full_code(), course.course_name, sep=' ')
-    #         return
-    #
-    #     flag = False
-    #     assert lec_sess,\
-    #         "[ERROR] You have to choose a lecture session!"
-    #     for l in course.lec_sessions:
-    #         if l.session_no == lec_sess.session_no:
-    #             flag = True
-    #             break
-    #     assert flag, "[ERROR] Wrong lecture session for this course!"
-    #     flag = False
-    #     if course.tut_sessions:
-    #         assert tut_sess,\
-    #             "[ERROR] You have to choose a tutorial session!"
-    #         for t in course.tut_sessions:
-    #             if t.session_no == tut_sess.session_no:
-    #                 flag = True
-    #                 break
-    #         assert flag, "[ERROR] Wrong tut session for this course!"
-    #
-    #     check1 = self.has_conflicts(lec_sess)
-    #     check2 = None
-    #     if tut_sess:
-    #         check2 = self.has_conflicts(tut_sess)
-    #     if not check1 and not check2:
-    #         self.__course_packages.append(course_package)
-    #         self.__courseList.append(course)
-    #         self.list_schedule()
-    #         print()
-    #     else:
-    #         print('[ERROR] Conflicts found!')
-    #         print(check1) if check1 else None
-    #         print(check2) if check2 else None
-    #         print('Add course has been rollbacked!\n  Pls check the conflict time!')
-    #         print()
-
-    def course_seleceted(self, course: Course) -> bool:
-        """
-        Return a boolean indicating whether a course (package) has been selected.
-        """
-        return any(True for selected in self.selected_pkgs
-                   if selected.course == course)
-
-    def select_pkg(self, pkg: Package):
-        """
-        Add a package to `selected_pkgs`, assuming package provided is conflict-free.
-        (This should be ensured by proper interface design using `session_time_conflicts`.
-        That is, users should not be able to form a package consisting of a session for
-        which `session_time_conflicts` returning True.)
-        TODO: Model related logic to ease work of frontend?
-        :param pkg: (Package) Package to add to selection
-        :return: (bool) Success status.
-        """
-        # if any(True for selected in self.selected_pkgs
-        #        if selected.course == pkg.course):
-        #     print('Course already selected!')
-        #     return False
-        self.selected_pkgs.append(pkg)
-        # return True
 
     def remove_pkg(self, pkg_idx: int) -> bool:
         """
@@ -204,15 +185,42 @@ class Schedule:
         :param pkg_idx: (int) Package index
         :return: (bool) Success status
         """
+        credits = self.selected_pkgs[pkg_idx].course.credit_units
         try:
             del self.selected_pkgs[pkg_idx]
+            self.selected_credits -= credits
         except Exception as e:
             print(e)
             return False
         return True
 
+    def course_selected(self, course: Course) -> bool:
+        """
+        Return a boolean indicating whether a course (package) has been selected.
+        """
+        return any(True for selected in self.selected_pkgs
+                   if course.eq_course(selected.course))
+
+    def choose_session(self,
+                       course: Course,
+                       lec_idx: int = None,
+                       tut_idx: int = None):
+        """
+        Choose lec or tut session for the (only) course package in buffer
+        Lec index and tut index assumed valid; corresponding sessions conflict-free.
+        :param course: Course of the package
+        :param lec_idx: Lecture index
+        :param tut_idx: Tutorial index
+        """
+        pkg = self.buffer_pkgs[0]  # Could be incomplete
+        if lec_idx is not None:
+            pkg.lec_sess = course.lec_sessions[lec_idx]
+        if tut_idx is not None:
+            pkg.tut_sess = course.tut_sessions[tut_idx]
+
     # TODO: Need Test
-    def swap_session(self, pkg_idx: int,
+    def swap_session(self,
+                     pkg_idx: int,
                      lec_idx: int = None,
                      tut_idx: int = None) -> bool:
         """
@@ -259,20 +267,20 @@ class Schedule:
             return False
 
     def add_course_to_wishlist(self, course: Course):
-        # course_code = course.full_code
+        """
+        Add course to wish list.
+        If adding succeeds, return an empty list
+        Else, return a list of all failing prerequisites
+        """
         wishes = self.preference.course_wishlist
         assert course not in wishes, \
             f"ERROR: Course {course.full_code} already in wish list!"
 
         prereq_fails = [p.full_code for p in course.prereqs
                         if not self.student.has_taken(p.full_code)]
-        if prereq_fails:
-            print(f"ERROR: Cannot add course {course.full_code} to wish list as prerequisites"
-                  f" {prereq_fails} are not satisfied!")
-            return -1
-        self.preference.course_wishlist.append(course)
-        return 0
-
+        if not prereq_fails:
+            self.preference.course_wishlist.append(course)
+        return prereq_fails
 
     # TODO: Need Test
     def _auto_schedule(self, course_idx: int) -> bool:
@@ -293,13 +301,13 @@ class Schedule:
         course = wishlist[course_idx]
         # Skip if wished course already in selected package.
         if any(True for pkg in self.selected_pkgs
-               if course == pkg.course):
+               if course.eq_course(pkg.course)):
             return self._auto_schedule(course_idx+1)
 
         # Search valid packages of wished course.
         def no_conflicts(ss):
             return not (self.session_time_conflicts(ss, True) or
-                        self.session_violates_preference(ss))
+                        self.session_violates_constraints(ss))
         for lec in filter(no_conflicts, course.lec_sessions):
             for tut in filter(no_conflicts, course.tut_sessions):
                 # Found valid package, append to auto-schedule.
@@ -317,7 +325,7 @@ class Schedule:
         Wrapper function of the auto-scheduling routine
         """
         # Empty auto-scheduled packages
-        self._buffer_pkgs = list()
+        self.empty_buffer()
         ret = self._auto_schedule(course_idx=0)
         if verbose:
             if ret:
@@ -329,8 +337,17 @@ class Schedule:
         return ret
 
     def select_buffer_pkgs(self):
-        self._selected_pkgs += self.buffer_pkgs
-        self._buffer_pkgs = list()
+        """
+        Add all packages from buffer to selected area.
+        If adding succeeds, the buffer is emptied and an empty list is returned.
+        If adding fails, a list of all incomplete packages is returned,
+        """
+        incomplete = [p for p in self.buffer_pkgs if not p.is_complete()]
+        if not incomplete:
+            self._selected_pkgs += self.buffer_pkgs
+            self.selected_credits += sum(p.course.credit_units for p in self.buffer_pkgs)
+            self.empty_buffer()
+        return incomplete
 
 
 if __name__ == '__main__':
@@ -343,15 +360,15 @@ if __name__ == '__main__':
     cw = Instructor('Chenye Wu',      'CSC', is_lecturer=True)
     jw = Instructor('Jian WANG',      'SME', is_lecturer=True)
 
-    t1 = Instructor('Songyang Ge',  'CSC', is_lecturer=False)
-    t2 = Instructor('Yushun Zhang', 'SDS', is_lecturer=False)
-    t3 = Instructor('Haijin WANG',  'CSC', is_lecturer=False)
-    t4 = Instructor('Shiping ZHU',  'CSC', is_lecturer=False)
-    t5 = Instructor('Haoxuan Che',  'CSC', is_lecturer=False)
-    t6 = Instructor('Kai Li',       'SDS', is_lecturer=False)
-    t7 = Instructor('Chi Li',       'SDS', is_lecturer=False)
-    t8 = Instructor('Junyi GE',     'SME', is_lecturer=False)
-    t9 = Instructor('Ang CHEN',     'SDS', is_lecturer=False)
+    t1 = Instructor('Songyang Ge',    'CSC', is_lecturer=False)
+    t2 = Instructor('Yushun Zhang',   'SDS', is_lecturer=False)
+    t3 = Instructor('Haijin WANG',    'CSC', is_lecturer=False)
+    t4 = Instructor('Shiping ZHU',    'CSC', is_lecturer=False)
+    t5 = Instructor('Haoxuan Che',    'CSC', is_lecturer=False)
+    t6 = Instructor('Kai Li',         'SDS', is_lecturer=False)
+    t7 = Instructor('Chi Li',         'SDS', is_lecturer=False)
+    t8 = Instructor('Junyi GE',       'SME', is_lecturer=False)
+    t9 = Instructor('Ang CHEN',       'SDS', is_lecturer=False)
 
     CSC4001 = Course('CSC', 4001, 'Software Engineering', credit_units=3)
     CSC4001.add_session(1501, {jy}, 'TA101', 'lec', ('1 08:30', '1 09:50'), ('3 08:30', '3 09:50'))
@@ -385,70 +402,84 @@ if __name__ == '__main__':
     CSC4008.add_session(1812, {t6, t7}, 'TD101', 'tut', ('2 19:00', '2 19:50'))
     CSC4008.add_session(1813, {t6, t7}, 'TD101', 'tut', ('3 19:00', '3 19:50'))
 
+    # Student logs in and set preference
     print("Student login")
     stud = Student(stuid=118020158,
                    name='Test Student',
-                   school='SDS', major='CSE', year=3,
-                   tot_credit=100, studied_courses={'CSC3170'})
+                   school='SDS',
+                   major='CSE',
+                   year=3,
+                   tot_credit=100,
+                   studied_courses={'CSC3170'})
+
     print('Init schedule...')
     sche = Schedule(stud)
-    sche.add_course_to_wishlist(FIN4060)
-    sche.add_course_to_wishlist(DDA4250)
-    sche.add_course_to_wishlist(CSC4008)
+    # Student wishes to add the following courses:
+    for course in FIN4060, DDA4250, CSC4008:
+        fails = sche.add_course_to_wishlist(course)
+        if fails:
+            print(f"Failed to wish-list {course.full_code}. Prerequisites {fails} not met.")
+        else:
+            print(f"Wish-listed course {course.full_code}.")
     sche.preference.no_friday = True
 
     # Auto-scheduling
     print('Auto-scheduling...')
-    sche.auto_schedule()
-    print('Auto-scheduling DONE!')
+    ret = sche.auto_schedule()
+    print(f"Auto-scheduling {'DONE' if ret else 'FAILED'}!")
     print(sche)
-    sche.select_buffer_pkgs()
     print('Selecting auto-scheduled sessions...')
+    incomplete = sche.select_buffer_pkgs()
+    if incomplete:
+        print(f"Fails to select sessions in buffer. "
+              f"Packages {incomplete} are incomplete!")
+    else:
+        print("Successful!")
     print(sche)
 
     # Session swap
     # print(FIN4060)
-    # Suppose student wants to swap to another tut session but not lec
-    fin_pkg = sche.find_selected_pkg('FIN4060')
+    # Suppose the student wants to swap to another tut session, but not lec
+    pkg_toswap = 'FIN4060'
+    pkg_idx = sche.find_selected_pkg(pkg_toswap)
     lec_idx = FIN4060.find_session('lec', 2000)
     tut_idx = FIN4060.find_session('tut', 2021)
-    if fin_pkg == -1:
-        print("Can't find package named FIN4060")
+    if pkg_idx == -1:
+        print(f"Can't find package named {pkg_toswap}")
     elif tut_idx == -1:
         print("Can't find tut session numbered 2021")
     else:
         print('Swapping tutorial...')
-        if sche.swap_session(fin_pkg, tut_idx=tut_idx):
+        if sche.swap_session(pkg_idx, tut_idx=tut_idx):
             print('Successful!')
         else:
             print('Failed!')
         print(sche)
 
     # Remove package
+    pkg_to_remove = sche.find_selected_pkg(pkg_toswap)
     print('Removing FIN4060 package...')
-    if sche.remove_pkg(fin_pkg):
-        print('Successful!')
+    print('Successful!' if sche.remove_pkg(pkg_to_remove) else 'Failed!')
+    print(sche)
+
+    # Manual add (say FIN4060)
+    sche.init_buffer()
+    sche.choose_session(FIN4060, lec_idx=lec_idx)
+    # Cannot select package cuz it is incomplete
+    print('Selecting package...')
+    incomplete = sche.select_buffer_pkgs()
+    if incomplete:
+        print(f"Fails to select sessions in buffer as it contains incomplete packages")
     else:
-        print('Failed!')
+        print("Successful!")
+    # Now it is complete
+    sche.choose_session(FIN4060, tut_idx=tut_idx)
+    print('Selecting package...')
+    incomplete = sche.select_buffer_pkgs()
+    if incomplete:
+        print(f"Fails to select sessions in buffer as it contains incomplete packages")
+    else:
+        print("Successful!")
+
     print(sche)
-
-    # Add package
-    # TODO: First add package to buffer. Only add to selected_pkgs when user has confirmed!
-    fin_pkg = Package(FIN4060.lec_sessions[lec_idx],
-                      FIN4060.tut_sessions[tut_idx])
-    print('Adding package...')
-    sche.select_pkg(fin_pkg)
-    print('Done!')
-    print(sche)
-
-
-
-    # sche = Schedule(118010154,[[CSC4001, cSC4001.session(1501), cSC4001.session(1511)],
-    # [CSC3170, cSC3170.session(1601), cSC3170.session(1614)]])
-    # print('\n\n')
-    # sche.add_course_package([DDA4250,DDA4250.session(1701),DDA4250.session(1711)])
-
-    # sche.add_course_package([CSC4008, cSC4008.session(1802), cSC4008.session(1811)]) # conflict
-    # sche.add_course_package([CSC4008, cSC4008.session(1801), cSC4008.session(1811)])
-    # sche.add_course_package([CSC4008, cSC4008.session(1802), cSC4008.session(1811)])
 

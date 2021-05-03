@@ -289,6 +289,9 @@ class Course:
             self.tut_sessions.sort(key=lambda sess: sess.session_no)
 
     def find_session(self, session_type: str, session_no: int) -> int:
+        """
+        Find session index given session type and number
+        """
         assert session_type in ('lec', 'tut'),\
             'Session can only be "lec" or "tut"!'
         ss = {'lec': self.lec_sessions,
@@ -297,7 +300,6 @@ class Course:
             if s.session_no == session_no:
                 return idx
         return -1
-
 
     def __str__(self):
         name = f'{self.full_code} {self.course_name}'
@@ -317,6 +319,10 @@ class Course:
         return '\n'.join(
             (sep, name, sep, s_lecturers, s_tutors, cred, lecs, tuts)
         )
+
+    def eq_course(self, other):
+        assert isinstance(other, Course), 'Other should be a Course object'
+        return self.full_code == other.full_code
 
 
 if __name__ == '__main__':

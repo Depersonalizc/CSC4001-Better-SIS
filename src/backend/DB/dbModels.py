@@ -109,7 +109,8 @@ class Student(db.Model):
 
 class Instructor(db.Model):
     __tablename__ = 'Instructor'
-    id = db.Column(db.Integer, primary_key=True)
+    idCount = 1
+    id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     school = db.Column(db.String(10))
     isLecturer = db.Column(db.Boolean)
@@ -117,16 +118,18 @@ class Instructor(db.Model):
     profile = db.Column(db.Text)
     # img
 
-    # def __init__(self,
-    #              name,
-    #              school = None,
-    #              isLecturer = None,
-    #              website = None):
-    #     super().__init__()
-    #     self.name = name
-    #     self.school = school
-    #     self.isLecturer = isLecturer
-    #     self.website = website
+    def __init__(self,
+                 name,
+                 school = None,
+                 isLecturer = None,
+                 website = None):
+        super().__init__()
+        self.id = self.idCount
+        self.idCount += 1
+        self.name = name
+        self.school = school
+        self.isLecturer = isLecturer
+        self.website = website
 
     def __repr__(self):
         return f'<Database Table {self.__tablename__}>'
@@ -134,6 +137,7 @@ class Instructor(db.Model):
 
 class Session(db.Model):
     __tablename__ = 'Session'
+    snoCount = 1
     # sno = db.Column(db.String(10), primary_key=True) #, autoincrement = True
     sno = db.Column(db.Integer, primary_key=True)
     course = db.Column(db.String(10), nullable=False)
@@ -145,22 +149,24 @@ class Session(db.Model):
     class1 = db.Column(db.String(20))
     class2 = db.Column(db.String(20))
 
-    # def __init__(self, 
-    #             # session_no:str,
-    #             course_code:str, 
-    #             type:str,
-    #             instr:str = None,
-    #             venue:str = None,
-    #             class1:str = None, 
-    #             class2:str = None):
-    #     super().__init__()
-    #     # self.sno = session_no
-    #     self.course = course_code
-    #     self.type = type
-    #     self.instr = instr
-    #     self.venue = venue
-    #     self.class1 = class1
-    #     self.class2 = class2
+    def __init__(self, 
+                # session_no:str,
+                course_code:str, 
+                type:str,
+                instr:str = None,
+                venue:str = None,
+                class1:str = None, 
+                class2:str = None):
+        super().__init__()
+        self.id = self.snoCount
+        self.snoCount += 1
+        # self.sno = session_no
+        self.course = course_code
+        self.type = type
+        self.instr = instr
+        self.venue = venue
+        self.class1 = class1
+        self.class2 = class2
 
 
 

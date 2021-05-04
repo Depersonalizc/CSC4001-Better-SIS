@@ -11,8 +11,12 @@ export default function Header(props) {
 			<div>
 				<p>A Better SIS</p>
 				<p>更方便使用，更人性化的在线选课平台</p>
-				<Button type="primary" shape="round" className="home-page-header-button">
-					开始使用
+				<Button 
+					type="primary" 
+					shape="round" 
+					className="home-page-header-button"
+				>
+					<a href="/registration">开始使用</a>
 				</Button>
 				<Button type="default" shape="round" className="home-page-header-button">
 					项目介绍

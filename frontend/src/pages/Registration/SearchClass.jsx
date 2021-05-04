@@ -9,15 +9,16 @@ import WeeklySchedule from '../GeneralComponents/WeeklySchedule';
 
 
 /* 引入数据 */
-import { RegistrationTermData } from '../data.d';
-import { 
-  SearchCoursePrefixData, 
-  SearchCourseSchoolData,
-  SearchCourseTargetStudentData } from '../data.d';
+// import { RegistrationTermData } from '../data.d';
+// import { 
+//   SearchCoursePrefixData, 
+//   SearchCourseSchoolData,
+//   SearchCourseTargetStudentData } from '../data.d';
+import { SearchData } from '../data.d';
 import { 
   CourseTimeSlotList, 
   ComingTimeSlotList,
-  CourseMarkingCriteriaData
+  // CourseMarkingCriteriaData
 } from '../data.d';
 
 /* 引入图片 */
@@ -57,7 +58,7 @@ export default function SearchClass(props) {
           ]}
         />
         <div className="registration-progress" style={{width: "70%",}}>
-          <p className="block-title">选课流程须知</p>
+          <p className="sub-title">选课流程须知</p>
           <Steps current={1}>
             <Step title="选择学期" description="This is a description." />
             <Step title="选择课程" description="This is a description." />
@@ -69,16 +70,16 @@ export default function SearchClass(props) {
         <div className="course-registration-search-class">
           <div>
             <div className="course-registration-select-class">
-              <p className="block-title">{"当前步骤：选择课程 > 查询课程"}</p>
-              <MySelector content={SearchCoursePrefixData} />
+              <p className="sub-title" style={{marginBottom: "8rem",}}>{"当前步骤：选择课程 > 查询课程"}</p>
+              <MySelector content={SearchData.coursePrefix} />
               <div className="course-registration-selector">
-                <span>
+                <span className="small-title">
                   课程编号
                 </span>
-                <Input placeholder="课程编号"/>
+                <Input className="course-registration-selector-body" placeholder="课程编号"/>
               </div>
-              <MySelector content={SearchCourseSchoolData} />
-              <MySelector content={SearchCourseTargetStudentData} />
+              <MySelector content={SearchData.courseSchool} />
+              <MySelector content={SearchData.courseTargetStudent} />
               <div className="next-step-button-div">
                 <Button 
                   type="primary"
@@ -111,7 +112,7 @@ export default function SearchClass(props) {
 function MySelector(props) {
   return (
     <div className="course-registration-selector">
-      <span>
+      <span className="small-title">
         {props.content.title}
       </span>
       <Select

@@ -8,7 +8,7 @@ import {
 } from 'antd';
 
 import { 
-  CoursePageInfoData,
+  // CoursePageInfoData,
   CourseTutorialListData,
 } from '../data.d';
 
@@ -101,6 +101,19 @@ export default (props) => {
       }
 		},
 	];
+
+  const CourseInfoTableColumns = [
+    {
+      title: "Time",
+      dataIndex: "time",
+    }, {
+      title: "Room",
+      dataIndex: "room",
+    }, {
+      title: "Instructor",
+      dataIndex: "instructor",
+    },
+  ];
 
   const TutorialTimeSlot = [
     {
@@ -223,8 +236,9 @@ export default (props) => {
       <div>
         <Table 
           className="course-description-info-table"
-          columns={CoursePageInfoData.columns}
+          // columns={CoursePageInfoData.columns}
           // dataSource={CoursePageInfoData.dataSource}
+          columns={CourseInfoTableColumns}
           dataSource={[{
             time: "Class Time Slot",
             room: props.data.location,

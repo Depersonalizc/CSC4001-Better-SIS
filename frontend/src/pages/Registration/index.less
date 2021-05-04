@@ -3,66 +3,17 @@
   position: relative;
 
   &-body {
-    position: absolute;
-    top: 20rem;
-    left: 35rem;
-    width: 130rem;
-    height: 80rem;
-    border: 2px solid cyan;
-  }
-}
-
-.navigator {
-  position: fixed;
-  top: 0rem;
-  width: 100%;
-  height: 12rem;
-  background-color: rgba(255, 255, 255, 0.8);
-  z-index: 1000;
-  border: 1px solid orange;
-
-  &-logo {
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 8rem;
-    height: 7rem;
-    user-select: none;
-    -webkit-user-select: none;
-  }
-  .navigator-time {
-    display: inline-block;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 70rem;
-    font-size: 3rem;
-    > span {
-      margin-right: 1rem;
-    }
-    > span:nth-child(2) {
-      margin-right: 2rem;
-    }
-  }
-  .navigator-content {
-    display: inline-block;
-    position: absolute;
-    right: 30rem;
-    top: 50%;
-    width: 70rem;
-    transform: translateY(-50%);
-    // background-color: rgba(255, 255, 255, 0);
-    background: none;
-    width: auto;
-  }
-  .navigator-user-info {
-    display: inline-block;
-    position: absolute;
-    right: 4rem;
-    width: auto;
-    top: 50%;
-    transform: translateY(-50%);
+    // position: absolute;
+    // top: 20rem;
+    // left: 35rem;
+    margin-top: 20rem;
+    margin-left: 15rem;
+    margin-right: 15rem;
+    padding-bottom: 20rem;
+    // width: 130rem;
+    // height: 80rem;
+    height: auto;
+    // border: 2px solid cyan;
   }
 }
 
@@ -74,5 +25,60 @@
 }
 
 .registration-progress {
+  margin-bottom: 5rem;
+}
+
+.course-registration-search-class {
+  margin-top: 8rem;
+  display: grid;
+  grid-template-columns: 45% auto;
+  column-gap: 12rem;
+
+  // > div {
+  //   border: 1px solid orange;
+  // }
+}
+
+.next-step-button-div {
+  text-align: right;
+  margin-top: 5rem;
+  padding-right: 28.5rem;
+
+  .next-step-button {
+    width: 20rem;
+  }
+}
+
+.course-registration-selector {
+  // border: 1px solid red;
+  margin-left: 10rem;
+  margin-bottom: 4rem;
+  // width: 55rem;
+  width: auto;
+
+  > span:nth-child(1) {
+    display: inline-block;
+    width: 18rem;
+  }
+
+  .course-registration-selector-body {
+    width: 36rem;
+  }
+}
+
+
+.select-term-table {
+  width: 100%;
+  height: auto;
+}
+.select-term-button {
+  margin-top: 6rem;
+  text-align: right;
+  padding-right: 5rem;
+}
+
+
+.course-info-card {
+  // border: 1px solid red;
   margin-bottom: 5rem;
 }

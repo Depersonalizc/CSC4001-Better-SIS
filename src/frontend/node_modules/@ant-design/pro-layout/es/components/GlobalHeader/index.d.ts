@@ -1,0 +1,25 @@
+import './index.less';
+import React from 'react';
+import type { HeaderViewProps } from '../../Header';
+import type { SiderMenuProps, PrivateSiderMenuProps } from '../SiderMenu/SiderMenu';
+import type { PureSettings } from '../../defaultSettings';
+import type { MenuDataItem } from '../../index';
+import type { WithFalse } from '../../typings';
+export declare type GlobalHeaderProps = {
+    collapsed?: boolean;
+    onCollapse?: (collapsed: boolean) => void;
+    isMobile?: boolean;
+    logo?: React.ReactNode;
+    menuRender?: WithFalse<(props: HeaderViewProps, defaultDom: React.ReactNode) => React.ReactNode>;
+    rightContentRender?: WithFalse<(props: HeaderViewProps) => React.ReactNode>;
+    className?: string;
+    prefixCls?: string;
+    menuData?: MenuDataItem[];
+    onMenuHeaderClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+    style?: React.CSSProperties;
+    menuHeaderRender?: SiderMenuProps['menuHeaderRender'];
+    collapsedButtonRender?: SiderMenuProps['collapsedButtonRender'];
+    splitMenus?: boolean;
+} & Partial<PureSettings>;
+declare const GlobalHeader: React.FC<GlobalHeaderProps & PrivateSiderMenuProps>;
+export default GlobalHeader;

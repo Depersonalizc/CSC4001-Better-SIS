@@ -9,14 +9,15 @@ import './index.less';
 /* 引入组件 */
 import Navigator from './Navigator';
 import RegistrationMenu from './Menu';
+import Breadcrumb from '../GeneralComponents/Breadcrumb';
 
 /* 引入图片 */
-
-import { Menu, Button, Dropdown, Steps, Divider } from 'antd';
+import { Menu, Button, Dropdown, Steps, Divider, Table } from 'antd';
 const { SubMenu } = Menu;
 const { Step } = Steps;
 
 import {
+  HomeOutlined,
   AppstoreOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -26,26 +27,87 @@ import {
   MailOutlined,
 } from '@ant-design/icons';
 
+/* 引入数据 */
+import {
+  TermListData,
+} from '../data.d';
+
+
+
 
 export default function Registration(props) {
+  const TermTableColumns = [
+    {
+      title: "Term",
+      dataIndex: "term",
+    },
+    // {
+    //   title: "name",
+    //   dataIndex: "name",
+    // },
+  ];
+
   return (
     <div className="course-registration">
       <Navigator />
-      <RegistrationMenu />
+      {/* <RegistrationMenu /> */}
       <div className="course-registration-body">
+        <Breadcrumb 
+          data={[
+            {
+              href: "/",
+              icon: <HomeOutlined className="breadcrumb-icon" />,
+              text: "Home",
+            },
+            {
+              href: "",
+              icon: <HomeOutlined className="breadcrumb-icon" />,
+              text: "选课系统",
+            },
+            {
+              href: null,
+              icon: null,
+              text: "选择课程",
+            },
+          ]}
+        />
         <div className="registration-progress">
-          <p>添加课程流程须知</p>
+          <p className="sub-title">添加课程流程须知</p>
           {/* <Divider /> */}
-          <Steps current={1}>
+          <Steps current={1} style={{width: "70%",}}>
             <Step title="选择学期" description="This is a description." />
             <Step title="选择课程" description="This is a description." />
             <Step title="到点抢课" description="This is a description." />
             <Step title="确定课程" description="This is a description." />
           </Steps>
+          <Divider />
         </div>
-        <div>
-          <p>当前步骤：选择学期</p>
-          
+        <div style={{width: "50%",}}>
+          <p className="sub-title">当前步骤：选择学期</p>
+          <Table 
+            className="select-term-table"
+            bordered
+            // style={{width: "70%",}}
+            rowSelection={{
+              type: "radio"
+            }}
+            columns={TermTableColumns}
+            dataSource={TermListData.map((ele) => {
+              return {
+                term: ele,
+                name: "hello world!",
+              }
+            })}
+            pagination={false}
+          />
+          <div className="select-term-button">
+            <Button
+              href="/registration/searchClass"
+              type="primary"  
+            >
+              下一步
+            </Button>
+          </div>
         </div>
       </div>
     </div>

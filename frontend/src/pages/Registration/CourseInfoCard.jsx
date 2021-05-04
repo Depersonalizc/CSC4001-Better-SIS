@@ -5,7 +5,7 @@ import { Descriptions, Badge, Button } from 'antd';
 export default function CourseInfoCard(props) {
   return (
     <div className="course-info-card">
-      <p className="text-highlight">
+      <p className="main-title text-highlight">
         <a href={props.data.coursePageLink}>{props.data.title}</a>
       </p>
       <Descriptions bordered column={3} style={{width: "80%",}}>

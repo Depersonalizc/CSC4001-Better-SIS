@@ -1,0 +1,14 @@
+var isUrl = function isUrl(path) {
+  if (!path.startsWith('http')) {
+    return false;
+  }
+
+  try {
+    var url = new URL(path);
+    return !!url;
+  } catch (error) {
+    return false;
+  }
+};
+
+export default isUrl;

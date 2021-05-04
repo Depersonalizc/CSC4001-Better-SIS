@@ -32,7 +32,7 @@ import {
 import { 
   CourseTimeSlotList, 
   ComingTimeSlotList,
-  CourseMarkingCriteriaData,
+  // CourseMarkingCriteriaData,
   CourseData,
 } from '../data.d';
 import { CourseCommentData } from '../data.d';
@@ -75,6 +75,17 @@ export default function CoursePage(props) {
   const [ showComingCourses, setShowComingCourses ] = React.useState(false);
   const [ comingLecture, setComingLecture ] = React.useState([]);
   const [ keepShowingComingCourses, setKeepShowingComingCourses ] = React.useState(false);
+  
+  const CourseMarkingCriteriaColumns = [
+    {
+      title: "Marking Item",
+      dataIndex: "item",
+    }, {
+      title: "Weight",
+      dataIndex: "weight",
+    },
+  ];
+
   return (
     <div className="course-page">
       <NavigatorWithTime />
@@ -170,9 +181,9 @@ export default function CoursePage(props) {
               <p className="sub-title">Marking Criteria</p>
               <Table 
                 className="course-marking-criteria-table"
-                columns={CourseMarkingCriteriaData.columns}
+                columns={CourseMarkingCriteriaColumns}
                 // dataSource={CourseMarkingCriteriaData.dataSource}
-                dataSource={coursePageData.markingItem}
+                dataSource={coursePageData.markingCriteria}
                 pagination={false}
               />
             </div>

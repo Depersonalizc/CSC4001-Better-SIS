@@ -38,6 +38,15 @@ export function WeeklySchedulePreference(props) {
     </div>
   );
 
+  const CourseListToAdd = [
+    "CSC1001",
+    "CSC1002",
+    "CSC3002",
+    "CSC3100",
+    "CSC3050",
+    "EIE2050",
+  ];
+
   const dayPereference = [
     "不要周一",
     "不要周二",
@@ -68,7 +77,8 @@ export function WeeklySchedulePreference(props) {
             size="small"
             split={false}
             // bordered
-            dataSource={WeeklySchedulePreferenceCourseList}
+            // dataSource={WeeklySchedulePreferenceCourseList}
+            dataSource={CourseListToAdd}
             renderItem={item => (
               <List.Item style={{height: "5rem",}}>
                 <span>{item}</span>

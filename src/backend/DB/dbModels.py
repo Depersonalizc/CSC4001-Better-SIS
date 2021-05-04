@@ -31,8 +31,6 @@ class Student(db.Model):
     year = db.Column(db.Integer)
     tot_credit = db.Column(db.Integer)
     studied_courses = db.Column(db.Text)
-    preference = db.Column(db.String(50))
-    wishlist = db.Column(db.Text)
     schedule = db.Column(db.Text)
 
     # UserImage = db.Column(db.BLOB)
@@ -45,9 +43,7 @@ class Student(db.Model):
                 major:str=None, 
                 year:int=None, 
                 totcrdt:int=None, 
-                studied_courses:str=None, 
-                pref:str=None, 
-                wishlist:str=None, 
+                studied_courses:str=None,
                 schedule:str=None, 
                 permission:int=None):
         super().__init__()
@@ -59,8 +55,6 @@ class Student(db.Model):
         self.year = year
         self.tot_credit = totcrdt
         self.studied_courses = studied_courses
-        self.preference = pref
-        self.wishlist = wishlist
         self.schedule = schedule
         self.permission = permission
 

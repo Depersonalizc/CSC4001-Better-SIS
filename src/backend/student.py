@@ -1,7 +1,8 @@
 import course
 from course import Course, Instructor, Session
 from typing import List, Set
-
+import DB.dbModels as dbMdl
+from DB.dbModels import db
 
 class Preference:
     def __init__(self,
@@ -63,6 +64,7 @@ class Student:
         :param preference: Preference configs
         # :param schedule Schedule: schedule of the student this semester
         """
+        
         self.__stuid = stuid
         self.__name = name
         self.__school = school
@@ -148,4 +150,14 @@ class Student:
 
 
 
+def get_student(stuid: str) -> Student:
+    s = dbMdl.Student.query.filter_by(id=stuid).first()
+    courses = s.studied_courses.split(' ')
+    pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
+    return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
 
+def create_new_student(stuid, name, pwd, school, major, year, tot_credit, courses):
+    s = dbMdl.Student(stuid, name, pwd, school, major, year, tot_credit, studied_courses=courses)
+    db.session.add(s)
+    pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
+    return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)

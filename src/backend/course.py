@@ -1,5 +1,7 @@
 from typing import List, Set, Tuple, Dict
 from utils import *
+import DB.dbModels as dbMdl
+from DB.dbModels import db
 
 # Global Constant
 CRE_TO_GRAD = 120                   # Credit number to graduate

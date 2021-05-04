@@ -1,4 +1,0 @@
-import moment from 'moment';
-declare type DateValue = moment.Moment | moment.Moment[] | string | string[] | number | number[];
-declare const parseValueToMoment: (value: DateValue, formatter?: string | undefined) => moment.Moment | moment.Moment[] | null | undefined;
-export default parseValueToMoment;

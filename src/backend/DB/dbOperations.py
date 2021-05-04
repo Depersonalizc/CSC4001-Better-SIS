@@ -57,21 +57,29 @@ def crate_stu():
     return json.dumps(rtdata)
 
 
-@app.route(userPrefix+'searchstu/<int:stuid>', methods=['GET'])
-def search_stu(stuid:int):
+@app.route(userPrefix+'signin', methods=['POST'])
+def signin_stu():
     # stu = dbMdl.Student.query.filter(
     #     dbMdl.Student.id == stuid).first()
+    stuid = request.form['stuid']
+    pwd = request.form['pwd']
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
+    rtdata = {
+        "exist": False,
+        "correctPwd": False
+    }
     if stu:
-        print("finded")
-        return json.dumps({
-            "exist":True
-        })
+        rtdata["exist"] = True
+        if stu.check_password(pwd):
+            print("corrent pwd")
+            rtdata["correctPwd"] = True
+            return json.dumps(rtdata)
+        else:
+            print("wrong pwd")
+            return json.dumps(rtdata)
     else:
         print("No such student")
-        return json.dumps({
-            "exist": False
-        })
+        return json.dumps(rtdata)
 
 
 @app.route(userPrefix+'delstu/<int:stuid>')
@@ -93,22 +101,22 @@ def delete_stu(stuid:int):
     db.session.commit()
 
 
-@app.route(userPrefix+'verifypwd', methods=['POST'])
-def verify_pwd():
-    stuid = request.form['stuid']
-    pwd = request.form['pwd']
-    stu = dbMdl.Student.query.filter_by(id = stuid).first()
-    # return stu.check_password(pwd)
-    if stu.check_password(pwd):
-        print("corrent pwd")
-        return json.dumps({
-            "correctPwd": True
-        })
-    else:
-        print("wrong pwd")
-        return json.dumps({
-            "correctPwd": False
-        })
+# @app.route(userPrefix+'verifypwd', methods=['POST'])
+# def verify_pwd():
+#     stuid = request.form['stuid']
+#     pwd = request.form['pwd']
+#     stu = dbMdl.Student.query.filter_by(id = stuid).first()
+#     # return stu.check_password(pwd)
+#     if stu.check_password(pwd):
+#         print("corrent pwd")
+#         return json.dumps({
+#             "correctPwd": True
+#         })
+#     else:
+#         print("wrong pwd")
+#         return json.dumps({
+#             "correctPwd": False
+#         })
 
 
 def change_pwd(stuid: int, newpwd):
@@ -152,6 +160,35 @@ def search_course(course_code):
         print("course doesn't exist")
 
 
-if __name__ == "__main__":
-    app.run()
-    db.init_app(app)
+def search_all_session(course_code):
+    sessions = dbMdl.Session.query.filter_by(course=course_code).all()
+    for sec in sessions:
+        print(sec.sno,sec.course, sec.type)
+
+
+def crate_session(course_code: str,
+                  type: str,
+                  instr: str = None,
+                  venue: str = None,
+                  class1: str = None,
+                  class2: str = None):
+    newSes = dbMdl.Session(course=course_code,
+                           type=type,
+                           instr=instr,
+                           venue=venue,
+                           class1=class1,
+                           class2=class2)
+    # newSes = dbMdl.Session(course_code,
+    #                        type,
+    #                        instr,
+    #                        venue,
+    #                        class1,
+    #                        class2)
+    db.session.add(newSes)
+    db.session.commit()
+    print("crate sec")
+
+
+# if __name__ == "__main__":
+#     app.run()
+#     db.init_app(app)

@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 
 class Student(db.Model):
     __tablename__ = 'Student'
-    id = db.Column(db.Integer, primary_key=True)  #autoincrement=True
+    id = db.Column(db.String(10), primary_key=True)  # autoincrement=True
     name = db.Column(db.String(20), nullable=False)
     __password = db.Column(db.String(200), nullable=False)
     permission = db.Column(db.Integer, default=1) #0 adm, 1 normal stu
@@ -31,20 +31,24 @@ class Student(db.Model):
     year = db.Column(db.Integer)
     tot_credit = db.Column(db.Integer)
     studied_courses = db.Column(db.Text)
-    schedule = db.Column(db.Text)
+    # preference = db.Column(db.String(50))
+    # wishlist = db.Column(db.Text)
+    # schedule = db.Column(db.Text)
 
     # UserImage = db.Column(db.BLOB)
 
     def __init__(self, 
-                id:int, 
+                id:str, 
                 name:str, 
                 pwd:str, 
                 school:str=None, 
                 major:str=None, 
                 year:int=None, 
                 totcrdt:int=None, 
-                studied_courses:str=None,
-                schedule:str=None, 
+                studied_courses:str=None, 
+                # pref:str=None, 
+                # wishlist:str=None, 
+                # schedule:str=None, 
                 permission:int=None):
         super().__init__()
         self.id = id
@@ -55,7 +59,9 @@ class Student(db.Model):
         self.year = year
         self.tot_credit = totcrdt
         self.studied_courses = studied_courses
-        self.schedule = schedule
+        # self.preference = pref
+        # self.wishlist = wishlist
+        # self.schedule = schedule
         self.permission = permission
 
 
@@ -87,11 +93,23 @@ class Student(db.Model):
             "totalCredit": self.tot_credit,
             "studiedCourses": self.studied_courses
         }
+    
+    def to_dict(self):
+        dic = {
+            "stuid": self.id,
+            "name" : self.name,
+            "school": self.school,
+            "major": self.major,
+            "year" : self.year,
+            "tot_credit" : self.totcrdt,
+            # "studied_courses" : self.studied_courses,
+        }
+        return
 
 
 class Instructor(db.Model):
     __tablename__ = 'Instructor'
-    id = db.Column(db.Integer,primary_key=True,autoincrement=True)
+    id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     school = db.Column(db.String(10))
     isLecturer = db.Column(db.Boolean)
@@ -99,16 +117,16 @@ class Instructor(db.Model):
     # profile
     # img
 
-    def __init__(self,
-                 name,
-                 school = None,
-                 isLecturer = None,
-                 website = None):
-        super().__init__()
-        self.name = name
-        self.school = school
-        self.isLecturer = isLecturer
-        self.website = website
+    # def __init__(self,
+    #              name,
+    #              school = None,
+    #              isLecturer = None,
+    #              website = None):
+    #     super().__init__()
+    #     self.name = name
+    #     self.school = school
+    #     self.isLecturer = isLecturer
+    #     self.website = website
 
     def __repr__(self):
         return f'<Database Table {self.__tablename__}>'
@@ -116,8 +134,8 @@ class Instructor(db.Model):
 
 class Session(db.Model):
     __tablename__ = 'Session'
-    sno = db.Column(db.String(20), primary_key=True,
-                    nullable=False, autoincrement=True)
+    # sno = db.Column(db.String(10), primary_key=True) #, autoincrement = True
+    sno = db.Column(db.Integer, primary_key=True)
     course = db.Column(db.String(10), nullable=False)
     type = db.Column(db.String(10), nullable=False)  # db.Enum
     # course_name = db.Column(db.String(50), nullable=False)
@@ -127,22 +145,22 @@ class Session(db.Model):
     class1 = db.Column(db.String(20))
     class2 = db.Column(db.String(20))
 
-    def __init__(self, 
-                sission_no:str,
-                course_code:str, 
-                type:str,
-                instr:str = None,
-                venue:str = None,
-                class1:str = None, 
-                class2:str = None):
-        super().__init__()
-        self.sno = sission_no
-        self.course = course_code
-        self.type = type
-        self.instr = instr
-        self.venue = venue
-        self.class1 = class1
-        self.class2 = class2
+    # def __init__(self, 
+    #             # session_no:str,
+    #             course_code:str, 
+    #             type:str,
+    #             instr:str = None,
+    #             venue:str = None,
+    #             class1:str = None, 
+    #             class2:str = None):
+    #     super().__init__()
+    #     # self.sno = session_no
+    #     self.course = course_code
+    #     self.type = type
+    #     self.instr = instr
+    #     self.venue = venue
+    #     self.class1 = class1
+    #     self.class2 = class2
 
 
 

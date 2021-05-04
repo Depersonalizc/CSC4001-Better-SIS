@@ -7,10 +7,8 @@ import json
 from flask import request
 
 
-userPrefix = "/user/"
 
-
-@app.route(userPrefix+'signup', methods=['POST'])
+@app.route('/signup', methods=['POST'])
 # def crate_stu(stuid:int,
 #               name: str,
 #               pwd: str,
@@ -57,7 +55,7 @@ def crate_stu():
     return json.dumps(rtdata)
 
 
-@app.route(userPrefix+'signin', methods=['POST'])
+@app.route('/signin', methods=['POST'])
 def signin_stu():
     # stu = dbMdl.Student.query.filter(
     #     dbMdl.Student.id == stuid).first()
@@ -82,7 +80,7 @@ def signin_stu():
         return json.dumps(rtdata)
 
 
-@app.route(userPrefix+'delstu/<int:stuid>')
+@app.route('delstu/<int:stuid>')
 def delete_stu(stuid:int):
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
     if stu:
@@ -127,6 +125,21 @@ def change_pwd(stuid: int, newpwd):
         stu.password = newpwd
         print("change pwd done")
     db.session.commit()
+
+
+@app.route('/getTermInfo', methods=['GET'])
+def getTermInfo():
+    return json.dumps([
+        "2018-2019 Term 1",
+        "2018-2019 Term 2",
+        "2018-2019 Summer Term",
+        "2019-2020 Term 1",
+        "2019-2020 Term 2",
+        "2019-2020 Summer Term",
+        "2020-2021 Term 1",
+        "2020-2021 Term 2",
+        "2020-2021 Summer Term",
+    ])
 
 
 def crate_course(course_code,

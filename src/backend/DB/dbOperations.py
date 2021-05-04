@@ -7,10 +7,8 @@ import json
 from flask import request
 
 
-userPrefix = "/user/"
 
-
-@app.route(userPrefix+'signup', methods=['POST'])
+@app.route('/signup', methods=['POST'])
 # def crate_stu(stuid:int,
 #               name: str,
 #               pwd: str,
@@ -57,7 +55,7 @@ def crate_stu():
     return json.dumps(rtdata)
 
 
-@app.route(userPrefix+'signin', methods=['POST'])
+@app.route('/signin', methods=['POST'])
 def signin_stu():
     # stu = dbMdl.Student.query.filter(
     #     dbMdl.Student.id == stuid).first()
@@ -82,12 +80,13 @@ def signin_stu():
         return json.dumps(rtdata)
 
 
-@app.route(userPrefix+'delstu/<int:stuid>')
+@app.route('/delstu/<int:stuid>')
 def delete_stu(stuid:int):
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
     if stu:
         db.session.delete(stu)
         print("del stu done")
+        db.session.commit()
         return json.dumps({
             "del": False,
             "error": "Account didn't Exist"
@@ -98,7 +97,7 @@ def delete_stu(stuid:int):
             "del": True,
             "error": None
         })
-    db.session.commit()
+
 
 
 # @app.route(userPrefix+'verifypwd', methods=['POST'])
@@ -118,6 +117,43 @@ def delete_stu(stuid:int):
 #             "correctPwd": False
 #         })
 
+@app.route('/getStudentInfo/<int:stuid>', methods=['GET'])
+def getStuInfo(stuid: int):
+    stu = dbMdl.Student.query.filter_by(id = stuid).first()
+    if stu:
+        return json.dumps({
+            'name':         stu.name,               # str
+            'stuid':        stu.stuid,              # int
+            'school':       stu.school,             # str
+            'major':        stu.major,              # str
+            'year':         stu.year,               # int
+            'tot_credit':   stu.studied_courses,    # str split(' ')
+        })
+
+@app.route('/getTermInfo', methods=['GET'])
+def getTermInfo():
+    return json.dumps({
+        "2020-2021 Term 1",
+        "2020-2021 Term 2",
+        "2020-2021 Summer Term"
+    })
+
+@app.route('/searchCourse', methods=['POST'])
+def searchCourse():
+    pre = request.form['coursePrefix']
+    code = str(request.form['courseCode'])
+    school = request.form['school']
+    ret = dbMdl.Course.query.filter_by(code=pre+code).first()
+
+    return json.dumps({
+        'code':         ret.code,       # full code
+        'name':         ret.name,
+        'units':        ret.units,
+        'prereqs':      ret.prereqs,    # str split(' ') full code
+        'lecturers':    ret.lecturers,  # str split(' ') lecturer name
+        'tutors':       ret.tutors      # str split(' ') tutor name
+    })
+
 
 def change_pwd(stuid: int, newpwd):
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
@@ -127,6 +163,21 @@ def change_pwd(stuid: int, newpwd):
         stu.password = newpwd
         print("change pwd done")
     db.session.commit()
+
+
+@app.route('/getTermInfo', methods=['GET'])
+def getTermInfo():
+    return json.dumps([
+        "2018-2019 Term 1",
+        "2018-2019 Term 2",
+        "2018-2019 Summer Term",
+        "2019-2020 Term 1",
+        "2019-2020 Term 2",
+        "2019-2020 Summer Term",
+        "2020-2021 Term 1",
+        "2020-2021 Term 2",
+        "2020-2021 Summer Term",
+    ])
 
 
 def crate_course(course_code,

@@ -276,8 +276,8 @@ class Schedule:
         assert course not in wishes, \
             f"ERROR: Course {course.full_code} already in wish list!"
 
-        prereq_fails = [p.full_code for p in course.prereqs
-                        if not self.student.has_taken(p.full_code)]
+        prereq_fails = [p for p in course.prereqs
+                        if not self.student.has_taken(p)]
         if not prereq_fails:
             self.preference.course_wishlist.append(course)
         return prereq_fails
@@ -384,14 +384,14 @@ if __name__ == '__main__':
     CSC3170.add_session(1613, {t3, t4}, 'TB202', 'tut', ('2 18:00', '2 18:50'))
     CSC3170.add_session(1614, {t3, t4}, 'TB202', 'tut', ('2 19:00', '2 19:50'))
 
-    FIN4060 = Course('FIN', 4060, 'Supermarket Theory', credit_units=3, prereqs={CSC3170})
+    FIN4060 = Course('FIN', 4060, 'Supermarket Theory', credit_units=3, prereqs={'CSC3170'})
     FIN4060.add_session(2000, {jw}, 'TC414', 'lec', ('2 13:30', '2 14:50'), ('4 13:30', '4 14:50'))
     FIN4060.add_session(2001, {jw}, 'TC414', 'lec', ('2 15:30', '2 16:50'), ('4 15:30', '4 16:50'))
     FIN4060.add_session(2020, {t8}, 'CD101', 'tut', ('1 18:00', '1 18:50'))
     FIN4060.add_session(2021, {t9}, 'CD101', 'tut', ('1 19:00', '1 19:50'))
 
     DDA4250 = Course('DDA', 4250, 'Mathematical Introduction to Deep Learning',
-                     credit_units=3, prereqs={CSC4001, CSC3170})
+                     credit_units=3, prereqs={'CSC4001', 'CSC3170'})
     DDA4250.add_session(1701, {aj}, 'ZOOM', 'lec', ('2 15:30', '2 17:20'), ('5 20:00', '5 21:50'))
     DDA4250.add_session(1711, {t5}, 'ZOOM', 'tut', ('4 19:00', '4 19:50'))
 

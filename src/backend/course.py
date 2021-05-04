@@ -22,6 +22,7 @@ Major = ['CSE', 'DS', 'STA', 'MKT', 'ACT', 'EIE', 'MAT', 'BIM']  # too many and 
 
 # 以上学校的分类要求复杂，可以考虑简化
 
+
 class Comment():
     def __init__(self, stuid: str, stuName: str, rating: int, comment: str = None, keywords: Set[str] = None):
         self.__stuid = stuid                # We don't show id publicly
@@ -87,9 +88,6 @@ class Instructor:
     def is_lecturer(self):
         return self._is_lecturer
 
-
-# TODO
-# Add venue: TB102...
 
 class Session:
 
@@ -212,7 +210,7 @@ class Course:
                  course_code: int,
                  course_name: str,
                  credit_units: int = 3,
-                 prereqs: Set = None,
+                 prereqs: Set[str] = None,
                  comment: List[Comment] = None):
         """
         :param dept: letter initialization of the offering department (e.g. 'CSC') (type: str)
@@ -224,7 +222,7 @@ class Course:
         self.__tut_sessions: List[Session] = list()
         self.__lecturers: Set[Instructor] = set()
         self.__tutors: Set[Instructor] = set()
-        self.__prereqs: Set[Course] = set() if prereqs is None else prereqs
+        self.__prereqs: Set[str] = set() if prereqs is None else prereqs
         self.__dept = dept
         self.__course_code = course_code
         self.__course_name = course_name
@@ -328,8 +326,8 @@ class Course:
             self._add_session(new_session)
             self.add_instructors(instructors, session_type)
 
-    def add_prereq(self, prereq_course):
-        self.__prereqs.add(prereq_course)
+    def add_prereq(self, prereq: str):
+        self.__prereqs.add(prereq)
 
     def add_comment(self, comment: Comment):
         self.__comment.append(comment)
@@ -442,3 +440,4 @@ if __name__ == '__main__':
             print(iter_to_str(overlaps, sep='\n'))
         else:  # Empty list
             print('No conflicts found!')
+

@@ -80,12 +80,13 @@ def signin_stu():
         return json.dumps(rtdata)
 
 
-@app.route('delstu/<int:stuid>')
+@app.route('/delstu/<int:stuid>')
 def delete_stu(stuid:int):
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
     if stu:
         db.session.delete(stu)
         print("del stu done")
+        db.session.commit()
         return json.dumps({
             "del": False,
             "error": "Account didn't Exist"
@@ -96,7 +97,7 @@ def delete_stu(stuid:int):
             "del": True,
             "error": None
         })
-    db.session.commit()
+
 
 
 # @app.route(userPrefix+'verifypwd', methods=['POST'])
@@ -115,6 +116,43 @@ def delete_stu(stuid:int):
 #         return json.dumps({
 #             "correctPwd": False
 #         })
+
+@app.route('/getStudentInfo/<int:stuid>', methods=['GET'])
+def getStuInfo(stuid: int):
+    stu = dbMdl.Student.query.filter_by(id = stuid).first()
+    if stu:
+        return json.dumps({
+            'name':         stu.name,               # str
+            'stuid':        stu.stuid,              # int
+            'school':       stu.school,             # str
+            'major':        stu.major,              # str
+            'year':         stu.year,               # int
+            'tot_credit':   stu.studied_courses,    # str split(' ')
+        })
+
+@app.route('/getTermInfo', methods=['GET'])
+def getTermInfo():
+    return json.dumps({
+        "2020-2021 Term 1",
+        "2020-2021 Term 2",
+        "2020-2021 Summer Term"
+    })
+
+@app.route('/searchCourse', methods=['POST'])
+def searchCourse():
+    pre = request.form['coursePrefix']
+    code = str(request.form['courseCode'])
+    school = request.form['school']
+    ret = dbMdl.Course.query.filter_by(code=pre+code).first()
+
+    return json.dumps({
+        'code':         ret.code,       # full code
+        'name':         ret.name,
+        'units':        ret.units,
+        'prereqs':      ret.prereqs,    # str split(' ') full code
+        'lecturers':    ret.lecturers,  # str split(' ') lecturer name
+        'tutors':       ret.tutors      # str split(' ') tutor name
+    })
 
 
 def change_pwd(stuid: int, newpwd):

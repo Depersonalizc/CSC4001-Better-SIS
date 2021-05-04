@@ -97,7 +97,7 @@ class Student(db.Model):
 
 class Instructor(db.Model):
     __tablename__ = 'Instructor'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     school = db.Column(db.String(10))
     isLecturer = db.Column(db.Boolean)
@@ -106,11 +106,13 @@ class Instructor(db.Model):
     # img
 
     def __init__(self,
+                 id,
                  name,
                  school = None,
                  isLecturer = None,
                  website = None):
         super().__init__()
+        self.id = id
         self.name = name
         self.school = school
         self.isLecturer = isLecturer

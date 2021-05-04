@@ -9,7 +9,8 @@ ALPHABETS = 'abcdefghijklmnopqrstuvwxyz'
 DIGITS = '0123456789'
 
 # Global variables
-courses = instructors = dict()
+courses = dict()
+instructors = dict()
 
 db.drop_all()
 db.create_all()
@@ -28,13 +29,24 @@ db.create_all()
 # CSC3170.add_session(1613, {t3, t4}, 'TB202', 'tut', ('2 18:00', '2 18:50'))
 # CSC3170.add_session(1614, {t3, t4}, 'TB202', 'tut', ('2 19:00', '2 19:50'))
 
-c = dbMdl.Course(code='CSC4001', name='Software Engineering', school='SDS',
-                 units=3, prereqs='MAT1001 MAT1002')
-lec = dbMdl.Session('10001', course_code='CSC1001', type='lec', )
-tut = dbMdl.Session('10002', course_code='CSC1001', type='tut')
-db.session.add(c)
-db.session.add(lec)
-db.session.add(tut)
+
+db.session.add(dbMdl.Course(code='CSC4001', name='Software Engineering', school='SDS',
+                            units=3, prereqs='MAT1001 MAT1002'))
+db.session.add(dbMdl.Instructor(1, 'lecturer1', school='school', isLecturer=True, website='abc'))
+db.session.add(dbMdl.Instructor(2, 'tutor1', school='school', isLecturer=False, website='def'))
+db.session.add(dbMdl.Instructor(3, 'tutor2', school='school', isLecturer=False, website='ghi'))
+
+db.session.add(
+    dbMdl.Session('10001', course_code='CSC4001',
+                  type='lec', instr='1', venue='TA101',
+                  class1='1 08:30-1 09:50',
+                  class2='3 08:30-3 09:50')
+               )
+db.session.add(
+    dbMdl.Session('10002', course_code='CSC4001',
+                  type='tut', instr='2 3', venue='TA101',
+                  class1='2 19:30-2 20:30')
+               )
 
 
 def get_course(full_code: str):
@@ -50,19 +62,33 @@ def get_course(full_code: str):
     # Fetch course and session info from db
     c = dbMdl.Course.query.filter_by(code=full_code).first()
     ss = dbMdl.Session.query.filter_by(course=full_code).all()
-    if c is None:
-        return c
+    if not c:
+        print("not found")
+        return None
     # create Course instance
     prereqs = {p for p in c.prereqs.split(' ')}
     comment = None  # TODO: Fetch and create Comment instance
     course = Course(dept, code, c.name, c.units, prereqs, comment)
     courses[full_code] = course
 
-    ins = set()
     for s in ss:
-        class1 = tuple(t for t in s.class1)
-        class2 = tuple(t for t in s.class2) if s.class2 else None
-        course.add_session(s.sno, ins, s.venue, s.type, class1, class2)
+        ins_id = [int(i) for i in s.instr.split(' ')]
+        ss_ins = set()
+        for id in ins_id:
+            if id in instructors:
+                ss_ins.add(instructors[i])
+            else:
+                # Fetch info from db
+                ins = dbMdl.Instructor.query.filter_by(id=id).first()
+                # create Instructor instance
+                # TODO: add website
+                instr = Instructor(ins.name, ins.school, ins.isLecturer)
+                instructors[id] = instr
+                ss_ins.add(instr)
+
+        class1 = tuple(t for t in s.class1.split('-'))
+        class2 = tuple(t for t in s.class1.split('-')) if s.class2 else None
+        course.add_session(s.sno, ss_ins, s.venue, s.type, class1, class2)
 
     return course
     # print()
@@ -81,7 +107,7 @@ def get_course(full_code: str):
 # schedule = Schedule()
 
 # s = Student(stuid, name, school, major, year, tot_credit, studied_course, schedule)
-s = Student('118010154','lyh','SDS','CSE', 3, 90, ['CSC4001'])
+s = Student('118010154', 'lyh', 'SDS', 'CSE', 3, 90, ['CSC4001'])
 
 '''
 2. ENTER PROFILE PAGE
@@ -112,4 +138,6 @@ s = Student('118010154','lyh','SDS','CSE', 3, 90, ['CSC4001'])
 
 
 if __name__ == '__main__':
-    get_course('CSC1001')
+    get_course('CSC4001')
+    print(', '.join(str(c) for c in courses))
+    print(', '.join(str(i) for i in instructors))

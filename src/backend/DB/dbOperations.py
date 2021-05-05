@@ -158,6 +158,46 @@ def delete_stu(stuid:str):
 #             "correctPwd": False
 #         })
 
+<<<<<<< Updated upstream
+=======
+@app.route('/getStudentInfo/<int:stuid>', methods=['GET'])
+def getStuInfo(stuid: int):
+    stu = dbMdl.Student.query.filter_by(id = stuid).first()
+    if stu:
+        return json.dumps({
+            'name':         stu.name,               # str
+            'stuid':        stu.stuid,              # int
+            'school':       stu.school,             # str
+            'major':        stu.major,              # str
+            'year':         stu.year,               # int
+            'tot_credit':   stu.studied_courses,    # str split(' ')
+        })
+
+# @app.route('/getTermInfo', methods=['GET'])
+# def getTermInfo():
+#     return json.dumps({
+#         "2020-2021 Term 1",
+#         "2020-2021 Term 2",
+#         "2020-2021 Summer Term"
+#     })
+
+@app.route('/searchCourse', methods=['POST'])
+def searchCourse():
+    pre = request.form['coursePrefix']
+    code = str(request.form['courseCode'])
+    school = request.form['school']
+    ret = dbMdl.Course.query.filter_by(code=pre+code).first()
+
+    return json.dumps({
+        'code':         ret.code,       # full code
+        'name':         ret.name,
+        'units':        ret.units,
+        'prereqs':      ret.prereqs,    # str split(' ') full code
+        'lecturers':    ret.lecturers,  # str split(' ') lecturer name
+        'tutors':       ret.tutors      # str split(' ') tutor name
+    })
+
+>>>>>>> Stashed changes
 
 def change_pwd(stuid: int, newpwd):
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
@@ -264,6 +304,12 @@ def crate_session(course_code: str,
     print("crate sec")
 
 
+<<<<<<< Updated upstream
 # if __name__ == "__main__":
 #     app.run(host='0.0.0.0')
 #     db.init_app(app)
+=======
+if __name__ == "__main__":
+    app.run()
+    db.init_app(app)
+>>>>>>> Stashed changes

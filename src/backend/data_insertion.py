@@ -1,8 +1,8 @@
 import DB.dbModels as dbMdl
 from DB.dbModels import db
+
 db.drop_all()
 db.create_all()
-
 
 def data_insert():
     # CSC4001 = Course('CSC', 4001, 'Software Engineering', credit_units=3)

@@ -36,6 +36,23 @@ import {
 
 
 export default function Registration(props) {
+  const [ TermList, setTermList ] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchTermList = async () => {
+      const baseURL = "http://175.24.4.124:5000";
+      const targetURL = `${baseURL}/getTermInfo`;
+      let resp = await( fetch(targetURL, {
+        method: "GET",
+        mode: "cors",
+      }) );
+      let text = resp.text();
+      console.log(`text = ${ text }`);
+    };
+
+    fetchTermList();
+  }, []);
+
   const TermTableColumns = [
     {
       title: "Term",

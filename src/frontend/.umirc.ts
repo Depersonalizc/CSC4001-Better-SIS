@@ -17,6 +17,12 @@ export default defineConfig({
       title: "登录界面",
       component: '@/pages/login/index' 
     },
+    {
+      path: '/createAccount',
+      exact: true,
+      title: "创建账号",
+      component: "@/pages/login/CreateAccount",
+    },
     { 
       path: '/registration', 
       exact: true, 

@@ -133,6 +133,27 @@ export const CourseTimeSlotList = [
 	},
 ];
 
+export const AddedNotConfirmedList = [
+	{
+		courseTitle: "CSC3100",
+		session: 1,
+		isLecture: true,
+		beginTime: "8:30",
+		endTime: "9:50",
+		weekday: "Wednesday",
+		location: "TA 101",
+	},
+	{
+		courseTitle: "CSC3100",
+		session: 2,
+		isLecture: true,
+		beginTime: "10:30",
+		endTime: "11:50",
+		weekday: "Friday",
+		location: "TA 310",
+	},
+];
+
 
 export const ComingTimeSlotList = [
 	{
@@ -230,10 +251,21 @@ export const CourseData = [
 			{
 				sessionNumber: 1,
 				isLecture: true,
-				insturctor: "Xiaoguang Han",
+				instructor: "Xiaoguang Han",
 				weekday: "Monday",
 				beginTime: "13:00",
 				endTime: "14:20",
+				timeSlots: [
+					{
+						weekday: "Monday",
+						beginTime: "13:00",
+						endTime: "14:20",
+					}, {
+						weekday: "Wednesday",
+						beginTime: "13:00",
+						endTime: "14:20",
+					},
+				],
 				location: "TB 101",
 				currentEnrollment: 142,
 				classCapacity: 150,
@@ -241,10 +273,21 @@ export const CourseData = [
 			{
 				sessionNumber: 2,
 				isLecture: true,
-				insturctor: "Junhua Zhao",
+				instructor: "Junhua Zhao",
 				weekday: "Monday",
 				beginTime: "15:00",
 				endTime: "16:20",
+				timeSlots: [
+					{
+						weekday: "Monday",
+						beginTime: "15:00",
+						endTime: "16:20",
+					}, {
+						weekday: "Wednesday",
+						beginTime: "15:00",
+						endTime: "16:20",
+					},
+				],
 				location: "TB 105",
 				currentEnrollment: 129,
 				classCapacity: 150,
@@ -252,10 +295,21 @@ export const CourseData = [
 			{
 				sessionNumber: 3,
 				isLecture: true,
-				insturctor: "Wei Cai",
+				instructor: "Wei Cai",
 				weekday: "Tuesday",
 				beginTime: "13:00",
 				endTime: "14:20",
+				timeSlots: [
+					{
+						weekday: "Tuesday",
+						beginTime: "13:00",
+						endTime: "14:20",
+					}, {
+						weekday: "Thursday",
+						beginTime: "13:00",
+						endTime: "14:20",
+					},
+				],
 				location: "TB 110",
 				currentEnrollment: 148,
 				classCapacity: 150,
@@ -263,10 +317,17 @@ export const CourseData = [
 			{
 				sessionNumber: 1,
 				isLecture: false,
-				insturctor: "Staff",
+				instructor: "Staff",
 				weekday: "Monday",
 				beginTime: "18:00",
 				endTime: "18:50",
+				timeSlots: [
+					{
+						weekday: "Monday",
+						beginTime: "18:00",
+						endTime: "18:50",
+					},
+				],
 				location: "TD 110",
 				currentEnrollment: 37,
 				classCapacity: 40,
@@ -274,10 +335,17 @@ export const CourseData = [
 			{
 				sessionNumber: 2,
 				isLecture: false,
-				insturctor: "Staff",
+				instructor: "Staff",
 				weekday: "Wednesday",
 				beginTime: "19:00",
 				endTime: "19:50",
+				timeSlots: [
+					{
+						weekday: "Wednesday",
+						beginTime: "19:00",
+						endTime: "19:50",
+					},
+				],
 				location: "TC 210",
 				currentEnrollment: 40,
 				classCapacity: 40,
@@ -320,10 +388,21 @@ export const CourseData = [
 			{
 				sessionNumber: 1,
 				isLecture: true,
-				insturctor: "Rui Huang",
+				instructor: "Rui Huang",
 				weekday: "Thursday",
 				beginTime: "13:00",
 				endTime: "14:20",
+				timeSlots: [
+					{
+						weekday: "Tuesday",
+						beginTime: "13:00",
+						endTime: "14:20",
+					}, {
+						weekday: "Thursday",
+						beginTime: "13:00",
+						endTime: "14:20",
+					},
+				],
 				location: "TB 101",
 				currentEnrollment: 142,
 				classCapacity: 150,
@@ -331,10 +410,21 @@ export const CourseData = [
 			{
 				sessionNumber: 2,
 				isLecture: true,
-				insturctor: "Rui Huang",
+				instructor: "Rui Huang",
 				weekday: "Friday",
 				beginTime: "15:00",
 				endTime: "16:20",
+				timeSlots: [
+					{
+						weekday: "Friday",
+						beginTime: "15:00",
+						endTime: "16:20",
+					}, {
+						weekday: "Friday",
+						beginTime: "16:30",
+						endTime: "16:50",
+					},
+				],
 				location: "TB 105",
 				currentEnrollment: 129,
 				classCapacity: 150,
@@ -342,10 +432,17 @@ export const CourseData = [
 			{
 				sessionNumber: 1,
 				isLecture: false,
-				insturctor: "Staff",
+				instructor: "Staff",
 				weekday: "Monday",
 				beginTime: "19:00",
 				endTime: "19:50",
+				timeSlots: [
+					{
+						weekday: "Monday",
+						beginTime: "19:00",
+						endTime: "19:50",
+					},
+				],
 				location: "TD 110",
 				currentEnrollment: 37,
 				classCapacity: 40,
@@ -353,10 +450,17 @@ export const CourseData = [
 			{
 				sessionNumber: 2,
 				isLecture: false,
-				insturctor: "Staff",
+				instructor: "Staff",
 				weekday: "Thursday",
 				beginTime: "19:00",
 				endTime: "19:50",
+				timeSlots: [
+					{
+						weekday: "Thursday",
+						beginTime: "19:00",
+						endTime: "19:50",
+					},
+				],
 				location: "TC 210",
 				currentEnrollment: 40,
 				classCapacity: 40,

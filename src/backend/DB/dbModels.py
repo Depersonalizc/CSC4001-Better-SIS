@@ -106,10 +106,8 @@ class Student(db.Model):
         }
         return
 
-
 class Instructor(db.Model):
     __tablename__ = 'Instructor'
-    idCount = 1
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     school = db.Column(db.String(10))
@@ -124,8 +122,8 @@ class Instructor(db.Model):
                  isLecturer = None,
                  website = None):
         super().__init__()
-        self.id = self.idCount
-        self.idCount += 1
+        # self.insid = self.insidCount
+        # self.insidCount += 1
         self.name = name
         self.school = school
         self.isLecturer = isLecturer
@@ -135,10 +133,9 @@ class Instructor(db.Model):
         return f'<Database Table {self.__tablename__}>'
 
 
+
 class Session(db.Model):
     __tablename__ = 'Session'
-    snoCount = 1
-    # sno = db.Column(db.String(10), primary_key=True) #, autoincrement = True
     sno = db.Column(db.Integer, primary_key=True)
     course = db.Column(db.String(10), nullable=False)
     type = db.Column(db.String(10), nullable=False)  # db.Enum
@@ -158,8 +155,6 @@ class Session(db.Model):
                 class1:str = None, 
                 class2:str = None):
         super().__init__()
-        self.id = self.snoCount
-        self.snoCount += 1
         self.course = course_code
         self.type = type
         self.instr = instr
@@ -273,7 +268,6 @@ class SemesterCourse(db.Model):
 
 class Comment(db.Model):
     __tablename__ = 'Comment'
-    idCount = 1
     id = db.Column(db.Integer, primary_key=True)
     # ,db.ForeignKey('user.id')
     stuid = db.Column(db.Integer, nullable=False)
@@ -295,8 +289,6 @@ class Comment(db.Model):
                  content = None,
                  keywords = None):
         super().__init__()
-        self.id = self.idCount
-        self.idCount += 1
         self.stuid = stuid
         self.stuName = stuName
         self.course = course_code

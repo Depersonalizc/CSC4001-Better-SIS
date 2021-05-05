@@ -9,7 +9,9 @@ import { Descriptions, Divider } from 'antd';
 
 
 /* 引入数据 */
-import { StudentData } from '../data.d';
+import { 
+  StudentData,
+} from '../data.d';
 const oneStudentData = StudentData[0];
 
 
@@ -36,8 +38,10 @@ export default function UserPage(props) {
           </Descriptions>
         </div>
         <Divider />
-        <p className="user-page-title">课程时间安排表</p>
-        <WeeklyScheduleWithPreference />
+        <div>
+          <p className="user-page-title">课程时间安排表</p>
+          <WeeklyScheduleWithPreference />
+        </div>
       </div>
     </div>
   )

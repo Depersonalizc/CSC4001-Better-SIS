@@ -4,6 +4,11 @@ import '../global.less';
 /* 引入数据 */
 import { CourseTimeSlotList } from '../data.d';
 
+/* 引入Ant Design */
+import {
+  Badge,
+} from 'antd';
+
 
 const rowNumber = 16;
 const rowHeight = 5;
@@ -13,6 +18,19 @@ const columnNumber = 6;
 const columnWidth = 20;
 const startDate = new Date();
 let weeklyScheduleArray = [];
+
+const ColorList = {
+  confirmed: "#8CEA00",           // code: 1
+  addedNotConfirmed: "#b37feb",   // code: 2
+  added: "#ff85c0",               // code: 3
+  toAdd: "#ff85c0",
+};
+// const ColorCodeToString = (code) => {
+//   switch(code) {
+//     case 1:
+//       return ColorList["confior"]
+//   }
+// }
 
 
 // let dateRow = ["time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -31,45 +49,104 @@ for ( let row = 1; row < rowNumber; ++row ) {
 }
 
 export default function WeeklySchedule(props) {
+  /* 
+   * props格式
+   * --------------------------
+   * {
+   *   timeSlots: {
+   *     confirmed: {
+   *        show: boolean,
+   *        data: [],
+   *     },
+   *     addedNotConfirmed: {
+   *        show: boolean,
+   *        data: [], 
+   *     },
+   *     comingLectures: {
+   *        show: boolean,
+   *        keepShowing: boolean,
+   *        data: [],
+   *     },
+   *     comingTutorials: {
+   *        show: boolean,
+   *        keepShowing: boolean,
+   *        data: [],
+   *     },
+   *   }
+   * }
+   */
   return (
-    <div className="weekly-schedule">
-      {
-        weeklyScheduleArray.map((ele, index) => {
-          return (
-            <div key={index}>
-              <p className="default-grid-text">{ele}</p>
-            </div>
-          )
-        })
-      }
-      {/* {
-        CourseTimeSlotList.map((ele, index) => {
-          return (
-            <TimeSlot data={ele} key={index} />
-          )
-        })
-      } */}
-      {
-        props.existsCourseList && props.existsCourseList.map((ele, index) => {
-          return (
-            <TimeSlot data={ele} key={index} isExist={true} />
-          )
-        })
-      }
-      {
-        props.showComingCourses && props.comingCourseList && props.comingCourseList.map((ele, index) => {
-          return (
-            <TimeSlot data={ele} key={index} isExist={false} />
-          )
-        })
-      }
-      {
-        props.showComingTutorial && props.comingTutorialList && props.comingTutorialList.map((ele, index) => {
-          return (
-            <TimeSlot data={ele} key={index} isExist={false} />
-          )
-        })
-      }
+    <div>
+      <div className="weekly-schedule">
+        {
+          weeklyScheduleArray.map((ele, index) => {
+            return (
+              <div key={index}>
+                <p className="default-grid-text">{ele}</p>
+              </div>
+            )
+          })
+        }
+        {
+          props.timeSlots && props.timeSlots.confirmed && props.timeSlots.confirmed.show && props.timeSlots.confirmed.data.map((ele, index) => {
+            return (
+              <TimeSlot data={ele} key={index} type={"confirmed"} />
+            );
+          })
+        }
+        {
+          props.timeSlots && props.timeSlots.addedNotConfirmed && props.timeSlots.addedNotConfirmed.show && props.timeSlots.addedNotConfirmed.data.map((ele, index) => {
+            return (
+              <TimeSlot data={ele} key={index} type={"addedNotConfirmed"} />
+            );
+          })
+        }
+        {
+          props.timeSlots && props.timeSlots.comingLectures && props.timeSlots.comingLectures.show && props.timeSlots.comingLectures.data.map((ele, index) => {
+            return (
+              <TimeSlot data={ele} key={index} type={"added"} />
+            );
+          })
+        }
+        {
+          props.timeSlots && props.timeSlots.comingTutorials && props.timeSlots.comingTutorials.show && props.timeSlots.comingTutorials.data.map((ele, index) => {
+            return (
+              <TimeSlot data={ele} key={index} type={"added"} />
+            );
+          })
+        }
+
+
+
+        {/* {
+          props.existsCourseList && props.existsCourseList.map((ele, index) => {
+            return (
+              <TimeSlot data={ele} key={index} type={"confirmed"} />
+            )
+          })
+        }
+        {
+          props.showComingCourses && props.comingCourseList && props.comingCourseList.map((ele, index) => {
+            return (
+              <TimeSlot data={ele} key={index} type={"added"} />
+            )
+          })
+        }
+        {
+          props.showComingTutorial && props.comingTutorialList && props.comingTutorialList.map((ele, index) => {
+            return (
+              <TimeSlot data={ele} key={index} type={"added"} />
+            )
+          })
+        } */}
+      </div>
+      <div className="weekly-schedule-prompt">
+        <div>
+          <Badge className="weekly-schedule-prompt-badge" color={ColorList.confirmed} text={"Confirmed"} />
+          <Badge className="weekly-schedule-prompt-badge" color={ColorList.addedNotConfirmed} text={"Added But Not Confirmed"} />
+          <Badge className="weekly-schedule-prompt-badge" color={ColorList.toAdd} text={"to add"} />
+        </div>
+      </div>
     </div>
   )
 }
@@ -131,7 +208,7 @@ function TimeSlot(props) {
       style={{
         top: calculateTopMargin(props.data.beginTime),
         left: calculateLeftMargin(props.data.weekday),
-        backgroundColor: props.isExist? "#8CEA00" : "#ff85c0",
+        backgroundColor: ColorList[props.type],
         boxShadow: props.isExist? "1.5px 1.5px 1.5px 1.5px rgba(182, 209, 146)" : "1.5px 1.5px 1.5px 1.5px #ffd6e7",
       }}
     >

@@ -31,6 +31,7 @@ import {
 /* 引入数据 */
 import { 
   CourseTimeSlotList, 
+  AddedNotConfirmedList,
   ComingTimeSlotList,
   // CourseMarkingCriteriaData,
   CourseData,
@@ -130,17 +131,20 @@ export default function CoursePage(props) {
             <div>
               <p className="large-text">This is your <span className="text-highlight">Major Required</span> course.</p>
             </div>
-            <p className="sub-title" style={{marginTop: "8rem",}}>Sessions</p>
+            <p className="sub-title" style={{marginTop: "8rem",}}>Lectures</p>
             {
               coursePageData.session.map((ele, index) => {
                 ele.courseTitle = coursePageData.title;
-                return (
+                let sessionObjWithCourseTitle = ele;
+                sessionObjWithCourseTitle.courseTitle = coursePageData.title;
+                return ele.isLecture && (
                   <CourseInfoTable 
                     key={index}
-                    data={ele}
+                    data={sessionObjWithCourseTitle}
                     sessionList={coursePageData.session}
                     showComingCourses={showComingCourses}
                     setShowComingCourses={setShowComingCourses} 
+                    comingLecture={comingLecture}
                     setComingLecture={setComingLecture}
                     keepShowingComingCourses={keepShowingComingCourses}
                     setKeepShowingComingCourses={setKeepShowingComingCourses}
@@ -157,6 +161,24 @@ export default function CoursePage(props) {
                 // comingCourseList={ComingTimeSlotList}
                 comingCourseList={comingLecture}
                 showComingCourses={showComingCourses}
+                timeSlots={{
+                  confirmed: {
+                    show: true,
+                    data: CourseTimeSlotList,
+                  },
+                  addedNotConfirmed: {
+                    show: true,
+                    data: AddedNotConfirmedList,
+                  },
+                  comingLectures: {
+                    show: showComingCourses,
+                    data: comingLecture,
+                  },
+                  comingTutorials: {
+                    show: false,
+                    data: [],
+                  }
+                }}
               />
             </div>
           </div>

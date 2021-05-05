@@ -6,7 +6,11 @@ import { List, Popover, Button, Checkbox, Divider } from 'antd';
 import WeeklySchedule from './WeeklySchedule';
 
 /* 引入数据 */
-import { CourseTimeSlotList, ComingTimeSlotList } from '../data.d';
+import { 
+  CourseTimeSlotList, 
+  ComingTimeSlotList,
+  AddedNotConfirmedList,
+} from '../data.d';
 import { WeeklySchedulePreferenceCourseList } from '../data.d';
 
 
@@ -18,6 +22,24 @@ export default function WeeklyScheduleWithPreference(props) {
           existsCourseList={CourseTimeSlotList}
           comingCourseList={ComingTimeSlotList}
           showComingCourses={true}
+          timeSlots={{
+            confirmed: {
+              show: true,
+              data: CourseTimeSlotList,
+            },
+            addedNotConfirmed: {
+              show: true,
+              data: AddedNotConfirmedList,
+            },
+            // ComingTimeSlotList: {
+            //   show: true,
+            //   data: comingCourseList,
+            // },
+            comingTutorials: {
+              show: false,
+              data: [],
+            },
+          }}
         />
       </div>
       <div>

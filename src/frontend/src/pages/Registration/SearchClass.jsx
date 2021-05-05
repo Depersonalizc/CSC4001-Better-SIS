@@ -97,6 +97,12 @@ export default function SearchClass(props) {
                 existsCourseList={CourseTimeSlotList}
                 comingCourseList={ComingTimeSlotList}
                 // showComingCourses={showComingCourses}
+                timeSlots={{
+                  confirmed: {
+                    show: true,
+                    data: CourseTimeSlotList,
+                  },
+                }}
               />
             </div>
           </div>

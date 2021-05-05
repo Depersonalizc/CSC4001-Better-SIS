@@ -20,6 +20,40 @@ import {
 
 
 export default (props) => {
+  const [ userName, setUserName ] = React.useState("");
+  const [ password, setPassword ] = React.useState("");
+
+  const handleUserNameChange = (event) => {
+    setUserName(event.target.value);
+  };
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+
+  const onFormFinish = async () => {
+    console.log(`login form finish`);
+
+    let baseURL = "http://175.24.4.124:5000";
+    let targetURL = `${baseURL}/signin`;
+    let resp = await( fetch(targetURL, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+  　　　　'Content-Type': 'application/json',
+  　　},
+  　　body: JSON.stringify({
+    　　studentID: userName,
+        password: password,
+  　　})
+    }) );
+    let json = await( resp.json() );
+    console.log(`return json = ${ JSON.stringify(json) }`);
+  };
+  const onFormFailed = () => {
+    alert("login form failed, please try again");
+    // throw new Error(`login form failed`);
+  };
+
   return (
     <div>
       <NavigatorWithTime />
@@ -34,8 +68,8 @@ export default (props) => {
             name="basic"
             className="login-form"
             initialValues={{ remember: true }}
-            // onFinish={onFinish}
-            // onFinishFailed={onFinishFailed}
+            onFinish={onFormFinish}
+            onFinishFailed={onFormFailed}
           >
             <Form.Item
               label="Username"
@@ -43,7 +77,7 @@ export default (props) => {
               className="login-form-item"
               rules={[{ required: true, message: 'Please input your username!' }]}
             >
-              <Input />
+              <Input onChange={handleUserNameChange} />
             </Form.Item>
 
             <Form.Item
@@ -52,7 +86,7 @@ export default (props) => {
               className="login-form-item"
               rules={[{ required: true, message: 'Please input your password!' }]}
             >
-              <Input.Password />
+              <Input.Password onChange={handlePasswordChange} />
             </Form.Item>
 
             <Form.Item name="remember" valuePropName="checked" style={{display: "inline-block", height: "6rem",}}>

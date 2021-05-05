@@ -14,6 +14,7 @@ import {
 
 import { 
   CourseTimeSlotList, 
+  AddedNotConfirmedList,
   ComingTimeSlotList,
   CourseMarkingCriteriaData
 } from '../data.d';
@@ -214,7 +215,7 @@ export default (props) => {
           onCancel={handleModalCancel}
         >
           <p className="sub-title">Your Weekly Schedule</p>
-          <div style={{transform: "scale(0.55)", transformOrigin: "50% 0%", textAlign: "center",}}>
+          <div style={{transform: "scale(0.55)", transformOrigin: "50% 0%", textAlign: "center", border: "1px solid red",}}>
             <WeeklySchedule 
               existsCourseList={CourseTimeSlotList}
               // comingCourseList={ComingTimeSlotList}
@@ -230,7 +231,7 @@ export default (props) => {
                 },
                 addedNotConfirmed: {
                   show: true,
-                  data: [],
+                  data: AddedNotConfirmedList,
                 },
                 comingLectures: {
                   show: props.showComingCourses,

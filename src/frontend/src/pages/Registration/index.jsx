@@ -46,8 +46,12 @@ export default function Registration(props) {
         method: "GET",
         mode: "cors",
       }) );
-      let text = resp.text();
-      console.log(`text = ${ text }`);
+      let text = await( resp.text() );
+      console.log(`text = ${ text } with type = ${typeof text}`);
+
+      let array = eval( text );
+      console.log(`array = ${array} with type = ${Object.prototype.toString.call(array)}`);
+      setTermList(array);
     };
 
     fetchTermList();
@@ -109,7 +113,7 @@ export default function Registration(props) {
               type: "radio"
             }}
             columns={TermTableColumns}
-            dataSource={TermListData.map((ele) => {
+            dataSource={TermList.map((ele) => {
               return {
                 term: ele,
                 name: "hello world!",

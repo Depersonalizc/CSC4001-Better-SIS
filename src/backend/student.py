@@ -147,3 +147,18 @@ class Student:
         idx = self.studied_courses.find(course)
         # db query and return info
         # initialize the course and show
+
+    def __repr__(self):
+        return f'Student ID:     {self.stuid}\n'\
+             + f'Student name:   {self.name}\n'\
+             + f'Student school: {self.school}\n'\
+             + f'Student major:  {self.major}\n'\
+             + f'Year of study:  {self.year}\n'\
+             + f'Total credits:  {self.tot_credit}\n'\
+             + f'Student major:  {self.major}\n'\
+             + 'Studied courses:\n\t'\
+             + ' '.join(self.studied_courses)
+    def str(self):
+        return self.__str__()
+
+

@@ -1,39 +1,38 @@
-from hashlib import new
+# from hashlib import new
 import dbModels as dbMdl
 from dbModels import db
 from dbModels import app
-import hashlib
+# import hashlib
 import json
 from flask import request
+from flask_cors import cross_origin
 
+@app.route('/searchStu/<string:stuid>', methods=['GET'])
+@cross_origin()
+def find_stu(stuid: str):
+    stu = dbMdl.Student.query.filter_by(id=stuid).first()
+    if stu:
+        print("stu exist")
+        return json.dumps({"exist": True})
+    else:
+        return json.dumps({"exist": False})
 
 
 @app.route('/signup', methods=['POST'])
-# def crate_stu(stuid:int,
-#               name: str,
-#               pwd: str,
-#               school: str = None,
-#               major: str = None,
-#               year: int = None,
-#               totcrdt: int = None,
-#               studied_courses: str = None,
-#               pref: str = None,
-#               wishlist: str = None,
-#               schedule: str = None,
-#               permission: int = None):
+@cross_origin()
 def crate_stu():
-    stuid = request.form['stuid']
-    name = request.form['name']
-    pwd = request.form['pwd']
+    stuid = request.form['studentID']
+    name = request.form['userName']
+    pwd = request.form['password']
     school = request.form['school']
     major = request.form['major']
     year = request.form['year']
-    permission = request.form['permission']
+    # permission = request.form['permission']
     rtdata = {
         "crated": True,
-        "error": None
+        "error": None,
+        "studentID": stuid
     }
-
 
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     if stu:
@@ -47,8 +46,8 @@ def crate_stu():
                             pwd,
                             school,
                             major,
-                            year,
-                            permission = permission)
+                            year)
+                            # permission = permission)
     db.session.add(newStu)
     db.session.commit()
     print("add stu done")
@@ -56,11 +55,12 @@ def crate_stu():
 
 
 @app.route('/signin', methods=['POST'])
+@cross_origin()
 def signin_stu():
     # stu = dbMdl.Student.query.filter(
     #     dbMdl.Student.id == stuid).first()
-    stuid = request.form['stuid']
-    pwd = request.form['pwd']
+    stuid = request.form['studentID']
+    pwd = request.form['password']
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
     rtdata = {
         "exist": False,
@@ -80,13 +80,42 @@ def signin_stu():
         return json.dumps(rtdata)
 
 
-@app.route('/delstu/<int:stuid>')
-def delete_stu(stuid:int):
+@app.route('/getStudentInfo/<string:stuid>')
+@cross_origin()
+def getStuInfo(stuid:str):
+    stu = dbMdl.Student.query.filter_by(id=stuid).first()
+    if stu:
+        return json.dumps({
+            "name":       stu.name,
+            "studentID":  stu.id,
+            "year":       stu.year,
+            "gender":     None,
+            "school":     stu.school,
+            "college":    None,
+            "major":      stu.major,
+            "tot_creidt": stu.tot_credit
+        })
+    else:
+        return json.dumps({
+            "name":       None,
+            "studentID":  None,
+            "year":       None,
+            "gender":     None,
+            "school":     None,
+            "college":    None,
+            "major":      None,
+            "tot_creidt": None
+        })
+
+
+@app.route('/delstu/<str:stuid>')
+@cross_origin()
+def delete_stu(stuid:str):
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
     if stu:
         db.session.delete(stu)
-        print("del stu done")
         db.session.commit()
+        print("del stu done")
         return json.dumps({
             "del": False,
             "error": "Account didn't Exist"
@@ -97,7 +126,7 @@ def delete_stu(stuid:int):
             "del": True,
             "error": None
         })
-
+    
 
 
 # @app.route(userPrefix+'verifypwd', methods=['POST'])
@@ -117,43 +146,6 @@ def delete_stu(stuid:int):
 #             "correctPwd": False
 #         })
 
-@app.route('/getStudentInfo/<int:stuid>', methods=['GET'])
-def getStuInfo(stuid: int):
-    stu = dbMdl.Student.query.filter_by(id = stuid).first()
-    if stu:
-        return json.dumps({
-            'name':         stu.name,               # str
-            'stuid':        stu.stuid,              # int
-            'school':       stu.school,             # str
-            'major':        stu.major,              # str
-            'year':         stu.year,               # int
-            'tot_credit':   stu.studied_courses,    # str split(' ')
-        })
-
-@app.route('/getTermInfo', methods=['GET'])
-def getTermInfo():
-    return json.dumps({
-        "2020-2021 Term 1",
-        "2020-2021 Term 2",
-        "2020-2021 Summer Term"
-    })
-
-@app.route('/searchCourse', methods=['POST'])
-def searchCourse():
-    pre = request.form['coursePrefix']
-    code = str(request.form['courseCode'])
-    school = request.form['school']
-    ret = dbMdl.Course.query.filter_by(code=pre+code).first()
-
-    return json.dumps({
-        'code':         ret.code,       # full code
-        'name':         ret.name,
-        'units':        ret.units,
-        'prereqs':      ret.prereqs,    # str split(' ') full code
-        'lecturers':    ret.lecturers,  # str split(' ') lecturer name
-        'tutors':       ret.tutors      # str split(' ') tutor name
-    })
-
 
 def change_pwd(stuid: int, newpwd):
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
@@ -166,6 +158,7 @@ def change_pwd(stuid: int, newpwd):
 
 
 @app.route('/getTermInfo', methods=['GET'])
+@cross_origin()
 def getTermInfo():
     return json.dumps([
         "2018-2019 Term 1",
@@ -203,6 +196,25 @@ def crate_course(course_code,
     print("add stu done")
 
 
+@app.route('/searchCourse', methods=['POST'])
+@cross_origin()
+def searchCourse():
+    pre = request.form['coursePrefix']
+    code = str(request.form['courseCode'])
+    school = request.form['school']
+    ret = dbMdl.Course.query.filter_by(code=pre+code).first()
+
+    return json.dumps({
+        'code':         ret.code,       # full code
+        'name':         ret.name,
+        'units':        ret.units,
+        'prereqs':      ret.prereqs,    # str split(' ') full code
+        # 'lecturers':    ret.lecturers,  # str split(' ') lecturer name
+        # 'tutors':       ret.tutors      # str split(' ') tutor name
+    })
+
+
+
 def search_course(course_code):
     course = dbMdl.Course.query.filter_by(code=course_code).first()
     if course:
@@ -223,8 +235,8 @@ def crate_session(course_code: str,
                   venue: str = None,
                   class1: str = None,
                   class2: str = None):
-    newSes = dbMdl.Session(course=course_code,
-                           type=type,
+    newSes = dbMdl.Session(course_code,
+                           type,
                            instr=instr,
                            venue=venue,
                            class1=class1,
@@ -240,6 +252,7 @@ def crate_session(course_code: str,
     print("crate sec")
 
 
-# if __name__ == "__main__":
-#     app.run()
-#     db.init_app(app)
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
+    db.init_app(app)
+

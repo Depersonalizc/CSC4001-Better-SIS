@@ -147,17 +147,3 @@ class Student:
         idx = self.studied_courses.find(course)
         # db query and return info
         # initialize the course and show
-
-
-
-def get_student(stuid: str) -> Student:
-    s = dbMdl.Student.query.filter_by(id=stuid).first()
-    courses = s.studied_courses.split(' ')
-    pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-    return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
-
-def create_new_student(stuid, name, pwd, school, major, year, tot_credit, courses):
-    s = dbMdl.Student(stuid, name, pwd, school, major, year, tot_credit, studied_courses=courses)
-    db.session.add(s)
-    pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-    return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)

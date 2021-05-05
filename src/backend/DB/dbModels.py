@@ -160,7 +160,6 @@ class Session(db.Model):
         super().__init__()
         self.id = self.snoCount
         self.snoCount += 1
-        # self.sno = session_no
         self.course = course_code
         self.type = type
         self.instr = instr
@@ -178,10 +177,13 @@ class Course(db.Model):
     __tablename__ = 'Course'
     # id = db.Column(db.String(20), primary_key=True, nullable=False)
     code = db.Column(db.String(10), primary_key=True, nullable=False) 
+    # prefix = db.Column(db.String(5))
+    # suffix = db.Column(db.Integer)
+    units = db.Column(db.Integer)
     name = db.Column(db.String(50))
     school = db.Column(db.String(10))
     units = db.Column(db.Integer)
-    prereqs = db.Column(db.Text)
+    prereqs = db.Column(db.Text)     #str split(' ') full code
     # lecturers = db.Column(db.Text)
     # tutors = db.Column(db.Text)
 
@@ -196,6 +198,8 @@ class Course(db.Model):
                 ):
         super().__init__()
         self.code = code
+        # self.prefix = code[0:3]
+        # self.suffix = int(code[3:7])
         self.name = name
         self.school = school
         self.units = units
@@ -269,7 +273,8 @@ class SemesterCourse(db.Model):
 
 class Comment(db.Model):
     __tablename__ = 'Comment'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    idCount = 1
+    id = db.Column(db.Integer, primary_key=True)
     # ,db.ForeignKey('user.id')
     stuid = db.Column(db.Integer, nullable=False)
     stuName = db.Column(db.String(20))
@@ -290,6 +295,8 @@ class Comment(db.Model):
                  content = None,
                  keywords = None):
         super().__init__()
+        self.id = self.idCount
+        self.idCount += 1
         self.stuid = stuid
         self.stuName = stuName
         self.course = course_code

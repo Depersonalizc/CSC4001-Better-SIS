@@ -157,9 +157,9 @@ class Session(db.Model):
                 type:str,
                 instr:str = None,
                 venue:str = None,
-                capacity: int = None,
                 class1:str = None, 
-                class2:str = None):
+                class2:str = None,
+                capacity: int = None,):
         super().__init__()
         self.course = course_code
         self.type = type
@@ -184,8 +184,8 @@ class Course(db.Model):
     __tablename__ = 'Course'
     # id = db.Column(db.String(20), primary_key=True, nullable=False)
     code = db.Column(db.String(10), primary_key=True, nullable=False) 
-    # prefix = db.Column(db.String(5))
-    # suffix = db.Column(db.Integer)
+    prefix = db.Column(db.String(5))
+    suffix = db.Column(db.Integer)
     units = db.Column(db.Integer)
     name = db.Column(db.String(50))
     school = db.Column(db.String(10))
@@ -212,8 +212,8 @@ class Course(db.Model):
                 ):
         super().__init__()
         self.code = code
-        # self.prefix = code[0:3]
-        # self.suffix = int(code[3:7])
+        self.prefix = code[0:3]
+        self.suffix = int(code[3:7])
         self.name = name
         self.school = school
         self.units = units

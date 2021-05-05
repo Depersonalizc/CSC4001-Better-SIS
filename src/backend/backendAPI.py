@@ -175,67 +175,63 @@ def getTermInfo():
 # @cross_origin()
 def searchCourse():
     pre = request.form['coursePrefix']     #CSC
-    code = str(request.form['courseCode']) #1001
+    code = request.form['courseCode'] #1001
     school = request.form['school']        #SSE
-    ret = dbMdl.Course.query.filter_by(code=pre+code).first()
-    mrkCrtrData = [
-        # {
-        #     "item":   "Assignments",
-        #     "weight": "20%",
-        # },
-        # {
-        #     "item":   "Midterm Exam",
-        #     "weight": "30%",
-        # },
-        # {
-        #     "item":   "Final Exam",
-        #     "weight": "50%",
-        # },
-    ]
-    for mrkCrtrItm in ret.markingCriteria.split(","):
-        mrkCrtrData.append({"item": mrkCrtrItm.split(':')[0],
-                            "weight": mrkCrtrItm.split(':')[1]})
-    sessionData = []
-    sessions = dbMdl.Session.query.filter_by(course=pre+code).all()
-    for ses in sessions:
-        instr = dbMdl.Instructor.query.filter_by(id=int(ses.instr.split(' ')[0])).first()
-        timesltData = []
-        if ses.class1:
-            timesltData.append({
-                "weekday": day_name[int(ses.class1[0])-1],
-                "beginTime": ses.class1[2:7],
-                "endTime": ses.class1[10:],
-            })
-        if ses.class2:
-            timesltData.append({
-                "weekday": day_name[int(ses.class2[0])-1],
-                "beginTime": ses.class2[2:7],
-                "endTime": ses.class2[10:],
-            })
-        sessionData.append({"sessionNumber": ses.sno,
-                            "isLecture": ses.type=='lec',
-                            "instructor": instr.name,
-                            'timeSlots': timesltData,
-                            "location": ses.venue,
-                            "currentEnrollment": ses.curEnroll,
-                            "classCapacity": ses.capacity,
-                            })
+    if not pre:
+        rets = dbMdl.Course.query.filter_by(suffix=code).all()
+    elif not code:
+        rets = dbMdl.Course.query.filter_by(prefix=pre).all()
+    else:
+        rets = dbMdl.Course.query.filter_by(code=pre+str(code)).all()
 
-    return json.dumps({
-        'title':          ret.code,       # full code
-        'fullname':       ret.code+' - '+ret.name,
-        'code':           code,
-        'credit':         ret.units,
-        'school':         ret.school,
-        'term':           "2020-2021 Term 2",
-        "mode":           "onsite",
-        "targetStudent":  "Undergraduate",
-        'introduction':   ret.intro,
-        'markingCriteria': mrkCrtrData,
-        "syllabus":     ret.syllabus,
-        "prerequisite": ret.prereqs.split(' '),
-        "session":      sessionData,
-    })
+    coursesData = []
+    for ret in rets:
+    
+        mrkCrtrData = []
+        for mrkCrtrItm in ret.markingCriteria.split(","):
+            mrkCrtrData.append({"item": mrkCrtrItm.split(':')[0],
+                                "weight": mrkCrtrItm.split(':')[1]})
+        sessionData = []
+        sessions = dbMdl.Session.query.filter_by(course=pre+code).all()
+        for ses in sessions:
+            instr = dbMdl.Instructor.query.filter_by(id=int(ses.instr.split(' ')[0])).first()
+            timesltData = []
+            if ses.class1:
+                timesltData.append({
+                    "weekday": day_name[int(ses.class1[0])-1],
+                    "beginTime": ses.class1[2:7],
+                    "endTime": ses.class1[10:],
+                })
+            if ses.class2:
+                timesltData.append({
+                    "weekday": day_name[int(ses.class2[0])-1],
+                    "beginTime": ses.class2[2:7],
+                    "endTime": ses.class2[10:],
+                })
+            sessionData.append({"sessionNumber": ses.sno,
+                                "isLecture": ses.type=='lec',
+                                "instructor": instr.name,
+                                'timeSlots': timesltData,
+                                "location": ses.venue,
+                                "currentEnrollment": ses.curEnroll,
+                                "classCapacity": ses.capacity,
+                                })
+            coursesData.append({
+                'title':          ret.code,       # full code
+                'fullname':       ret.code+' - '+ret.name,
+                'code':           code,
+                'credit':         ret.units,
+                'school':         ret.school,
+                'term':           "2020-2021 Term 2",
+                "mode":           "onsite",
+                "targetStudent":  "Undergraduate",
+                'introduction':   ret.intro,
+                'markingCriteria': mrkCrtrData,
+                "syllabus":     ret.syllabus,
+                "prerequisite": ret.prereqs.split(' '),
+                "session":      sessionData,
+            })
+    return json.dumps(coursesData)
 
 
 def crate_course(course_code,

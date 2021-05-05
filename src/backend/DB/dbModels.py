@@ -1,5 +1,7 @@
 # import sqlite3
 import hashlib
+# from random import randint, choice
+import random
 from datetime import datetime, time
 from flask import Flask
 from flask.helpers import send_file
@@ -25,7 +27,7 @@ class Student(db.Model):
     name = db.Column(db.String(20), nullable=False)
     __password = db.Column(db.String(200), nullable=False)
     permission = db.Column(db.Integer, default=1) #0 adm, 1 normal stu
-    # collage = db.Column(db.String(20), nullable=False) #db.Enum("Consumer", "Designer", "Company"), default=
+    collage = db.Column(db.String(20)) #db.Enum("Consumer", "Designer", "Company"), default=
     school = db.Column(db.String(10))
     major = db.Column(db.String(10))
     year = db.Column(db.Integer)
@@ -49,12 +51,16 @@ class Student(db.Model):
                 # pref:str=None, 
                 # wishlist:str=None, 
                 # schedule:str=None, 
-                permission:int=None):
+                permission:int=None,
+                collage: str = None,):
         super().__init__()
         self.id = id
         self.name = name
         self.password = pwd
         self.school = school
+        self.collage = collage
+        if not collage:
+            self.collage = random.choice(['Shaw', 'Diligentia', 'Muse', 'Harmonia'])
         self.major = major
         self.year = year
         self.tot_credit = totcrdt
@@ -63,8 +69,7 @@ class Student(db.Model):
         # self.wishlist = wishlist
         # self.schedule = schedule
         self.permission = permission
-
-
+            
     @property
     def password(self): 
         return self.__password
@@ -109,7 +114,6 @@ class Student(db.Model):
 
 class Instructor(db.Model):
     __tablename__ = 'Instructor'
-    idCount = 1
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     school = db.Column(db.String(10))
@@ -124,8 +128,6 @@ class Instructor(db.Model):
                  isLecturer = None,
                  website = None):
         super().__init__()
-        self.id = self.idCount
-        self.idCount += 1
         self.name = name
         self.school = school
         self.isLecturer = isLecturer
@@ -137,35 +139,40 @@ class Instructor(db.Model):
 
 class Session(db.Model):
     __tablename__ = 'Session'
-    snoCount = 1
-    # sno = db.Column(db.String(10), primary_key=True) #, autoincrement = True
     sno = db.Column(db.Integer, primary_key=True)
     course = db.Column(db.String(10), nullable=False)
     type = db.Column(db.String(10), nullable=False)  # db.Enum
     # course_name = db.Column(db.String(50), nullable=False)
-    instr = db.Column(db.Text)
+    instr = db.Column(db.Text)  # str split(' ') full code, with instr id
     # instr_id = db.Column(db.Integer)
     venue = db.Column(db.String(20))
-    class1 = db.Column(db.String(20))
-    class2 = db.Column(db.String(20))
+    capacity = db.Column(db.Integer)
+    curEnroll = db.Column(db.Integer)
+    class1 = db.Column(db.String(20))  # str split('-')
+    class2 = db.Column(db.String(20))  # str split('-')
+    
 
     def __init__(self, 
-                # session_no:str,
                 course_code:str, 
                 type:str,
                 instr:str = None,
                 venue:str = None,
                 class1:str = None, 
-                class2:str = None):
+                class2:str = None,
+                capacity: int = None,):
         super().__init__()
-        self.id = self.snoCount
-        self.snoCount += 1
         self.course = course_code
         self.type = type
         self.instr = instr
         self.venue = venue
+        self.capacity = capacity
+        self.curEnroll = 0
+        if not capacity:
+            capacity = [30,150][type=='lec']
+            self.curEnroll = random.randint(0,capacity)
         self.class1 = class1
         self.class2 = class2
+
 
 
 
@@ -177,33 +184,43 @@ class Course(db.Model):
     __tablename__ = 'Course'
     # id = db.Column(db.String(20), primary_key=True, nullable=False)
     code = db.Column(db.String(10), primary_key=True, nullable=False) 
-    # prefix = db.Column(db.String(5))
-    # suffix = db.Column(db.Integer)
+    prefix = db.Column(db.String(5))
+    suffix = db.Column(db.Integer)
     units = db.Column(db.Integer)
     name = db.Column(db.String(50))
     school = db.Column(db.String(10))
     units = db.Column(db.Integer)
     prereqs = db.Column(db.Text)     #str split(' ') full code
+    intro = db.Column(db.Text)
+    markingCriteria = db.Column(db.Text)
+    # str split(';') then split(','). EG:
+    syllabus = db.Column(db.String(255))
     # lecturers = db.Column(db.Text)
     # tutors = db.Column(db.Text)
 
     def __init__(self,
-                 code,
-                 name = None,
-                 school = None,
-                 units = None,
-                 prereqs = None,
-                #  lecturers = None,
+                 code:str,
+                 name:str = None,
+                 school:str = None,
+                 units:int = None,
+                 prereqs: str = None,
+                 intro: str = None,
+                 syllabus: str = 'https://www.lgulife.com/p/422/',
+                 markingCriteria: str = 'Assignment:20%,Midterm Exam:30%,Final Exam:50%'
+                # lecturers = None,
                 #  tutors = None
                 ):
         super().__init__()
         self.code = code
-        # self.prefix = code[0:3]
-        # self.suffix = int(code[3:7])
+        self.prefix = code[0:3]
+        self.suffix = int(code[3:7])
         self.name = name
         self.school = school
         self.units = units
         self.prereqs = prereqs
+        self.intro = intro
+        self.syllabus = syllabus
+        self.markingCriteria = markingCriteria
         # self.lecturers = lecturers
         # self.tutors = tutors
 
@@ -273,7 +290,6 @@ class SemesterCourse(db.Model):
 
 class Comment(db.Model):
     __tablename__ = 'Comment'
-    idCount = 1
     id = db.Column(db.Integer, primary_key=True)
     # ,db.ForeignKey('user.id')
     stuid = db.Column(db.Integer, nullable=False)
@@ -295,8 +311,6 @@ class Comment(db.Model):
                  content = None,
                  keywords = None):
         super().__init__()
-        self.id = self.idCount
-        self.idCount += 1
         self.stuid = stuid
         self.stuName = stuName
         self.course = course_code

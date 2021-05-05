@@ -1,7 +1,7 @@
 # from hashlib import new
-import dbModels as dbMdl
-from dbModels import db
-from dbModels import app
+import DB.dbModels as dbMdl
+from DB.dbModels import db
+from DB.dbModels import app
 # import hashlib
 import json
 from flask import request
@@ -108,8 +108,6 @@ def getStuInfo(stuid:str):
         })
 
 
-@app.route('/delstu/<str:stuid>')
-@cross_origin()
 def delete_stu(stuid:str):
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
     if stu:

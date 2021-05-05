@@ -14,6 +14,7 @@ import {
 
 import { 
   CourseTimeSlotList, 
+  AddedNotConfirmedList,
   ComingTimeSlotList,
   CourseMarkingCriteriaData
 } from '../data.d';
@@ -39,13 +40,24 @@ export default (props) => {
     props.setKeepShowingComingCourses(false);
   };
 
-  const handleModalAddSessionMouseOver = () => {
-    setComingTutorial([props.data]);
-    console.log(`props.data = ${JSON.stringify(props.data)}`);
+  function handleModalAddSessionMouseOver() {
+    console.log(`this = ${ JSON.stringify(this) }`);
+    setComingTutorial( this.timeSlots.map((ele) => {
+      return {
+        courseTitle: this.courseTitle,
+        session: this.sessionNumber,
+        isLecture: this.isLecture,
+        beginTime: ele.beginTime,
+        endTime: ele.endTime,
+        weekday: ele.weekday,
+        location: this.location,
+      };
+    }) );
+    // console.log(`props.data = ${JSON.stringify(props.data)}`);
     console.log(`set coming tutorial`);
     setShowComingTutorial(true);
   };
-  const handleModalAddSessionMouseLeave = () => {
+  function handleModalAddSessionMouseLeave() {
     setComingTutorial([]);
     console.log(`release coming tutorial`);
     setShowComingTutorial(false);
@@ -53,10 +65,20 @@ export default (props) => {
 
   const handleAddToCartMouseOver = () => {
     props.setShowComingCourses(true);
-    const comingLectureObj = props.data;
-    comingLectureObj.courseTitle = "CSC4001";
-    console.log(`comingLectureObj = ${ JSON.stringify(comingLectureObj) }`);
-    props.setComingLecture([comingLectureObj]);
+    const comingLectureSession = props.data;
+    let comingLecturList = comingLectureSession.timeSlots.map((ele, index) => {
+      return {
+        courseTitle: comingLectureSession.courseTitle,
+        session: comingLectureSession.sessionNumber,
+        isLecture: comingLectureSession.isLecture,
+        beginTime: ele.beginTime,
+        endTime: ele.endTime,
+        weekday: ele.weekday,
+        location: comingLectureSession.location,
+      };
+    });
+    // console.log(`comingLectureObj = ${ JSON.stringify(comingLectureObj) }`);
+    props.setComingLecture(comingLecturList);
   };
   const handleAddToCartMouseLeave = () => {
     !props.keepShowingComingCourses && props.setShowComingCourses(false);
@@ -88,17 +110,17 @@ export default (props) => {
 		}, {
 			title: "Add Session",
 			dataIndex: "addSession",
-      render: (text) => {
-        return (
-          <Button
-            type="primary"
-            onMouseMove={handleModalAddSessionMouseOver}
-            onMouseLeave={handleModalAddSessionMouseLeave}
-          >
-            {text}
-          </Button>
-        )
-      }
+      // render: (text) => {
+      //   return (
+      //     <Button
+      //       type="primary"
+      //       onMouseMove={handleModalAddSessionMouseOver}
+      //       onMouseLeave={handleModalAddSessionMouseLeave}
+      //     >
+      //       {text}
+      //     </Button>
+      //   )
+      // }
 		},
 	];
 
@@ -127,6 +149,7 @@ export default (props) => {
     },
   ];
 
+  // console.log(`props.data = ${ JSON.stringify(props.data) }`);
   return (
     <div className="course-description-table">
       <div>
@@ -192,14 +215,33 @@ export default (props) => {
           onCancel={handleModalCancel}
         >
           <p className="sub-title">Your Weekly Schedule</p>
-          <div style={{transform: "scale(0.55)", transformOrigin: "60% 0%",}}>
+          <div style={{transform: "scale(0.55)", transformOrigin: "50% 0%", textAlign: "center", border: "1px solid red",}}>
             <WeeklySchedule 
               existsCourseList={CourseTimeSlotList}
-              comingCourseList={ComingTimeSlotList}
+              // comingCourseList={ComingTimeSlotList}
+              comingCourseList={props.comingLecture}
               showComingCourses={props.showComingCourses}
               showComingTutorial={showComingTutorial}
               // comingTutorialList={TutorialTimeSlot}
               comingTutorialList={comingTutorial}
+              timeSlots={{
+                confirmed: {
+                  show: true,
+                  data: CourseTimeSlotList,
+                },
+                addedNotConfirmed: {
+                  show: true,
+                  data: AddedNotConfirmedList,
+                },
+                comingLectures: {
+                  show: props.showComingCourses,
+                  data: props.comingLecture,
+                },
+                comingTutorials: {
+                  show: showComingTutorial,
+                  data: comingTutorial,
+                },
+              }}
             />
           </div>
           <Table 
@@ -208,7 +250,7 @@ export default (props) => {
             // columns={CourseTutorialListData.columns}
             columns={TutorialTableColumns}
             // dataSource={CourseTutorialListData.dataSource}
-            dataSource={props.sessionList.map((ele, index) => {
+            dataSource={props.sessionList.filter((ele) => ele.isLecture === false).map((ele, index) => {
               return {
                 key: index,
                 session: (ele.isLecture? "Lecture" : "Tutorial") + "-" + (ele.sessionNumber.toString().length === 1? "0" + ele.sessionNumber.toString() : ele.sessionNumber.toString()),
@@ -226,7 +268,15 @@ export default (props) => {
                   />
                 ),
                 classroom: ele.location,
-                addSession: "Add Session",
+                addSession: (
+                  <Button
+                    type="primary"
+                    onMouseMove={handleModalAddSessionMouseOver.bind(ele)}
+                    onMouseLeave={handleModalAddSessionMouseLeave.bind(ele)}
+                  >
+                    {"Add Session"}
+                  </Button>
+                ),
               };
             })}
             pagination={false}
@@ -240,7 +290,14 @@ export default (props) => {
           // dataSource={CoursePageInfoData.dataSource}
           columns={CourseInfoTableColumns}
           dataSource={[{
-            time: "Class Time Slot",
+            time: props.data.timeSlots.map((ele, index) => {
+              return (
+                <div className="course-time-indent-format" key={index}>
+                  <span>{ele.weekday} </span>
+                  <span>{ele.beginTime} - {ele.endTime}</span>
+                </div>
+              );
+            }),
             room: props.data.location,
             instructor: props.data.instructor,
           }]}

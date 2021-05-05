@@ -6,6 +6,9 @@ import '../../utils/rem';
 /* 引入样式表 */
 import './index.less';
 
+/* 引入api函数 */
+import { getTermList } from '../api/api';
+
 /* 引入组件 */
 import Navigator from './Navigator';
 import RegistrationMenu from './Menu';
@@ -39,20 +42,25 @@ export default function Registration(props) {
   const [ TermList, setTermList ] = React.useState([]);
 
   React.useEffect(() => {
-    const fetchTermList = async () => {
-      const baseURL = "http://175.24.4.124:5000";
-      const targetURL = `${baseURL}/getTermInfo`;
-      let resp = await( fetch(targetURL, {
-        method: "GET",
-        mode: "cors",
-      }) );
-      let text = await( resp.text() );
-      console.log(`text = ${ text } with type = ${typeof text}`);
+    // const fetchTermList = async () => {
+    //   const baseURL = "http://175.24.4.124:5000";
+    //   const targetURL = `${baseURL}/getTermInfo`;
+    //   let resp = await( fetch(targetURL, {
+    //     method: "GET",
+    //     mode: "cors",
+    //   }) );
+    //   let text = await( resp.text() );
+    //   console.log(`text = ${ text } with type = ${typeof text}`);
 
-      let array = eval( text );
-      console.log(`array = ${array} with type = ${Object.prototype.toString.call(array)}`);
-      setTermList(array);
-    };
+    //   let array = eval( text );
+    //   console.log(`array = ${array} with type = ${Object.prototype.toString.call(array)}`);
+    //   setTermList(array);
+    // };
+
+    const fetchTermList = async () => {
+      let returnTermList = await( getTermList() );
+      setTermList(returnTermList);
+    }
 
     fetchTermList();
   }, []);

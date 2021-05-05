@@ -3,6 +3,9 @@ import React from 'react';
 /* 引入样式表 */
 import './index.less';
 
+/* 引入api函数 */
+import { SignIn } from '../api/api';
+
 /* 引入组件 */
 import NavigatorWithTime from '../GeneralComponents/NavigatorWithTime';
 
@@ -20,35 +23,52 @@ import {
 
 
 export default (props) => {
-  const [ userName, setUserName ] = React.useState("");
+  const [ studentID, setStudentID ] = React.useState("");
   const [ password, setPassword ] = React.useState("");
 
-  const handleUserNameChange = (event) => {
-    setUserName(event.target.value);
+  const handleStudentIDChange = (event) => {
+    setStudentID(event.target.value);
   };
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
 
-  const onFormFinish = async () => {
-    console.log(`login form finish`);
+  // const onFormFinish = async () => {
+  //   console.log(`login form finish`);
 
-    let baseURL = "http://175.24.4.124:5000";
-    let targetURL = `${baseURL}/signin`;
-    let resp = await( fetch(targetURL, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-  　　　　'Content-Type': 'application/json',
-  　　},
-  　　body: JSON.stringify({
-    　　studentID: userName,
-        password: password,
-  　　})
-    }) );
-    let json = await( resp.json() );
-    console.log(`return json = ${ JSON.stringify(json) }`);
+  //   let baseURL = "http://175.24.4.124:5000";
+  //   let targetURL = `${baseURL}/signin`;
+  //   const formData = new FormData();
+  //   formData.append("studentID", studentID);
+  //   formData.append("password", password);
+  //   let resp = await( fetch(targetURL, {
+  //     method: "POST",
+  //     mode: "cors",
+  //     body: formData,
+  //   }) );
+  //   let json = await( resp.json() );
+  //   console.log(`return json = ${ JSON.stringify(json) }`);
+
+  //   if ( json["exist"] && json["correctPwd"] ) {
+  //     alert("Success");
+  //   } else {
+  //     alert("login failed");
+  //   }
+  // };
+
+  const onFormFinish = async () => {
+    const formData = new FormData();
+    formData.append("studentID", studentID);
+    formData.append("password", password);
+    let json = await( SignIn(formData) );
+
+    if ( json["exist"] && json["correctPwd"] ) {
+      alert("Success");
+    } else {
+      alert("login failed");
+    }
   };
+
   const onFormFailed = () => {
     alert("login form failed, please try again");
     // throw new Error(`login form failed`);
@@ -72,12 +92,12 @@ export default (props) => {
             onFinishFailed={onFormFailed}
           >
             <Form.Item
-              label="Username"
-              name="username"
+              label="Student ID"
+              name="studentID"
               className="login-form-item"
-              rules={[{ required: true, message: 'Please input your username!' }]}
+              rules={[{ required: true, message: 'Please input your studentID!' }]}
             >
-              <Input onChange={handleUserNameChange} />
+              <Input onChange={handleStudentIDChange} />
             </Form.Item>
 
             <Form.Item

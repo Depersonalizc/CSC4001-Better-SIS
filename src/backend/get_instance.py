@@ -96,7 +96,7 @@ def create_new_student(stuid, name, pwd, school, major, year, tot_credit, studie
 
 
 def get_schedule(stuid):
-    assert stuid in students, 'No such student in {students}'
+    assert stuid in students, 'No such student in {students}, try sign in first'
     stud = students[stuid]
     if stuid in schedules:
         return schedules[stuid]

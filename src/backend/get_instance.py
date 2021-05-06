@@ -51,7 +51,8 @@ def get_course(full_code: str):
 
         class1 = tuple(t for t in s.class1.split('-'))
         class2 = tuple(t for t in s.class1.split('-')) if s.class2 else None
-        course.add_session(s.sno, ss_ins, s.venue, s.type, class1, class2)
+        course.add_session(s.sno, ss_ins, s.venue, s.type,
+                           s.capacity, s.curEnroll, class1, class2)
 
     return course
     # print()
@@ -96,4 +97,3 @@ def get_schedule(stuid):
     sche = Schedule(stud)
     schedules[stuid] = sche
     return sche
-

@@ -103,6 +103,7 @@ class Instructor:
     def email(self):
         return self.email
 
+
 class Session:
 
     # A Session of a course (either lecture or tutorial), atom of scheduling
@@ -318,6 +319,8 @@ class Course:
                     instructors: Set[Instructor],
                     venue: str,
                     session_type: str,
+                    capacity: int,
+                    cur_enroll: int,
                     class1: Tuple[str, str],
                     class2: Tuple[str, str] = None) -> None:
         """
@@ -344,6 +347,7 @@ class Course:
             new_session = Session(session_no, self,
                                   instructors, venue,
                                   session_type,
+                                  capacity, cur_enroll,
                                   class1_ts, class2_ts)
             self._add_session(new_session)
             self.add_instructors(instructors, session_type)

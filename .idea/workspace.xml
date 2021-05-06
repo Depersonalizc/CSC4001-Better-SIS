@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="654224b9-ecd6-4125-85df-3a45798e0c99" name="Default Changelist" comment="Add time_utils.py, rewrite course.py">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/backend/course.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/course.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/backend/get_instance.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/get_instance.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/backend/schedule.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/schedule.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/backend/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/student.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,8 +21,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/backend/course.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="241">
-              <caret line="183" lean-forward="true" selection-start-line="183" selection-end-line="183" />
+            <state relative-caret-position="162">
+              <caret line="315" lean-forward="true" selection-start-line="315" selection-end-line="315" />
             </state>
           </provider>
         </entry>
@@ -30,8 +30,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/backend/schedule.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="682">
-              <caret line="293" selection-start-line="293" selection-end-line="293" />
+            <state relative-caret-position="7">
+              <caret line="271" column="24" selection-start-line="271" selection-start-column="24" selection-end-line="271" selection-end-column="24" />
               <folding>
                 <element signature="e#0#46#0" expanded="true" />
               </folding>
@@ -54,8 +54,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/backend/get_instance.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
-              <caret line="98" lean-forward="true" selection-start-line="98" selection-end-line="98" />
+            <state relative-caret-position="484">
+              <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
               </folding>
@@ -540,15 +540,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/backend/course.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="241">
-          <caret line="183" lean-forward="true" selection-start-line="183" selection-end-line="183" />
+        <state relative-caret-position="162">
+          <caret line="315" lean-forward="true" selection-start-line="315" selection-end-line="315" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/backend/schedule.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="682">
-          <caret line="293" selection-start-line="293" selection-end-line="293" />
+        <state relative-caret-position="7">
+          <caret line="271" column="24" selection-start-line="271" selection-start-column="24" selection-end-line="271" selection-end-column="24" />
           <folding>
             <element signature="e#0#46#0" expanded="true" />
           </folding>
@@ -557,8 +557,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/backend/get_instance.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="98" lean-forward="true" selection-start-line="98" selection-end-line="98" />
+        <state relative-caret-position="484">
+          <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />
           </folding>

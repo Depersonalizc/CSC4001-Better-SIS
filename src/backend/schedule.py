@@ -269,7 +269,7 @@ class Schedule:
     def can_buffer_session(self, ss: Session):
         """
         (Assume in course page, only one package in buffer)
-        Return True iff
+        Return True iff:
         1. session has no time conflict with current selected+buffer area
         2. student has taken all the prereqs of the course
         3. any other session (same type) of the same course has not been buffered.

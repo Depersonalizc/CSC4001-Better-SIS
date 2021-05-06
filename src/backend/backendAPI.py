@@ -12,7 +12,6 @@ from calendar import day_name
 CORS(app, supports_credentials=True, resources=r"/*")
 
 @app.route('/searchStu/<string:stuid>', methods=['GET'])
-# @cross_origin()
 def find_stu(stuid: str):
 # @app.route('/searchStu', methods=['GET'])
 # def find_stu():
@@ -26,7 +25,6 @@ def find_stu(stuid: str):
 
 
 @app.route('/signup', methods=['POST'])
-# @cross_origin()
 def create_stu():
     stuid = request.form['studentID']
     name = request.form['userName']
@@ -64,7 +62,6 @@ def create_stu():
 
 
 @app.route('/signin', methods=['POST'])
-# @cross_origin()
 def signin_stu():
     # stu = dbMdl.Student.query.filter(
     #     dbMdl.Student.id == stuid).first()
@@ -90,7 +87,6 @@ def signin_stu():
 
 
 @app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
-# @cross_origin()
 def getStuInfo(stuid:str):
 # @app.route('/getStudentInfo', methods=['GET'])
 # def getStuInfo():
@@ -119,52 +115,7 @@ def getStuInfo(stuid:str):
             "tot_creidt": None
         })
 
-
-def delete_stu(stuid:str):
-    stu = dbMdl.Student.query.filter_by(id = stuid).first()
-    if stu:
-        db.session.delete(stu)
-        db.session.commit()
-        print("del stu done")
-        return json.dumps({
-            "del": False,
-            "error": "Account didn't Exist"
-        })
-    else:
-        print("No such student")
-        return json.dumps({
-            "del": True,
-            "error": None
-        })
-    
-def verify_pwd():
-    stuid = request.form['stuid']
-    pwd = request.form['pwd']
-    stu = dbMdl.Student.query.filter_by(id = stuid).first()
-    # return stu.check_password(pwd)
-    if stu.check_password(pwd):
-        print("corrent pwd")
-        return json.dumps({
-            "correctPwd": True
-        })
-    else:
-        print("wrong pwd")
-        return json.dumps({
-            "correctPwd": False
-        })
-
-def change_pwd(stuid: int, newpwd):
-    stu = dbMdl.Student.query.filter_by(id = stuid).first()
-    if stu.check_password(newpwd):
-        print("same as before")
-    else:
-        stu.password = newpwd
-        print("change pwd done")
-    db.session.commit()
-
-
 @app.route('/getTermInfo', methods=['GET'])
-# @cross_origin()
 def getTermInfo():
     return json.dumps([
         "2018-2019 Term 1",
@@ -179,7 +130,6 @@ def getTermInfo():
     ])
 
 @app.route('/searchCourse', methods=['POST'])
-# @cross_origin()
 def searchCourse():
     pre = request.form['coursePrefix']     #CSC
     code = request.form['courseCode'] #1001
@@ -243,7 +193,6 @@ def searchCourse():
 
 
 @app.route('/getInstr/<string:courseTitle>', methods=['GET'])
-# @cross_origin()
 def getInstr(courseTitle: str):
     InstrData = []
     lecs = dbMdl.Session.query.filter(dbMdl.Session.course==courseTitle, dbMdl.Session.type=='lec').all()
@@ -260,7 +209,6 @@ def getInstr(courseTitle: str):
 
 
 @app.route('/getCourseComment/<string:courseTitle>', methods=['GET'])
-# @cross_origin()
 def getCourseComment(courseTitle: str):
     cmtData = []
     avgRating = 0.0
@@ -281,7 +229,6 @@ def getCourseComment(courseTitle: str):
     })
 
 @app.route('/postCourseComment', methods=['POST'])
-# @cross_origin()
 def postCourseComment():
     corsCode = request.form['courseTitle']
     stuid = request.form['studentID']
@@ -296,57 +243,101 @@ def postCourseComment():
         return json.dumps({'succeed':False})
 
 
-def create_course(course_code,
-                 name=None,
-                 school=None,
-                 units=None,
-                 prereqs=None,
-                 lecturers=None,
-                 tutors=None):
-    course = dbMdl.Course.query.filter_by(code=course_code).first()
-    if course:
-        print("course exist")
-        return
-    newCourse = dbMdl.Course(course_code,
-                             name,
-                             school,
-                             units,
-                             prereqs,
-                             lecturers,
-                             tutors)
-    db.session.add(newCourse)
-    db.session.commit()
-    print("add stu done")
 
-def search_course(course_code):
-    course = dbMdl.Course.query.filter_by(code=course_code).first()
-    if course:
-        print("course exist")
-    else:
-        print("course doesn't exist")
+# def delete_stu(stuid:str):
+#     stu = dbMdl.Student.query.filter_by(id = stuid).first()
+#     if stu:
+#         db.session.delete(stu)
+#         db.session.commit()
+#         print("del stu done")
+#         return json.dumps({
+#             "del": False,
+#             "error": "Account didn't Exist"
+#         })
+#     else:
+#         print("No such student")
+#         return json.dumps({
+#             "del": True,
+#             "error": None
+#         })
+    
+# def verify_pwd():
+#     stuid = request.form['stuid']
+#     pwd = request.form['pwd']
+#     stu = dbMdl.Student.query.filter_by(id = stuid).first()
+#     # return stu.check_password(pwd)
+#     if stu.check_password(pwd):
+#         print("corrent pwd")
+#         return json.dumps({
+#             "correctPwd": True
+#         })
+#     else:
+#         print("wrong pwd")
+#         return json.dumps({
+#             "correctPwd": False
+#         })
+
+# def change_pwd(stuid: int, newpwd):
+#     stu = dbMdl.Student.query.filter_by(id = stuid).first()
+#     if stu.check_password(newpwd):
+#         print("same as before")
+#     else:
+#         stu.password = newpwd
+#         print("change pwd done")
+#     db.session.commit()
 
 
-def search_all_session(course_code):
-    sessions = dbMdl.Session.query.filter_by(course=course_code).all()
-    for sec in sessions:
-        print(sec.sno,sec.course, sec.type)
+# def create_course(course_code,
+#                  name=None,
+#                  school=None,
+#                  units=None,
+#                  prereqs=None,
+#                  lecturers=None,
+#                  tutors=None):
+#     course = dbMdl.Course.query.filter_by(code=course_code).first()
+#     if course:
+#         print("course exist")
+#         return
+#     newCourse = dbMdl.Course(course_code,
+#                              name,
+#                              school,
+#                              units,
+#                              prereqs,
+#                              lecturers,
+#                              tutors)
+#     db.session.add(newCourse)
+#     db.session.commit()
+#     print("add stu done")
+
+# def search_course(course_code):
+#     course = dbMdl.Course.query.filter_by(code=course_code).first()
+#     if course:
+#         print("course exist")
+#     else:
+#         print("course doesn't exist")
 
 
-def create_session(course_code: str,
-                  type: str,
-                  instr: str = None,
-                  venue: str = None,
-                  class1: str = None,
-                  class2: str = None):
-    newSes = dbMdl.Session(course_code,
-                           type,
-                           instr=instr,
-                           venue=venue,
-                           class1=class1,
-                           class2=class2)
-    db.session.add(newSes)
-    db.session.commit()
-    print("create sec")
+# def search_all_session(course_code):
+#     sessions = dbMdl.Session.query.filter_by(course=course_code).all()
+#     for sec in sessions:
+#         print(sec.sno,sec.course, sec.type)
+
+
+# def create_session(course_code: str,
+#                   type: str,
+#                   instr: str = None,
+#                   venue: str = None,
+#                   class1: str = None,
+#                   class2: str = None):
+#     newSes = dbMdl.Session(course_code,
+#                            type,
+#                            instr=instr,
+#                            venue=venue,
+#                            class1=class1,
+#                            class2=class2)
+#     db.session.add(newSes)
+#     db.session.commit()
+#     print("create sec")
 
 
 if __name__ == "__main__":

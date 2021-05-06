@@ -225,6 +225,43 @@ def getInstr(courseCode: str):
         })
     return json.dumps(InstrData)
 
+### 7 add class to confirmed list
+@app.route('/addClass', methods=['POST'])
+def addClass():
+    s = request.from['']
+    sess = dbMdl.Session.query.filter_by(sno=session['sessionNum']).first()
+    sche = get_schedule(current_student)
+    # sche.choose_
+
+
+
+### 8 test session conflict
+@app.route('/isSessionConflict', methods=['POST'])
+def isSessionConflict():
+    s1 = request.from['session1']
+    s2 = request.from['session2']
+    s1 = dbMdl.Session.query.filter_by(sno = s1['sessionNumber']).first()
+    s2 = dbMdl.Session.query.filter_by(sno = s2['sessionNumber']).first()
+
+    if s1 and s2:
+        sess1 = Session(s1.sno, s1.course, set(s1.instr.split(' ')), 
+                        s1.venue, s1.type, TimeSlot(s1.class1.split('-')[0], s1.class1.split('-')[1]),
+                        TimeSlot(s1.class2.split('-')[0], s1.class2.split('-')[1]))
+        sess2 = Session(s2.sno, s2.course, set(s2.instr.split(' ')), 
+                s2.venue, s2.type, TimeSlot(s2.class1.split('-')[0], s2.class1.split('-')[1]),
+                TimeSlot(s2.class2.split('-')[0], s2.class2.split('-')[1]))
+        conflict = True if sess1.overlaps_with_session(sess2) else False
+
+        return json.dumps({'conflict': conflict})
+    else:
+        print('No such sessions')
+
+### 9 delete an added course session
+@app.route('/removeAddedCourse', methods=['POST'])
+def removeAddedCourse():
+    # remove_package
+    pass
+
 ### 10.1 get course comment
 @app.route('/getCourseComment/<string:courseCode>', methods=['GET'])
 def getCourseComment(courseCode: str):
@@ -262,7 +299,14 @@ def postCourseComment():
     except:
         return json.dumps({'succeed':False})
 
-
+### 11 set preference
+@app.route('/setPreference', methods=['POST'])
+def setPreference():
+    noMorningClass = request.from['noMorningClass']
+    noNoonClass = request.from['noNoonClass']
+    noFridayClass = request.from['noFridayClass']
+    courseWishlist = request.form['courseWishlist']
+    sche = get_schedule(current_student)
 
 # def delete_stu(stuid:str):
 #     stu = dbMdl.Student.query.filter_by(id = stuid).first()

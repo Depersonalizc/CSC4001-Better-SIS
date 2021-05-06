@@ -7,7 +7,7 @@ from DB.dbModels import app
 import json
 import random
 from flask import request
-from backend.get_instance import get_course, get_schedule, current_student
+from get_instance import get_course, get_schedule
 from flask_cors import cross_origin, CORS
 from calendar import day_name
 from course import Course, Session
@@ -283,7 +283,24 @@ def canBufferSession():
     except:
         return json.dumps({'able' : False})
 
+### 9. add session to buffer
+@app.route('/addSessionToBuffer', methods=['GET'])
+def canBufferSession():
+    code = request.form['courseCode']
+    snos = request.form['sessionNo']
+    stuid = request.cookies.get('studentID')
 
+    ret = dict()
+    try:
+        sche = get_schedule(stuid)
+        for sno in snos:
+            s = dbMdl.Session.query.filter_by(sno=sno).first()
+            course = get_course(s.course)
+            sess = course.find_session_instance()
+            ret[sno] = sche.can_buffer_session(sess)
+        return json.dumps({'able' : ret})
+    except:
+        return json.dumps({'able' : False})
 
 ### 10.1 get course comment
 @app.route('/getCourseComment/<string:courseCode>', methods=['GET'])

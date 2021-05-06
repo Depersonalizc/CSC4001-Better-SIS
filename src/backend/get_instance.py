@@ -1,6 +1,6 @@
 from DB.dbModels import db
 import DB.dbModels as dbMdl
-from backend.schedule import Schedule
+from schedule import Schedule
 from course import Course, Instructor, Session
 from student import Student, Preference
 from schedule import Schedule

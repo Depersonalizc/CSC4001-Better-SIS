@@ -283,24 +283,6 @@ def canBufferSession():
     except:
         return json.dumps({'able' : False})
 
-### 9. add session to buffer
-@app.route('/addSessionToBuffer', methods=['GET'])
-def canBufferSession():
-    code = request.form['courseCode']
-    snos = request.form['sessionNo']
-    stuid = request.cookies.get('studentID')
-
-    ret = dict()
-    try:
-        sche = get_schedule(stuid)
-        for sno in snos:
-            s = dbMdl.Session.query.filter_by(sno=sno).first()
-            course = get_course(s.course)
-            sess = course.find_session_instance()
-            ret[sno] = sche.can_buffer_session(sess)
-        return json.dumps({'able' : ret})
-    except:
-        return json.dumps({'able' : False})
 
 ### 10.1 get course comment
 @app.route('/getCourseComment/<string:courseCode>', methods=['GET'])
@@ -339,6 +321,21 @@ def postCourseComment():
     except:
         return json.dumps({'succeed':False})
 
+### 11. Set Preference
+@app.route('/setPreference', methods=['POST'])
+def setPreference():
+    noMorning = request.form['noMorning']
+    noNoon = request.form['noNoon']
+    noFriday = request.form['noFriday']
+    stuid = request.cookies.get('studentID')
+    try:
+        student = get_student(stuid)
+        student.preference.no_morning = noMorning
+        student.preference.noNoon = noNoon
+        student.preference.noFriday = noFriday
+        return json.dumps({'seted': True})
+    except:
+        return json.dumps({'seted': False})
 
 #### 13. can add wishlist
 @app.route('/canWishlistCourse', methods=['POST'])
@@ -354,7 +351,7 @@ def canWishlistCourse():
         return json.dumps({'able' : None})
 
 
-# 14. auto schedule confirm
+### 14. auto schedule confirm
 @app.route('/autoScheduleConfirm', methods=['GET'])
 def autoScheduleConfirm():
     stuid = request.cookies.get('studentID')

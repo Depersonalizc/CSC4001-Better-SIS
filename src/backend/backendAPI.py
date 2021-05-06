@@ -231,7 +231,7 @@ def addClass():
     snos = request.form['sessionNo']
     try:
         stuid = request.cookies.get('studentID')
-        sche = get_schedule()
+        sche = get_schedule(stuid)
         for s in snos:
             sche.buffer_session_by_sno(int(s))
         sche.select_buffer_pkgs()

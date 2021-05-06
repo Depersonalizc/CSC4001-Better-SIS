@@ -173,14 +173,15 @@ class Session(db.Model):
                 venue:str = None,
                 class1:str = None, 
                 class2:str = None,
-                capacity: int = None,):
+                capacity: int = None,
+                curEnroll: int = None):
         super().__init__()
         self.course = course_code
         self.type = type
         self.instr = instr
         self.venue = venue
         self.capacity = capacity
-        self.curEnroll = 0
+        self.curEnroll = curEnroll
         if not capacity:
             capacity = [30,150][type=='lec']
             self.curEnroll = random.randint(0,capacity)

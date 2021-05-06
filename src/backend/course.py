@@ -115,10 +115,11 @@ class Session:
                  instructors: Set[Instructor],
                  venue: str,
                  session_type: str,
-                 capacity: int,
-                 cur_enroll: int,
                  class1_ts: TimeSlot,
-                 class2_ts: TimeSlot = None):
+                 class2_ts: TimeSlot = None,
+                 capacity: int = 100,
+                 cur_enroll: int = 0,
+                 ):
         """
         :param instructors (Set[Instructor]): set of instructors of the session
         :param venue (str): Venue of session (e.g., 'TA101')
@@ -319,22 +320,14 @@ class Course:
                     instructors: Set[Instructor],
                     venue: str,
                     session_type: str,
-                    capacity: int,
-                    cur_enroll: int,
                     class1: Tuple[str, str],
-                    class2: Tuple[str, str] = None) -> None:
+                    class2: Tuple[str, str] = None,
+                    capacity: int = 100,
+                    cur_enroll: int = 0,
+                    ) -> None:
         """
         Add session to list given all related info.
         Session numbers are given in order of insertions.
-
-        :param session_no: Session number to assign
-        :param instructors: Set of instructors of the session (type: Set[Instructor...])
-        :param venue: Venue of the session (type: str)
-        :param session_type: 'lec' or 'tut' (type: str)
-        :param class1: start and end time of first class of the week
-                       in `%d %H:%M` format (type: Tuple[str, str])
-        :param class2: start and end time of second class of the week (if any)
-                       in `%d %H:%M` format (type: Tuple[str, str])
         """
         # Parse time slots
         try:
@@ -347,8 +340,9 @@ class Course:
             new_session = Session(session_no, self,
                                   instructors, venue,
                                   session_type,
-                                  capacity, cur_enroll,
-                                  class1_ts, class2_ts)
+                                  class1_ts, class2_ts,
+                                  capacity=capacity,
+                                  cur_enroll=cur_enroll)
             self._add_session(new_session)
             self.add_instructors(instructors, session_type)
 

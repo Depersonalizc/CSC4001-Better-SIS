@@ -131,8 +131,8 @@ def getStuInfo():
                                         "currentEnrollment": ses.curEnroll,
                                         "classCapacity": ses.capacity,
                                         })
-        wkSchdlData['confirmed'] = sesData[1]
-        wkSchdlData['added'] = sesData[2]
+        wkSchdlData['confirmed'] = sesData[0]
+        wkSchdlData['added'] = sesData[1]
         return json.dumps({
             "name":       stu.name,
             "studentID":  stu.id,
@@ -180,23 +180,6 @@ def searchCourse():
     school = request.form['school']        #SSE
     stuid = request.cookies.get('studentID')
     stuInst = get_student(stuid)
-
-    # rets = []
-    # qry = 'dbMdl.Course.query'
-    # if not pre:
-    #     qry += '.filter_by(suffix=code)'
-    #     # rets = dbMdl.Course.query.filter_by(suffix=code).all()
-    # # elif not code:
-    # if not code:
-    #     qry += '.filter_by(prefix=pre)'
-    #     # rets = dbMdl.Course.query.filter_by(prefix=pre).all()
-    # # else:
-    # #     rets = dbMdl.Course.query.filter_by(code=pre+str(code)).all()
-
-    # if not school:
-    #     qry += '.filter_by(school=school)'
-    #     # rets = dbMdl.Course.query.filter_by(school=school).all()
-    # rets =eval(qry+'.all()')
 
     rets = dbMdl.Course.query
     if code:

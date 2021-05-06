@@ -80,6 +80,7 @@ def signin_stu():
         if stu.check_password(pwd):
             print("corrent pwd")
             rtdata["correctPwd"] = True
+            get_student(stuid)
             return json.dumps(rtdata)
         else:
             print("wrong pwd")
@@ -234,7 +235,7 @@ def addClass():
         sche = get_schedule(stuid)
         for s in snos:
             sche.buffer_session_by_sno(int(s))
-        sche.select_buffer_pkgs()
+            sche.select_buffer_pkgs()
         return json.dumps({'added' : True})
     except:
         print('Failed to add class')

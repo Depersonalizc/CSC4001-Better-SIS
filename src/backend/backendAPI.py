@@ -11,6 +11,7 @@ from flask_cors import cross_origin, CORS
 from calendar import day_name
 CORS(app, supports_credentials=True, resources=r"/*")
 
+### 1.5 search stu
 @app.route('/searchStu/<string:stuid>', methods=['GET'])
 def find_stu(stuid: str):
 # @app.route('/searchStu', methods=['GET'])
@@ -23,7 +24,7 @@ def find_stu(stuid: str):
     else:
         return json.dumps({"exist": False})
 
-
+### 2 signup
 @app.route('/signup', methods=['POST'])
 def create_stu():
     stuid = request.form['studentID']
@@ -60,7 +61,7 @@ def create_stu():
     print("add stu done")
     return json.dumps(rtdata)
 
-
+### 1 signin
 @app.route('/signin', methods=['POST'])
 def signin_stu():
     # stu = dbMdl.Student.query.filter(
@@ -85,7 +86,7 @@ def signin_stu():
         print("No such student")
         return json.dumps(rtdata)
 
-
+### 3 get student info
 @app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
 def getStuInfo(stuid:str):
 # @app.route('/getStudentInfo', methods=['GET'])
@@ -115,6 +116,9 @@ def getStuInfo(stuid:str):
             "tot_creidt": None
         })
 
+    # TODO
+
+### 4 get term info
 @app.route('/getTermInfo', methods=['GET'])
 def getTermInfo():
     return json.dumps([
@@ -129,6 +133,7 @@ def getTermInfo():
         "2020-2021 Summer Term",
     ])
 
+### 5 search course
 @app.route('/searchCourse', methods=['POST'])
 def searchCourse():
     pre = request.form['coursePrefix']     #CSC
@@ -191,7 +196,7 @@ def searchCourse():
             })
     return json.dumps(coursesData)
 
-
+### 6.1 get instructor info
 @app.route('/getInstr/<string:courseTitle>', methods=['GET'])
 def getInstr(courseTitle: str):
     InstrData = []
@@ -207,7 +212,7 @@ def getInstr(courseTitle: str):
         })
     return json.dumps(InstrData)
 
-
+### 10.1 get course comment
 @app.route('/getCourseComment/<string:courseTitle>', methods=['GET'])
 def getCourseComment(courseTitle: str):
     cmtData = []
@@ -228,6 +233,8 @@ def getCourseComment(courseTitle: str):
         'comments':     cmtData
     })
 
+
+### 10.2 post course comment
 @app.route('/postCourseComment', methods=['POST'])
 def postCourseComment():
     corsCode = request.form['courseTitle']

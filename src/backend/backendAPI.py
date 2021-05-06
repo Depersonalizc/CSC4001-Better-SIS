@@ -10,7 +10,7 @@ from flask import request
 from backend.get_instance import get_course, get_schedule, current_student
 from flask_cors import cross_origin, CORS
 from calendar import day_name
-from course import Course, Session
+from get_instance import get_course, get_student, create_new_student, get_schedule
 CORS(app, supports_credentials=True, resources=r"/*")
 
 ### 1.5 search stu
@@ -76,6 +76,8 @@ def signin_stu():
         "correctPwd": False
     }
     if stu:
+        stuInst = get_student(stuid)
+        schdlInst = get_schedule(stuid)
         rtdata["exist"] = True
         if stu.check_password(pwd):
             print("corrent pwd")

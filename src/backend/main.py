@@ -1,3 +1,4 @@
+from backend.get_instance import create_new_student
 from schedule import Schedule
 from student import Student,Preference
 from course import Course, Instructor, Session
@@ -61,5 +62,8 @@ DIGITS = '0123456789'
 if __name__ == '__main__':
     data_insert()
     get_course('CSC4001')
+    create_new_student('118010154', 'lyh', '123', 'SDS', 'CSE', 3, 90, ['CSC4001'])
+    s = dbMdl.Student.query.filter_by(id='118010154').first()
+    print(s.name)
     print(', '.join(str(c) for c in courses))
     print(', '.join(str(i) for i in instructors))

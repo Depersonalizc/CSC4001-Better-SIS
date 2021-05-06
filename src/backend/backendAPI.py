@@ -7,8 +7,10 @@ from DB.dbModels import app
 import json
 import random
 from flask import request
+from backend.get_instance import get_course, get_schedule, current_student
 from flask_cors import cross_origin, CORS
 from calendar import day_name
+from course import Course, Session
 CORS(app, supports_credentials=True, resources=r"/*")
 
 ### 1.5 search stu
@@ -171,7 +173,7 @@ def searchCourse():
                     "endTime": ses.class2[10:],
                 })
             sessionData.append({"sessionNumber": ses.sno,
-                                "courseTitle": ret.code,
+                                "courseCode": ret.code,
                                 "isLecture": ses.type=='lec',
                                 "instructor": instr.name,
                                 'timeSlots': timesltData,
@@ -196,11 +198,22 @@ def searchCourse():
             })
     return json.dumps(coursesData)
 
+### 6 create course instance
+@app.route('/coursePage/<string:courseCode>', method=['GET'])
+def create_course_instance(courseCode: str):
+    if dbMdl.Course.query.filter_by(code=courseCode).first():
+        try:
+            get_course(courseCode)
+            return json.dumps({'create': True})
+        except:
+            print('Failed creating course instance')
+    return json.dumps({'create': False})
+
 ### 6.1 get instructor info
-@app.route('/getInstr/<string:courseTitle>', methods=['GET'])
-def getInstr(courseTitle: str):
+@app.route('/getInstr/<string:courseCode>', methods=['GET'])
+def getInstr(courseCode: str):
     InstrData = []
-    lecs = dbMdl.Session.query.filter(dbMdl.Session.course==courseTitle, dbMdl.Session.type=='lec').all()
+    lecs = dbMdl.Session.query.filter(dbMdl.Session.course==courseCode, dbMdl.Session.type=='lec').all()
     for lec in lecs:
         instr = dbMdl.Instructor.query.filter_by(id=int(lec.instr.split(' ')[0])).first()
         InstrData.append({
@@ -213,11 +226,11 @@ def getInstr(courseTitle: str):
     return json.dumps(InstrData)
 
 ### 10.1 get course comment
-@app.route('/getCourseComment/<string:courseTitle>', methods=['GET'])
-def getCourseComment(courseTitle: str):
+@app.route('/getCourseComment/<string:courseCode>', methods=['GET'])
+def getCourseComment(courseCode: str):
     cmtData = []
     avgRating = 0.0
-    cmts = dbMdl.Comment.query.filter_by(course=courseTitle).all()
+    cmts = dbMdl.Comment.query.filter_by(course=courseCode).all()
     for cmt in cmts:
         avgRating += cmt.rating
         cmtData.append({
@@ -237,7 +250,7 @@ def getCourseComment(courseTitle: str):
 ### 10.2 post course comment
 @app.route('/postCourseComment', methods=['POST'])
 def postCourseComment():
-    corsCode = request.form['courseTitle']
+    corsCode = request.form['courseCode']
     stuid = request.form['studentID']
     auther = request.form['author']
     rating = request.form['rating']

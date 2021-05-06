@@ -6,8 +6,8 @@ from student import Student, Preference
 
 # Global variables
 courses = dict()      #temp rule: course full code : course instance
-instructors = dict()  #temp rule: instr id : instr instance
-students = dict()     #temp rule: stu id : stu instance    # necessary? schdl contains a stu instance
+instructors = dict()  #temp rule: instr id : instr instance  # necessary?
+students = dict()     #temp rule: stu id : stu instance      # necessary? schdl contains a stu instance
 schedules = dict()    #temp rule: stu id : schdl instance
 
 def get_course(full_code: str):

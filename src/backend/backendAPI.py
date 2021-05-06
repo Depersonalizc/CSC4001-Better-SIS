@@ -257,8 +257,8 @@ def getInstr(courseTitle: str):
 # @cross_origin()
 def getCourseComment(courseTitle: str):
     cmtData = []
-    avgRating = 0
-    cmts = dbMdl.Comment.query.filter_by(course_code=courseTitle).all()
+    avgRating = 0.0
+    cmts = dbMdl.Comment.query.filter_by(course=courseTitle).all()
     for cmt in cmts:
         avgRating += cmt.rating
         cmtData.append({
@@ -268,7 +268,11 @@ def getCourseComment(courseTitle: str):
             'rating':     cmt.rating,
             'content':    cmt.content,
         })
-    return json.dumps(cmtData)
+    avgRating = round(avgRating/len(cmts),1)
+    return json.dumps({
+        'avgRating':    avgRating,
+        'comments':     cmtData
+    })
 
 @app.route('/postCourseComment', methods=['POST'])
 # @cross_origin()
@@ -280,7 +284,7 @@ def postCourseComment():
     content = request.form['content']
     try:
         db.session.add(dbMdl.Comment(stuid, auther, corsCode, rating, content))
-        db.commit()
+        db.session.commit()
         return json.dumps({'succeed':True})
     except:
         return json.dumps({'succeed':False})

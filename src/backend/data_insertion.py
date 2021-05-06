@@ -217,7 +217,7 @@ def data_insert():
     )
     db.session.add(
         dbMdl.Comment(stuid='118010158', stuName='Zeyu Li',
-                      course_code='CSC1001', rating=4,
+                      course_code='CSC3150', rating=4,
                       content='Good Course!')
     )
     db.session.add(

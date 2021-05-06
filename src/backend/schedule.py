@@ -286,14 +286,14 @@ class Schedule:
         #            else pkg.tut_sess is not None
         return (
                 not self.session_time_conflicts(ss, True)
-                and self.student.met_prereqs(ss.course)
+                and self.student.met_all_prereqs(ss.course)
                 and not ss.is_full()
                 # and not other_ss
         )
 
     def can_wishlist_course(self, course: Course):
         return (
-                self.student.met_prereqs(course) and
+                self.student.met_all_prereqs(course) and
                 course not in self.preference.course_wishlist
         )
 

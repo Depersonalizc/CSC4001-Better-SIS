@@ -208,7 +208,7 @@ class Schedule:
         return any(True for selected in self.selected_pkgs
                    if course.eq_course(selected.course))
 
-    def choose_session(self,
+    def buffer_session(self,
                        course: Course,
                        lec_idx: int = None,
                        tut_idx: int = None):
@@ -223,6 +223,17 @@ class Schedule:
         if lec_idx is not None:
             pkg.lec_sess = course.lec_sessions[lec_idx]
         if tut_idx is not None:
+            pkg.tut_sess = course.tut_sessions[tut_idx]
+
+    def buffer_session_by_sno(self, course: Course,
+                              lec_sno: int = None,
+                              tut_sno: int = None):
+        pkg = self.buffer_pkgs[0]  # Could be incomplete
+        if lec_sno is not None:
+            lec_idx = course.find_session('lec', lec_sno)
+            pkg.lec_sess = course.lec_sessions[lec_idx]
+        if tut_sno is not None:
+            tut_idx = course.find_session('tut', tut_sno)
             pkg.tut_sess = course.tut_sessions[tut_idx]
 
     # TODO: Need Test

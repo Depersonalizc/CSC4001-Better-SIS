@@ -266,21 +266,39 @@ class Schedule:
             print(e)
             return False
 
-    def add_course_to_wishlist(self, course: Course):
+    def can_buffer_session(self, ss: Session):
         """
-        Add course to wish list.
-        If adding succeeds, return an empty list
-        Else, return a list of all failing prerequisites
+        (Assume in course page, only one package in buffer)
+        Return True iff
+        1. session has no time conflict with current selected+buffer area
+        2. student has taken all the prereqs of the course
+        3. any other session (same type) of the same course has not been buffered.
         """
-        wishes = self.preference.course_wishlist
-        assert course not in wishes, \
-            f"ERROR: Course {course.full_code} already in wish list!"
+        # pkg = self.buffer_pkgs[0]
+        # other_ss = pkg.lec_sess is not None if ss.session_type == 'lec' \
+        #            else pkg.tut_sess is not None
+        return (
+                not self.session_time_conflicts(ss, True)
+                and self.student.met_prereqs(ss.course)
+                and not ss.is_full()
+                # and not other_ss
+        )
 
-        prereq_fails = [p for p in course.prereqs
-                        if not self.student.has_taken(p)]
-        if not prereq_fails:
-            self.preference.course_wishlist.append(course)
-        return prereq_fails
+    def can_wishlist_course(self, course: Course):
+        return (
+                self.student.met_prereqs(course) and
+                course not in self.preference.course_wishlist
+        )
+
+    def add_course_to_wishlist(self, course: Course):
+        assert self.can_wishlist_course(course)
+
+        # prereq_fails = [p for p in course.prereqs
+        #                 if not self.student.has_taken(p)]
+        # if not prereq_fails:
+        #     self.preference.course_wishlist.append(course)
+        self.preference.course_wishlist.append(course)
+        # return prereq_fails
 
     # TODO: Need Test
     def _auto_schedule(self, course_idx: int) -> bool:

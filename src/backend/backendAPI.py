@@ -181,19 +181,19 @@ def searchCourse():
     stuid = request.cookies.get('studentID')
     stuInst = get_student(stuid)
 
-    rets = dbMdl.Course.query
+    courses = dbMdl.Course.query
     if code:
-        rets = rets.filter_by(suffix=code)
+        courses = courses.filter_by(suffix=code)
     if pre:
-        rets = rets.filter_by(prefix=pre)
+        courses = courses.filter_by(prefix=pre)
     if school:
-        rets = rets.filter_by(school=school)
-    rets = rets.all()
+        courses = courses.filter_by(school=school)
+    courses = courses.all()
 
     coursesData = []
-    for ret in rets:
+    for crs in courses:
         mrkCrtrData = []
-        prereqsData = ret.prereqs.split(' ')
+        prereqsData = crs.prereqs.split(' ')
         prereqsStfyData = []
 
         if prereqsData == ['']:
@@ -203,11 +203,11 @@ def searchCourse():
             for prrq in prereqsData:
                 prereqsStfyData.append(prrq in stuInst.studied_courses)
 
-        for mrkCrtrItm in ret.markingCriteria.split(","):
+        for mrkCrtrItm in crs.markingCriteria.split(","):
             mrkCrtrData.append({"item": mrkCrtrItm.split(':')[0],
                                 "weight": mrkCrtrItm.split(':')[1]})
         sessionData = []
-        sessions = dbMdl.Session.query.filter_by(course=ret.code).all()
+        sessions = dbMdl.Session.query.filter_by(course=crs.code).all()
         for ses in sessions:
             instr = dbMdl.Instructor.query.filter_by(id=int(ses.instr.split(' ')[0])).first()
             timesltData = []
@@ -224,7 +224,7 @@ def searchCourse():
                     "endTime": ses.class2[10:],
                 })
             sessionData.append({"sessionNumber": ses.sno,
-                                "courseCode": ret.code,
+                                "courseCode": crs.code,
                                 "isLecture": ses.type=='lec',
                                 "instructor": instr.name,
                                 'timeSlots': timesltData,
@@ -234,17 +234,17 @@ def searchCourse():
                                 })
         
         coursesData.append({
-            'title':          ret.code,       # full code
-            'fullname':       ret.code+' - '+ret.name,
+            'title':          crs.code,       # full code
+            'fullname':       crs.code+' - '+crs.name,
             'code':           code,
-            'credit':         ret.units,
-            'school':         ret.school,
+            'credit':         crs.units,
+            'school':         crs.school,
             'term':           "2020-2021 Term 2",
             "mode":           "onsite",
             "targetStudent":  "Undergraduate",
-            'introduction':   ret.intro,
+            'introduction':   crs.intro,
             'markingCriteria': mrkCrtrData,
-            "syllabus":     ret.syllabus,
+            "syllabus":     crs.syllabus,
             "prerequisite": prereqsData,
             'prereqSatisfied': prereqsStfyData,
             "session":      sessionData,
@@ -516,28 +516,4 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0')
     # app.run()
     db.init_app(app)
-
-    # pre = 'CSC'  # CSC
-    # code = 4001      #1001
-    # school = None#'SSE'      #SSE
-
-    # # rets = []
-    # qry = 'dbMdl.Course.query'
-    # if not pre:
-    #     qry += '.filter_by(suffix=code)'
-    #     # rets = dbMdl.Course.query.filter_by(suffix=code).all()
-    # # elif not code:
-    # if not code:
-    #     qry += '.filter_by(prefix=pre)'
-    #     # rets = dbMdl.Course.query.filter_by(prefix=pre).all()
-    # # else:
-    # #     rets = dbMdl.Course.query.filter_by(code=pre+str(code)).all()
-
-    # if not school:
-    #     qry += '.filter_by(school=school)'
-    #     # rets = dbMdl.Course.query.filter_by(school=school).all()
-    # rets =eval(qry+'.all()')
-    # print(qry)
-    # for r in rets:
-    #     print(r.code)
 

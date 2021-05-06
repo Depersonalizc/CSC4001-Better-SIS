@@ -391,6 +391,19 @@ class Course:
                 return idx
         return -1
 
+    def find_session_instance(self, session_type: str, session_no: int) -> int:
+        """
+        Find session index given session type and number
+        """
+        assert session_type in ('lec', 'tut'),\
+            'Session can only be "lec" or "tut"!'
+        ss = {'lec': self.lec_sessions,
+              'tut': self.tut_sessions}[session_type]
+        for idx, s in enumerate(ss):
+            if s.session_no == session_no:
+                return s
+        return None
+
     def __str__(self):
         name = f'{self.full_code} {self.course_name}'
         sep = '=' * len(name)

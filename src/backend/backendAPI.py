@@ -14,6 +14,9 @@ CORS(app, supports_credentials=True, resources=r"/*")
 @app.route('/searchStu/<string:stuid>', methods=['GET'])
 # @cross_origin()
 def find_stu(stuid: str):
+# @app.route('/searchStu', methods=['GET'])
+# def find_stu():
+    # stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     if stu:
         print("stu exist")
@@ -89,6 +92,9 @@ def signin_stu():
 @app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
 # @cross_origin()
 def getStuInfo(stuid:str):
+# @app.route('/getStudentInfo', methods=['GET'])
+# def getStuInfo():
+    # stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     if stu:
         return json.dumps({

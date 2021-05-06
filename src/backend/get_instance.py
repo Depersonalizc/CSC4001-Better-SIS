@@ -58,8 +58,9 @@ def get_student(stuid: str) -> Student:
     pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
     return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
 
-# def create_new_student(stuid, name, pwd, school, major, year, tot_credit, courses):
-#     s = dbMdl.Student(stuid, name, pwd, school, major, year, tot_credit, studied_courses=courses)
-#     db.session.add(s)
-#     pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-#     return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
+def create_new_student(stuid, name, pwd, school, major, year, tot_credit, courses):
+    c = ' '.join([x for x in courses])
+    s = dbMdl.Student(stuid, name, pwd, school, major, year, tot_credit, studied_courses=c)
+    db.session.add(s)
+    pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
+    return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)

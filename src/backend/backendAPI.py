@@ -28,7 +28,7 @@ def crate_stu():
     name = request.form['userName']
     pwd = request.form['password']
     school = request.form['school']
-    collage = request.form['collage']
+    college = request.form['college']
     major = request.form['major']
     year = request.form['year']
     # permission = request.form['permission']
@@ -51,7 +51,7 @@ def crate_stu():
                             school,
                             major,
                             year,
-                            collage=collage)
+                            college=college)
                             # permission = permission)
     db.session.add(newStu)
     db.session.commit()

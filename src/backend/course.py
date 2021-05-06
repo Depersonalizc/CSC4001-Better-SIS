@@ -114,6 +114,8 @@ class Session:
                  instructors: Set[Instructor],
                  venue: str,
                  session_type: str,
+                 capacity: int,
+                 cur_enroll: int,
                  class1_ts: TimeSlot,
                  class2_ts: TimeSlot = None):
         """
@@ -122,6 +124,7 @@ class Session:
         :param class1_ts (TimeSlot): time slot for first class in the week
         :param class2_ts (TimeSlot): time slot for second class in the week, if any
         :param session_type (type: str): 'lec' for lectures or 'tut' for tutorials
+        :param capacity: capacity of the session
         """
         session_type = session_type.lower()
         assert session_type in ['lec', 'tut'], \
@@ -133,6 +136,8 @@ class Session:
         self.__instructors = instructors
         self.__venue = venue
         self.__session_no = session_no
+        self.capacity = capacity
+        self.cur_enroll = cur_enroll
 
     @property
     def session_no(self):  # here, directly use s.session_no, which is a list (s.session_no())
@@ -176,6 +181,9 @@ class Session:
     @property
     def session_type(self) -> str:
         return self.__session_type
+
+    def is_full(self):
+        return self.cur_enroll >= self.capacity
 
     def overlaps_with_session(self, other) -> List[TimeSlot]:
         """

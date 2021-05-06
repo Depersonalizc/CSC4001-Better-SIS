@@ -11,6 +11,7 @@ instructors = dict()  #temp rule: instr id : instr instance  # necessary?
 students = dict()     #temp rule: stu id : stu instance      # necessary? schdl contains a stu instance
 schedules = dict()    #temp rule: stu id : schdl instance
 
+
 def get_course(full_code: str):
     for i, c in enumerate(full_code):
         if c.isdigit():
@@ -56,30 +57,43 @@ def get_course(full_code: str):
     # print()
     # print(s.course)
 
+
 def get_student(stuid: str) -> Student:
+    if stuid in students:
+        return students[stuid]
     s = dbMdl.Student.query.filter_by(id=stuid).first()
-    courses = s.studied_courses.split(' ')
-    pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-    students[stuid] = Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
+    studied_courses = set(s.studied_courses.split(' '))
+    pref = Preference()
+    stud = Student(s.id, s.name, s.school, s.major, s.year,
+                   s.tot_credit, studied_courses, pref)
+    students[stuid] = stud
+    return stud
 
 
-def create_new_student(stuid, name, pwd, school, major, year, tot_credit, courses):
-    c = ' '.join([x for x in courses])
+# not being used currently
+def create_new_student(stuid, name, pwd, school, major, year, tot_credit, studied_courses):
+    c = ' '.join(x for x in courses)
     s = dbMdl.Student(stuid, name, pwd, school, major, year, tot_credit, studied_courses=c)
     try:
         db.session.add(s)
         db.commit()
     except:
         print('Failed to add student!')
-    pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-    students[stuid] = Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
+        return -1
+    else:
+        pref = Preference()
+        stud = Student(s.id, s.name, s.school, s.major, s.year,
+                       s.tot_credit, studied_courses, pref)
+        students[stuid] = stud
+        return students
+
 
 def get_schedule(stuid):
-    flag = False                     # if the student in dict
-    for s in students:
-        if stuid == s.stuid:
-            flag = True
-            schedules.add(Schedule(stuid))
-    if not flag:
-        print('No such student')
+    assert stuid in students, 'No such student in {students}'
+    stud = students[stuid]
+    if stuid in schedules:
+        return schedules[stuid]
+    sche = Schedule(stud)
+    schedules[stuid] = sche
+    return sche
 

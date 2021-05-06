@@ -301,7 +301,7 @@ def addClass():
     snos = request.form['sessionNo']
     try:
         stuid = request.cookies.get('studentID')
-        sche = get_schedule()
+        sche = get_schedule(stuid)
         for s in snos:
             sche.buffer_session_by_sno(int(s))
         sche.select_buffer_pkgs()
@@ -354,7 +354,6 @@ def canBufferSession():
         return json.dumps({'able' : False})
 
 
-
 ### 10.1 get course comment
 @app.route('/getCourseComment/<string:courseCode>', methods=['GET'])
 def getCourseComment(courseCode: str):
@@ -391,6 +390,47 @@ def postCourseComment():
         return json.dumps({'succeed':True})
     except:
         return json.dumps({'succeed':False})
+
+### 11. Set Preference
+@app.route('/setPreference', methods=['POST'])
+def setPreference():
+    noMorning = request.form['noMorning']
+    noNoon = request.form['noNoon']
+    noFriday = request.form['noFriday']
+    stuid = request.cookies.get('studentID')
+    try:
+        student = get_student(stuid)
+        student.preference.no_morning = noMorning
+        student.preference.noNoon = noNoon
+        student.preference.noFriday = noFriday
+        return json.dumps({'seted': True})
+    except:
+        return json.dumps({'seted': False})
+
+#### 13. can add wishlist
+@app.route('/canWishlistCourse', methods=['POST'])
+def canWishlistCourse():
+    full_code = request.form['courseCode']
+    stuid = request.cookies.get('studentID')
+    try:
+        sche = get_schedule(stuid)
+        course = get_course(full_code)
+        ret = sche.can_wishlist_course(course)
+        return json.dumps({'able' : ret})
+    except:
+        return json.dumps({'able' : None})
+
+
+### 14. auto schedule confirm
+@app.route('/autoScheduleConfirm', methods=['GET'])
+def autoScheduleConfirm():
+    stuid = request.cookies.get('studentID')
+    try:
+        sche = get_schedule(stuid)
+        sche.select_buffer_pkgs()
+        return json.dumps({'confirmed' : True})
+    except:
+        return json.dumps({'confirmed' : False})
 
 
 # def delete_stu(stuid:str):

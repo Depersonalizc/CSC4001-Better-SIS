@@ -3,6 +3,7 @@ import DB.dbModels as dbMdl
 from backend.schedule import Schedule
 from course import Course, Instructor, Session
 from student import Student, Preference
+from schedule import Schedule
 
 # Global variables
 courses = dict()      #temp rule: course full code : course instance
@@ -59,7 +60,8 @@ def get_student(stuid: str) -> Student:
     s = dbMdl.Student.query.filter_by(id=stuid).first()
     courses = s.studied_courses.split(' ')
     pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-    return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
+    students[stuid] = Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
+
 
 def create_new_student(stuid, name, pwd, school, major, year, tot_credit, courses):
     c = ' '.join([x for x in courses])
@@ -70,4 +72,14 @@ def create_new_student(stuid, name, pwd, school, major, year, tot_credit, course
     except:
         print('Failed to add student!')
     pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-    return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
+    students[stuid] = Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
+
+def get_schedule(stuid):
+    flag = False                     # if the student in dict
+    for s in students:
+        if stuid == s.stuid:
+            flag = True
+            schedules.add(Schedule(stuid))
+    if not flag:
+        print('No such student')
+

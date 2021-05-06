@@ -5,6 +5,7 @@ from DB.dbModels import db
 from DB.dbModels import app
 # import hashlib
 import json
+import random
 from flask import request
 from flask_cors import cross_origin, CORS
 from calendar import day_name
@@ -23,17 +24,17 @@ def find_stu(stuid: str):
 
 @app.route('/signup', methods=['POST'])
 # @cross_origin()
-def crate_stu():
+def create_stu():
     stuid = request.form['studentID']
     name = request.form['userName']
     pwd = request.form['password']
     school = request.form['school']
-    collage = request.form['collage']
+    college = request.form['college']
     major = request.form['major']
     year = request.form['year']
     # permission = request.form['permission']
     rtdata = {
-        "crated": True,
+        "created": True,
         "error": None,
         "studentID": stuid
     }
@@ -42,7 +43,7 @@ def crate_stu():
     if stu:
         # db.session.delete(stu)
         print("stu exist")
-        rtdata["crated"] = False
+        rtdata["created"] = False
         rtdata["error"] = "Account Already Exists"
         return json.dumps(rtdata)
     newStu = dbMdl.Student(stuid,
@@ -51,7 +52,7 @@ def crate_stu():
                             school,
                             major,
                             year,
-                            collage=collage)
+                            college=college)
                             # permission = permission)
     db.session.add(newStu)
     db.session.commit()
@@ -94,9 +95,9 @@ def getStuInfo(stuid:str):
             "name":       stu.name,
             "studentID":  stu.id,
             "year":       stu.year,
-            "gender":     None,
+            "gender":     stu.gender,
             "school":     stu.school,
-            "college":    None,
+            "college":    stu.college,
             "major":      stu.major,
             "tot_creidt": stu.tot_credit
         })
@@ -192,7 +193,7 @@ def searchCourse():
             mrkCrtrData.append({"item": mrkCrtrItm.split(':')[0],
                                 "weight": mrkCrtrItm.split(':')[1]})
         sessionData = []
-        sessions = dbMdl.Session.query.filter_by(course=pre+code).all()
+        sessions = dbMdl.Session.query.filter_by(course=pre+str(code)).all()
         for ses in sessions:
             instr = dbMdl.Instructor.query.filter_by(id=int(ses.instr.split(' ')[0])).first()
             timesltData = []
@@ -209,6 +210,7 @@ def searchCourse():
                     "endTime": ses.class2[10:],
                 })
             sessionData.append({"sessionNumber": ses.sno,
+                                "courseTitle": ret.code,
                                 "isLecture": ses.type=='lec',
                                 "instructor": instr.name,
                                 'timeSlots': timesltData,
@@ -234,7 +236,13 @@ def searchCourse():
     return json.dumps(coursesData)
 
 
-def crate_course(course_code,
+@app.route('/getInstr/<string:courseTitle>', methods=['GET'])
+# @cross_origin()
+def getInstr(courseTitle: str):
+    pass
+
+
+def create_course(course_code,
                  name=None,
                  school=None,
                  units=None,
@@ -270,7 +278,7 @@ def search_all_session(course_code):
         print(sec.sno,sec.course, sec.type)
 
 
-def crate_session(course_code: str,
+def create_session(course_code: str,
                   type: str,
                   instr: str = None,
                   venue: str = None,
@@ -284,9 +292,10 @@ def crate_session(course_code: str,
                            class2=class2)
     db.session.add(newSes)
     db.session.commit()
-    print("crate sec")
+    print("create sec")
 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
+    # app.run()
     db.init_app(app)

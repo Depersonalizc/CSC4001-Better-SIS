@@ -4,7 +4,7 @@ import hashlib
 import random
 from datetime import datetime, time
 from flask import Flask
-from flask.helpers import send_file
+from flask.helpers import get_flashed_messages, send_file
 # from flask.globals import session
 from flask_sqlalchemy import SQLAlchemy
 
@@ -27,10 +27,11 @@ class Student(db.Model):
     name = db.Column(db.String(20), nullable=False)
     __password = db.Column(db.String(200), nullable=False)
     permission = db.Column(db.Integer, default=1) #0 adm, 1 normal stu
-    collage = db.Column(db.String(20)) #db.Enum("Consumer", "Designer", "Company"), default=
+    college = db.Column(db.String(20)) #db.Enum("Consumer", "Designer", "Company"), default=
     school = db.Column(db.String(10))
     major = db.Column(db.String(10))
     year = db.Column(db.Integer)
+    gender = db.Column(db.Boolean)
     tot_credit = db.Column(db.Integer)
     studied_courses = db.Column(db.Text)
     # preference = db.Column(db.String(50))
@@ -46,30 +47,38 @@ class Student(db.Model):
                 school:str=None, 
                 major:str=None, 
                 year:int=None, 
-                totcrdt:int=None, 
+                totcrdt:int=random.randint(0,120), 
                 studied_courses:str=None, 
                 # pref:str=None, 
                 # wishlist:str=None, 
                 # schedule:str=None, 
-                permission:int=None,
-                collage: str = None,):
+                permission:int=1,
+                college: str = None,
+                gender: bool = bool(random.getrandbits(1))):
         super().__init__()
         self.id = id
         self.name = name
         self.password = pwd
         self.school = school
-        self.collage = collage
-        if not collage:
-            self.collage = random.choice(['Shaw', 'Diligentia', 'Muse', 'Harmonia'])
+        self.college = college
         self.major = major
         self.year = year
         self.tot_credit = totcrdt
         self.studied_courses = studied_courses
+        self.gender = gender
         # self.preference = pref
         # self.wishlist = wishlist
         # self.schedule = schedule
         self.permission = permission
-            
+        if not college:
+            self.college = random.choice(['Shaw', 'Diligentia', 'Muse', 'Harmonia'])
+        if not school:
+            self.school = random.choice(['SDS', 'SSE', 'LHS', 'SME','SHSS'])
+        if not major:
+            self.major = random.choice([['DS', 'SS', 'CSE', 'FE'], ['EE', 'CE', 'PM', 'AM', 'FM'], ['BSE', 'BIM'], [
+                                       'ECO', 'MC', 'PA', "FIN"], ['TRA', 'PSY']][['SDS', 'SSE', 'LHS', 'SME', 'SHSS'].index(self.school)])
+        if not year:
+            self.year = random.randint(1,4)
     @property
     def password(self): 
         return self.__password
@@ -126,12 +135,14 @@ class Instructor(db.Model):
                  name,
                  school = None,
                  isLecturer = None,
-                 website = None):
+                 website = "This is instructor's personal website.",
+                 profile = "This is instructor's profile."):
         super().__init__()
         self.name = name
         self.school = school
         self.isLecturer = isLecturer
         self.website = website
+        self.profile = profile
 
     def __repr__(self):
         return f'<Database Table {self.__tablename__}>'
@@ -173,9 +184,6 @@ class Session(db.Model):
         self.class1 = class1
         self.class2 = class2
 
-
-
-
     def __repr__(self):
         return f'<Database Table {self.__tablename__}>'
 
@@ -204,7 +212,7 @@ class Course(db.Model):
                  school:str = None,
                  units:int = None,
                  prereqs: str = None,
-                 intro: str = None,
+                 intro: str = 'Here is the introduction of this course.',
                  syllabus: str = 'https://www.lgulife.com/p/422/',
                  markingCriteria: str = 'Assignment:20%,Midterm Exam:30%,Final Exam:50%'
                 # lecturers = None,
@@ -226,17 +234,6 @@ class Course(db.Model):
 
     def __repr__(self):
         return f'<Database Table {self.__tablename__}>'
-
-# no need
-# class Course_Session(db.Model):
-#     __tablename__ = 'Course_Session'
-#     course_code = db.Column(db.String(10), primary_key=True, nullable=False) 
-#     session_no = db.Column(db.String(20), primary_key=True, nullable=False)
-
-
-#     def __repr__(self):
-#         # return f'<Database Table {self.__tablename__}>'
-#         return f'Course code: {self.course_code}, Session No: {self.session_no}'
 
 
 class MajorCourse(db.Model):
@@ -296,7 +293,8 @@ class Comment(db.Model):
     stuName = db.Column(db.String(20))
     course = db.Column(db.String(10), nullable=False)
     # ,db.ForeignKey('course.id')
-    time = db.Column(db.DateTime, default=datetime.now)
+    time = db.Column(
+        db.String(20), default=datetime.now().strftime('%Y-%m-%d %H:%M%p'))
     rating = db.Column(db.Integer)
     content = db.Column(db.Text)
     # question = db.relationship('Question', backref=db.backref('comment',order_by=creat_time.desc))
@@ -304,12 +302,12 @@ class Comment(db.Model):
     keywords = db.Column(db.String(100))
 
     def __init__(self,
-                 stuid,
-                 stuName,
-                 course_code,
-                 rating = None,
-                 content = None,
-                 keywords = None):
+                 stuid:str,
+                 stuName:str,
+                 course_code:str,
+                 rating:int = 5,
+                 content:str = None,
+                 keywords:str = None):
         super().__init__()
         self.stuid = stuid
         self.stuName = stuName
@@ -324,61 +322,10 @@ class Comment(db.Model):
 
 #  test only
 
-@app.route("/")
-def hello():
-    return "Hello Database!"
+# @app.route("/")
+# def hello():
+#     return "Hello Database!"
 
-
-# # @app.route("/add", methods=['GET'])
-# def add():
-#     record = Course_Session(course_code='CSC4001', session_no='01')
-#     db.session.add(record)
-#     db.session.commit()
-#     return 'done'
-
-
-# # @app.route("/query", methods=['GET'])
-# def query():
-#     record = Course_Session.query.filter(
-#         Course_Session.course_code == 'CSC4001').first()
-#     print(record.course_code, record.session_no)
-#     print(record)
-#     return 'done'
-
-
-# # @app.route("/change", methods=['GET'])
-# def change():
-#     record = Course_Session.query.filter(
-#         Course_Session.course_code == 'CSC4001').first()
-#     record.session_no = '02'
-#     print(record.course_code, record.session_no)
-#     db.session.commit()
-#     return 'done'
-
-
-# # @app.route("/dela", methods=['GET'])
-# def dela():
-#     record = Course_Session.query.filter(
-#         Course_Session.course_code == 'CSC4001').first()
-#     if record is not None:
-#         db.session.delete(record)
-#         db.session.commit()
-#     return 'done'
-
-
-# if __name__ == '__main__':
-
-    # app.run()
-    # db.init_app(app)
-#     db.create_all()
-
-#     dela()
-#     add()
-#     query()
-#     change()
-#     dela()
-
-    # db.drop_all()
 
 
 

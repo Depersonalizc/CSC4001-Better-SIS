@@ -71,10 +71,12 @@ class Comment():
 
 
 class Instructor:
-    def __init__(self, name: str, dept: str, is_lecturer: bool):
+    def __init__(self, name: str, dept: str, is_lecturer: bool, website: str = None, profile: str = None):
         self._name = name
         self._dept = dept
         self._is_lecturer = is_lecturer
+        self._website = website
+        self._profile = profile
 
     @property
     def name(self):
@@ -88,6 +90,13 @@ class Instructor:
     def is_lecturer(self):
         return self._is_lecturer
 
+    @property
+    def website(self):
+        return self._website
+    
+    @property
+    def profile(self):
+        return self._profile
 
 class Session:
 

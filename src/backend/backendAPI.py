@@ -181,21 +181,21 @@ def searchCourse():
                                 "currentEnrollment": ses.curEnroll,
                                 "classCapacity": ses.capacity,
                                 })
-            coursesData.append({
-                'title':          ret.code,       # full code
-                'fullname':       ret.code+' - '+ret.name,
-                'code':           code,
-                'credit':         ret.units,
-                'school':         ret.school,
-                'term':           "2020-2021 Term 2",
-                "mode":           "onsite",
-                "targetStudent":  "Undergraduate",
-                'introduction':   ret.intro,
-                'markingCriteria': mrkCrtrData,
-                "syllabus":     ret.syllabus,
-                "prerequisite": ret.prereqs.split(' '),
-                "session":      sessionData,
-            })
+        coursesData.append({
+            'title':          ret.code,       # full code
+            'fullname':       ret.code+' - '+ret.name,
+            'code':           code,
+            'credit':         ret.units,
+            'school':         ret.school,
+            'term':           "2020-2021 Term 2",
+            "mode":           "onsite",
+            "targetStudent":  "Undergraduate",
+            'introduction':   ret.intro,
+            'markingCriteria': mrkCrtrData,
+            "syllabus":     ret.syllabus,
+            "prerequisite": ret.prereqs.split(' '),
+            "session":      sessionData,
+        })
     return json.dumps(coursesData)
 
 ### 6 create course instance

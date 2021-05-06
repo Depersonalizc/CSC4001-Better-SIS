@@ -1,5 +1,6 @@
 # from hashlib import new
 from flask.globals import session
+from sqlalchemy.orm import query
 import DB.dbModels as dbMdl
 from DB.dbModels import db
 from DB.dbModels import app
@@ -7,18 +8,18 @@ from DB.dbModels import app
 import json
 import random
 from flask import request
-from backend.get_instance import get_course, get_schedule, current_student
+from get_instance import get_course, get_schedule, get_student
 from flask_cors import cross_origin, CORS
 from calendar import day_name
-from get_instance import get_course, get_student, create_new_student, get_schedule
+from get_instance import get_course, get_student, get_schedule
 CORS(app, supports_credentials=True, resources=r"/*")
 
 ### 1.5 search stu
-@app.route('/searchStu/<string:stuid>', methods=['GET'])
-def find_stu(stuid: str):
-# @app.route('/searchStu', methods=['GET'])
-# def find_stu():
-    # stuid = request.cookies.get('studentID')
+# @app.route('/searchStu/<string:stuid>', methods=['GET'])
+# def find_stu(stuid: str):
+@app.route('/searchStu', methods=['GET'])
+def find_stu():
+    stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     if stu:
         print("stu exist")
@@ -76,8 +77,8 @@ def signin_stu():
         "correctPwd": False
     }
     if stu:
-        stuInst = get_student(stuid)
-        schdlInst = get_schedule(stuid)
+        get_student(stuid)
+        get_schedule(stuid)
         rtdata["exist"] = True
         if stu.check_password(pwd):
             print("corrent pwd")
@@ -91,13 +92,47 @@ def signin_stu():
         return json.dumps(rtdata)
 
 ### 3 get student info
-@app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
-def getStuInfo(stuid:str):
-# @app.route('/getStudentInfo', methods=['GET'])
-# def getStuInfo():
-    # stuid = request.cookies.get('studentID')
+# @app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
+# def getStuInfo(stuid:str):
+@app.route('/getStudentInfo', methods=['GET'])
+def getStuInfo():
+    stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
+    wkSchdlData = {'confirmed': None, 'added': None}
     if stu:
+        schdlInst = get_schedule(stuid)
+        sesData = [[], []]
+        pkgLs = [schdlInst.selected_pkgs, schdlInst.buffer_pkgs]
+        for i in range(2):
+            for pkg in pkgLs[i]:
+                for sno in [pkg.lec_sess.session_no, pkg.tut_sess.session_no]:
+                    ses = dbMdl.Session.query.filter_by(sno=sno).first()
+                    instr = dbMdl.Instructor.query.filter_by(
+                        id=int(ses.instr.split(' ')[0])).first()
+                    timesltData = []
+                    if ses.class1:
+                        timesltData.append({
+                            "weekday": day_name[int(ses.class1[0])-1],
+                            "beginTime": ses.class1[2:7],
+                            "endTime": ses.class1[10:],
+                        })
+                    if ses.class2:
+                        timesltData.append({
+                            "weekday": day_name[int(ses.class2[0])-1],
+                            "beginTime": ses.class2[2:7],
+                            "endTime": ses.class2[10:],
+                        })
+                    sesData[i].append({"sessionNumber": ses.sno,
+                                        "courseCode": ses.course,
+                                        "isLecture": ses.type == 'lec',
+                                        "instructor": instr.name,
+                                        'timeSlots': timesltData,
+                                        "location": ses.venue,
+                                        "currentEnrollment": ses.curEnroll,
+                                        "classCapacity": ses.capacity,
+                                        })
+        wkSchdlData['confirmed'] = sesData[1]
+        wkSchdlData['added'] = sesData[2]
         return json.dumps({
             "name":       stu.name,
             "studentID":  stu.id,
@@ -106,7 +141,8 @@ def getStuInfo(stuid:str):
             "school":     stu.school,
             "college":    stu.college,
             "major":      stu.major,
-            "tot_creidt": stu.tot_credit
+            "tot_creidt": stu.tot_credit,
+            'weeklySchedule': wkSchdlData
         })
     else:
         return json.dumps({
@@ -117,10 +153,9 @@ def getStuInfo(stuid:str):
             "school":     None,
             "college":    None,
             "major":      None,
-            "tot_creidt": None
+            "tot_creidt": None,
+            'weeklySchedule': None
         })
-
-    # TODO
 
 ### 4 get term info
 @app.route('/getTermInfo', methods=['GET'])
@@ -141,24 +176,55 @@ def getTermInfo():
 @app.route('/searchCourse', methods=['POST'])
 def searchCourse():
     pre = request.form['coursePrefix']     #CSC
-    code = request.form['courseCode'] #1001
+    code = request.form['courseCode']      #1001
     school = request.form['school']        #SSE
-    if not pre:
-        rets = dbMdl.Course.query.filter_by(suffix=code).all()
-    elif not code:
-        rets = dbMdl.Course.query.filter_by(prefix=pre).all()
-    else:
-        rets = dbMdl.Course.query.filter_by(code=pre+str(code)).all()
+    stuid = request.cookies.get('studentID')
+    stuInst = get_student(stuid)
+
+    # rets = []
+    # qry = 'dbMdl.Course.query'
+    # if not pre:
+    #     qry += '.filter_by(suffix=code)'
+    #     # rets = dbMdl.Course.query.filter_by(suffix=code).all()
+    # # elif not code:
+    # if not code:
+    #     qry += '.filter_by(prefix=pre)'
+    #     # rets = dbMdl.Course.query.filter_by(prefix=pre).all()
+    # # else:
+    # #     rets = dbMdl.Course.query.filter_by(code=pre+str(code)).all()
+
+    # if not school:
+    #     qry += '.filter_by(school=school)'
+    #     # rets = dbMdl.Course.query.filter_by(school=school).all()
+    # rets =eval(qry+'.all()')
+
+    rets = dbMdl.Course.query
+    if code:
+        rets = rets.filter_by(suffix=code)
+    if pre:
+        rets = rets.filter_by(prefix=pre)
+    if school:
+        rets = rets.filter_by(school=school)
+    rets = rets.all()
 
     coursesData = []
     for ret in rets:
-    
         mrkCrtrData = []
+        prereqsData = ret.prereqs.split(' ')
+        prereqsStfyData = []
+
+        if prereqsData == ['']:
+            prereqsData = ["No prerequisite course"]
+            prereqsStfyData = [True]
+        else:
+            for prrq in prereqsData:
+                prereqsStfyData.append(prrq in stuInst.studied_courses)
+
         for mrkCrtrItm in ret.markingCriteria.split(","):
             mrkCrtrData.append({"item": mrkCrtrItm.split(':')[0],
                                 "weight": mrkCrtrItm.split(':')[1]})
         sessionData = []
-        sessions = dbMdl.Session.query.filter_by(course=pre+str(code)).all()
+        sessions = dbMdl.Session.query.filter_by(course=ret.code).all()
         for ses in sessions:
             instr = dbMdl.Instructor.query.filter_by(id=int(ses.instr.split(' ')[0])).first()
             timesltData = []
@@ -183,6 +249,7 @@ def searchCourse():
                                 "currentEnrollment": ses.curEnroll,
                                 "classCapacity": ses.capacity,
                                 })
+        
         coursesData.append({
             'title':          ret.code,       # full code
             'fullname':       ret.code+' - '+ret.name,
@@ -195,7 +262,8 @@ def searchCourse():
             'introduction':   ret.intro,
             'markingCriteria': mrkCrtrData,
             "syllabus":     ret.syllabus,
-            "prerequisite": ret.prereqs.split(' '),
+            "prerequisite": prereqsData,
+            'prereqSatisfied': prereqsStfyData,
             "session":      sessionData,
         })
     return json.dumps(coursesData)
@@ -325,7 +393,6 @@ def postCourseComment():
         return json.dumps({'succeed':False})
 
 
-
 # def delete_stu(stuid:str):
 #     stu = dbMdl.Student.query.filter_by(id = stuid).first()
 #     if stu:
@@ -426,3 +493,28 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0')
     # app.run()
     db.init_app(app)
+
+    # pre = 'CSC'  # CSC
+    # code = 4001      #1001
+    # school = None#'SSE'      #SSE
+
+    # # rets = []
+    # qry = 'dbMdl.Course.query'
+    # if not pre:
+    #     qry += '.filter_by(suffix=code)'
+    #     # rets = dbMdl.Course.query.filter_by(suffix=code).all()
+    # # elif not code:
+    # if not code:
+    #     qry += '.filter_by(prefix=pre)'
+    #     # rets = dbMdl.Course.query.filter_by(prefix=pre).all()
+    # # else:
+    # #     rets = dbMdl.Course.query.filter_by(code=pre+str(code)).all()
+
+    # if not school:
+    #     qry += '.filter_by(school=school)'
+    #     # rets = dbMdl.Course.query.filter_by(school=school).all()
+    # rets =eval(qry+'.all()')
+    # print(qry)
+    # for r in rets:
+    #     print(r.code)
+

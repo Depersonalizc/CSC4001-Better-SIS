@@ -239,7 +239,51 @@ def searchCourse():
 @app.route('/getInstr/<string:courseTitle>', methods=['GET'])
 # @cross_origin()
 def getInstr(courseTitle: str):
-    pass
+    InstrData = []
+    lecs = dbMdl.Session.query.filter(dbMdl.Session.course==courseTitle, dbMdl.Session.type=='lec').all()
+    for lec in lecs:
+        instr = dbMdl.Instructor.query.filter_by(id=int(lec.instr.split(' ')[0])).first()
+        InstrData.append({
+            'name':      instr.name,
+            'school':    instr.school,
+            'website':   instr.website,
+            'profile':   instr.profile,
+            'email':     instr.email,
+        })
+    return json.dumps(InstrData)
+
+
+@app.route('/getCourseComment/<string:courseTitle>', methods=['GET'])
+# @cross_origin()
+def getCourseComment(courseTitle: str):
+    cmtData = []
+    avgRating = 0
+    cmts = dbMdl.Comment.query.filter_by(course_code=courseTitle).all()
+    for cmt in cmts:
+        avgRating += cmt.rating
+        cmtData.append({
+            'commentID':  cmt.id,
+            'author':     cmt.stuName,
+            'datetime':   cmt.time,
+            'rating':     cmt.rating,
+            'content':    cmt.content,
+        })
+    return json.dumps(cmtData)
+
+@app.route('/postCourseComment', methods=['POST'])
+# @cross_origin()
+def postCourseComment():
+    corsCode = request.form['courseTitle']
+    stuid = request.form['studentID']
+    auther = request.form['author']
+    rating = request.form['rating']
+    content = request.form['content']
+    try:
+        db.session.add(dbMdl.Comment(stuid, auther, corsCode, rating, content))
+        db.commit()
+        return json.dumps({'succeed':True})
+    except:
+        return json.dumps({'succeed':False})
 
 
 def create_course(course_code,

@@ -1,11 +1,14 @@
 from DB.dbModels import db
 import DB.dbModels as dbMdl
+from backend.schedule import Schedule
 from course import Course, Instructor, Session
 from student import Student, Preference
 
 # Global variables
-courses = dict()
-instructors = dict()
+courses = dict()      #temp rule: course full code : course instance
+instructors = dict()  #temp rule: instr id : instr instance
+students = dict()     #temp rule: stu id : stu instance    # necessary? schdl contains a stu instance
+schedules = dict()    #temp rule: stu id : schdl instance
 
 def get_course(full_code: str):
     for i, c in enumerate(full_code):

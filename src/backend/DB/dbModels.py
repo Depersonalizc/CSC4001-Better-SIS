@@ -129,6 +129,7 @@ class Instructor(db.Model):
     isLecturer = db.Column(db.Boolean)
     website = db.Column(db.String(255))
     profile = db.Column(db.Text)
+    email = db.Column(db.String(255))
     # img
 
     def __init__(self,
@@ -136,13 +137,15 @@ class Instructor(db.Model):
                  school = None,
                  isLecturer = None,
                  website = "This is instructor's personal website.",
-                 profile = "This is instructor's profile."):
+                 profile = "This is instructor's profile.",
+                 email = "This is instructor's email."):
         super().__init__()
         self.name = name
         self.school = school
         self.isLecturer = isLecturer
         self.website = website
         self.profile = profile
+        self.email = email
 
     def __repr__(self):
         return f'<Database Table {self.__tablename__}>'

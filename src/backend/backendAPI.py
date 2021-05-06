@@ -354,6 +354,18 @@ def canWishlistCourse():
         return json.dumps({'able' : None})
 
 
+# 14. auto schedule confirm
+@app.route('/autoScheduleConfirm', methods=['GET'])
+def autoScheduleConfirm():
+    stuid = request.cookies.get('studentID')
+    try:
+        sche = get_schedule(stuid)
+        sche.select_buffer_pkgs()
+        return json.dumps({'confirmed' : True})
+    except:
+        return json.dumps({'confirmed' : False})
+
+
 
 # def delete_stu(stuid:str):
 #     stu = dbMdl.Student.query.filter_by(id = stuid).first()

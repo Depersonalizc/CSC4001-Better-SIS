@@ -178,21 +178,28 @@ class Schedule:
         print(f'Package of the course {full_code} cannot be found!')
         return -1
 
-    def remove_pkg(self, pkg_idx: int) -> bool:
-        """
-        Remove package given package index.
+    def remove_selected_pkg(self, full_code: str):
+        for pkg in self.selected_pkgs:
+            if pkg.course.full_code == full_code:
+                credits = pkg.course.credit_units
+                del pkg
+                self.selected_credits -= credits
 
-        :param pkg_idx: (int) Package index
-        :return: (bool) Success status
-        """
-        credits = self.selected_pkgs[pkg_idx].course.credit_units
-        try:
-            del self.selected_pkgs[pkg_idx]
-            self.selected_credits -= credits
-        except Exception as e:
-            print(e)
-            return False
-        return True
+    # def remove_pkg(self, pkg_idx: int) -> bool:
+    #     """
+    #     Remove package given package index.
+    #
+    #     :param pkg_idx: (int) Package index
+    #     :return: (bool) Success status
+    #     """
+    #     credits = self.selected_pkgs[pkg_idx].course.credit_units
+    #     try:
+    #         del self.selected_pkgs[pkg_idx]
+    #         self.selected_credits -= credits
+    #     except Exception as e:
+    #         print(e)
+    #         return False
+    #     return True
 
     def course_selected(self, course: Course) -> bool:
         """
@@ -269,7 +276,7 @@ class Schedule:
     def can_buffer_session(self, ss: Session):
         """
         (Assume in course page, only one package in buffer)
-        Return True iff
+        Return True iff:
         1. session has no time conflict with current selected+buffer area
         2. student has taken all the prereqs of the course
         3. any other session (same type) of the same course has not been buffered.
@@ -292,7 +299,6 @@ class Schedule:
 
     def add_course_to_wishlist(self, course: Course):
         assert self.can_wishlist_course(course)
-
         # prereq_fails = [p for p in course.prereqs
         #                 if not self.student.has_taken(p)]
         # if not prereq_fails:

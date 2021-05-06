@@ -51,7 +51,14 @@ def get_course(full_code: str):
 
         class1 = tuple(t for t in s.class1.split('-'))
         class2 = tuple(t for t in s.class1.split('-')) if s.class2 else None
-        course.add_session(s.sno, ss_ins, s.venue, s.type, class1, class2)
+        course.add_session(session_no=s.sno,
+                           instructors=ss_ins,
+                           venue=s.venue,
+                           session_type=s.type,
+                           class1=class1,
+                           class2=class2,
+                           capacity=s.capacity,
+                           cur_enroll=s.curEnroll)
 
     return course
     # print()
@@ -72,7 +79,7 @@ def get_student(stuid: str) -> Student:
 
 # not being used currently
 def create_new_student(stuid, name, pwd, school, major, year, tot_credit, studied_courses):
-    c = ' '.join(x for x in courses)
+    c = ' '.join(x for x in studied_courses)
     s = dbMdl.Student(stuid, name, pwd, school, major, year, tot_credit, studied_courses=c)
     try:
         db.session.add(s)
@@ -96,4 +103,3 @@ def get_schedule(stuid):
     sche = Schedule(stud)
     schedules[stuid] = sche
     return sche
-

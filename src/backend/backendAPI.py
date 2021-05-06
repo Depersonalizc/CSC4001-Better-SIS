@@ -7,7 +7,7 @@ from DB.dbModels import app
 import json
 import random
 from flask import request
-from get_instance import get_course, get_schedule
+from get_instance import get_course, get_schedule, get_student
 from flask_cors import cross_origin, CORS
 from calendar import day_name
 from course import Course, Session
@@ -338,6 +338,20 @@ def postCourseComment():
         return json.dumps({'succeed':True})
     except:
         return json.dumps({'succeed':False})
+
+
+#### 13. can add wishlist
+@app.route('/canWishlistCourse', methods=['POST'])
+def canWishlistCourse():
+    full_code = request.form['courseCode']
+    stuid = request.cookies.get('studentID')
+    try:
+        sche = get_schedule(stuid)
+        course = get_course(full_code)
+        ret = sche.can_wishlist_course(course)
+        return json.dumps({'able' : ret})
+    except:
+        return json.dumps({'able' : None})
 
 
 

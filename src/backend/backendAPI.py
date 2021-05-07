@@ -14,6 +14,10 @@ from calendar import day_name
 from get_instance import get_course, get_student, get_schedule
 CORS(app, supports_credentials=True, resources=r"/*")
 
+cookies_stuid = request.cookies.get('studentID')
+if cookies_stuid:
+    get_student(cookies_stuid)
+
 ### 1.5 search stu
 # @app.route('/searchStu/<string:stuid>', methods=['GET'])
 # def find_stu(stuid: str):
@@ -85,6 +89,7 @@ def signin_stu():
         if stu.check_password(pwd):
             print("corrent pwd")
             rtdata["correctPwd"] = True
+            get_student(stuid)
             return json.dumps(rtdata)
         else:
             print("wrong pwd")
@@ -283,13 +288,14 @@ def getInstr(courseCode: str):
 ### 7 add class to confirmed list (manual)
 @app.route('/addClass', methods=['POST'])
 def addClass():
-    snos = request.form['sessionNo']
+    data = json.loads(request.get_data(as_text=True))
+    snos = data['sessionNo']
     try:
         stuid = request.cookies.get('studentID')
         sche = get_schedule(stuid)
         for s in snos:
             sche.buffer_session_by_sno(int(s))
-        sche.select_buffer_pkgs()
+            sche.select_buffer_pkgs()
         return json.dumps({'added' : True})
     except:
         print('Failed to add class')
@@ -310,7 +316,7 @@ def removeOneCourse():
 ### 7.3 remove all confirmed list
 @app.route('/removeAllCourse', methods=['GET'])
 def removeAllCourse():
-    code = request.form['courseCode']
+    # code = request.form['courseCode']
     stuid = request.cookies.get('studentID')
     try:
         sche = get_schedule(stuid)
@@ -320,9 +326,9 @@ def removeAllCourse():
         return json.dumps({'removed' : False})
 
 ### 8. test if session is conflict, used to button, use can buffer session
-@app.route('/canBufferSession', methods=['GET'])
+@app.route('/canBufferSession', methods=['POST'])
 def canBufferSession():
-    code = request.form['courseCode']
+    # code = request.form['courseCode']
     snos = request.form['sessionNo']
     stuid = request.cookies.get('studentID')
 

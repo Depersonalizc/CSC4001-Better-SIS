@@ -71,10 +71,13 @@ class Comment():
 
 
 class Instructor:
-    def __init__(self, name: str, dept: str, is_lecturer: bool):
+    def __init__(self, name: str, dept: str, is_lecturer: bool, website: str = None, profile: str = None, email=None):
         self._name = name
         self._dept = dept
         self._is_lecturer = is_lecturer
+        self._website = website
+        self._profile = profile
+        self._email = email
 
     @property
     def name(self):
@@ -87,6 +90,18 @@ class Instructor:
     @property
     def is_lecturer(self):
         return self._is_lecturer
+
+    @property
+    def website(self):
+        return self._website
+    
+    @property
+    def profile(self):
+        return self._profile
+    
+    @property
+    def email(self):
+        return self.email
 
 
 class Session:
@@ -101,13 +116,17 @@ class Session:
                  venue: str,
                  session_type: str,
                  class1_ts: TimeSlot,
-                 class2_ts: TimeSlot = None):
+                 class2_ts: TimeSlot = None,
+                 capacity: int = 100,
+                 cur_enroll: int = 0,
+                 ):
         """
         :param instructors (Set[Instructor]): set of instructors of the session
         :param venue (str): Venue of session (e.g., 'TA101')
         :param class1_ts (TimeSlot): time slot for first class in the week
         :param class2_ts (TimeSlot): time slot for second class in the week, if any
         :param session_type (type: str): 'lec' for lectures or 'tut' for tutorials
+        :param capacity: capacity of the session
         """
         session_type = session_type.lower()
         assert session_type in ['lec', 'tut'], \
@@ -119,6 +138,8 @@ class Session:
         self.__instructors = instructors
         self.__venue = venue
         self.__session_no = session_no
+        self.capacity = capacity
+        self.cur_enroll = cur_enroll
 
     @property
     def session_no(self):  # here, directly use s.session_no, which is a list (s.session_no())
@@ -162,6 +183,9 @@ class Session:
     @property
     def session_type(self) -> str:
         return self.__session_type
+
+    def is_full(self):
+        return self.cur_enroll >= self.capacity
 
     def overlaps_with_session(self, other) -> List[TimeSlot]:
         """
@@ -297,19 +321,13 @@ class Course:
                     venue: str,
                     session_type: str,
                     class1: Tuple[str, str],
-                    class2: Tuple[str, str] = None) -> None:
+                    class2: Tuple[str, str] = None,
+                    capacity: int = 100,
+                    cur_enroll: int = 0,
+                    ) -> None:
         """
         Add session to list given all related info.
         Session numbers are given in order of insertions.
-
-        :param session_no: Session number to assign
-        :param instructors: Set of instructors of the session (type: Set[Instructor...])
-        :param venue: Venue of the session (type: str)
-        :param session_type: 'lec' or 'tut' (type: str)
-        :param class1: start and end time of first class of the week
-                       in `%d %H:%M` format (type: Tuple[str, str])
-        :param class2: start and end time of second class of the week (if any)
-                       in `%d %H:%M` format (type: Tuple[str, str])
         """
         # Parse time slots
         try:
@@ -322,7 +340,9 @@ class Course:
             new_session = Session(session_no, self,
                                   instructors, venue,
                                   session_type,
-                                  class1_ts, class2_ts)
+                                  class1_ts, class2_ts,
+                                  capacity=capacity,
+                                  cur_enroll=cur_enroll)
             self._add_session(new_session)
             self.add_instructors(instructors, session_type)
 
@@ -370,6 +390,19 @@ class Course:
             if s.session_no == session_no:
                 return idx
         return -1
+
+    def find_session_instance(self, session_type: str, session_no: int) -> int:
+        """
+        Find session index given session type and number
+        """
+        assert session_type in ('lec', 'tut'),\
+            'Session can only be "lec" or "tut"!'
+        ss = {'lec': self.lec_sessions,
+              'tut': self.tut_sessions}[session_type]
+        for idx, s in enumerate(ss):
+            if s.session_no == session_no:
+                return s
+        return None
 
     def __str__(self):
         name = f'{self.full_code} {self.course_name}'

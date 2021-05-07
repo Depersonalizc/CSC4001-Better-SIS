@@ -1,11 +1,16 @@
 from DB.dbModels import db
 import DB.dbModels as dbMdl
+from schedule import Schedule
 from course import Course, Instructor, Session
 from student import Student, Preference
+from schedule import Schedule
 
 # Global variables
-courses = dict()
-instructors = dict()
+courses = dict()      #temp rule: course full code : course instance
+instructors = dict()  #temp rule: instr id : instr instance  # necessary?
+students = dict()     #temp rule: stu id : stu instance      # necessary? schdl contains a stu instance
+schedules = dict()    #temp rule: stu id : schdl instance
+
 
 def get_course(full_code: str):
     for i, c in enumerate(full_code):
@@ -46,20 +51,55 @@ def get_course(full_code: str):
 
         class1 = tuple(t for t in s.class1.split('-'))
         class2 = tuple(t for t in s.class1.split('-')) if s.class2 else None
-        course.add_session(s.sno, ss_ins, s.venue, s.type, class1, class2)
+        course.add_session(session_no=s.sno,
+                           instructors=ss_ins,
+                           venue=s.venue,
+                           session_type=s.type,
+                           class1=class1,
+                           class2=class2,
+                           capacity=s.capacity,
+                           cur_enroll=s.curEnroll)
 
     return course
     # print()
     # print(s.course)
 
-def get_student(stuid: str) -> Student:
-    s = dbMdl.Student.query.filter_by(id=stuid).first()
-    courses = s.studied_courses.split(' ')
-    pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-    return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
 
-# def create_new_student(stuid, name, pwd, school, major, year, tot_credit, courses):
-#     s = dbMdl.Student(stuid, name, pwd, school, major, year, tot_credit, studied_courses=courses)
-#     db.session.add(s)
-#     pref = Preference(course_wishlist=None, no_morning=False, no_noon=False, no_friday=False)
-#     return Student(s.id, s.name, s.school, s.major, s.year, s.tot_credit, courses, pref)
+def get_student(stuid: str) -> Student:
+    if stuid in students:
+        return students[stuid]
+    s = dbMdl.Student.query.filter_by(id=stuid).first()
+    studied_courses = set(s.studied_courses.split(' '))
+    pref = Preference()
+    stud = Student(s.id, s.name, s.school, s.major, s.year,
+                   s.tot_credit, studied_courses, pref)
+    students[stuid] = stud
+    return stud
+
+
+# not being used currently
+def create_new_student(stuid, name, pwd, school, major, year, tot_credit, studied_courses):
+    c = ' '.join(x for x in studied_courses)
+    s = dbMdl.Student(stuid, name, pwd, school, major, year, tot_credit, studied_courses=c)
+    try:
+        db.session.add(s)
+        db.commit()
+    except:
+        print('Failed to add student!')
+        return -1
+    else:
+        pref = Preference()
+        stud = Student(s.id, s.name, s.school, s.major, s.year,
+                       s.tot_credit, studied_courses, pref)
+        students[stuid] = stud
+        return students
+
+
+def get_schedule(stuid):
+    assert stuid in students, 'No such student in {students}, try sign in first'
+    stud = students[stuid]
+    if stuid in schedules:
+        return schedules[stuid]
+    sche = Schedule(stud)
+    schedules[stuid] = sche
+    return sche

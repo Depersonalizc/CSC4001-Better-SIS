@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="654224b9-ecd6-4125-85df-3a45798e0c99" name="Default Changelist" comment="Add time_utils.py, rewrite course.py">
-      <change beforePath="$PROJECT_DIR$/src/backend/DB/dbModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/DB/dbModels.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/backend/DB/dbOperations.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/DB/dbOperations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/backend/backendAPI.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backend/backendAPI.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,8 +18,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/backend/course.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="565">
-              <caret line="222" column="24" selection-start-line="222" selection-start-column="24" selection-end-line="222" selection-end-column="24" />
+            <state relative-caret-position="54">
+              <caret line="5" column="17" lean-forward="true" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -28,8 +27,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/backend/schedule.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="107">
-              <caret line="373" column="72" selection-start-line="373" selection-start-column="65" selection-end-line="373" selection-end-column="72" />
+            <state relative-caret-position="196">
+              <caret line="373" column="26" selection-start-line="373" selection-start-column="8" selection-end-line="373" selection-end-column="26" />
               <folding>
                 <element signature="e#0#46#0" expanded="true" />
               </folding>
@@ -38,43 +37,36 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/backend/main.py">
+        <entry file="file://$PROJECT_DIR$/src/backend/get_instance.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2509">
-              <caret line="143" lean-forward="true" selection-start-line="143" selection-end-line="143" />
+            <state relative-caret-position="372">
+              <caret line="100" column="26" lean-forward="true" selection-start-line="100" selection-start-column="26" selection-end-line="100" selection-end-column="26" />
               <folding>
-                <element signature="e#0#29#0" expanded="true" />
+                <element signature="e#0#26#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/backend/test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-7238">
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/backend/DB/dbModels.py">
+        <entry file="file://$PROJECT_DIR$/src/backend/backendAPI.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="243">
-              <caret line="129" lean-forward="true" selection-start-line="129" selection-end-line="129" />
+            <state relative-caret-position="156">
+              <caret line="360" column="8" lean-forward="true" selection-start-line="360" selection-start-column="8" selection-end-line="360" selection-end-column="8" />
               <folding>
-                <element signature="e#17#31#0" expanded="true" />
+                <element signature="e#26#59#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/backend/utils/printing.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/backend/utils/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
             </state>
           </provider>
         </entry>
@@ -121,20 +113,11 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>TODO</find>
-      <find>course ==</find>
-      <find>append</find>
-      <find>self._buffer_pkgs</find>
-      <find>return -1</find>
-      <find>return 0</find>
-      <find>empty</find>
-      <find>violates</find>
       <find>no_xx</find>
       <find>add_course_to_wishlist</find>
       <find>auto_schedule</find>
       <find>selected_pkgs[i</find>
       <find>empty_buffer</find>
-      <find>select_buffer_pkgs</find>
       <find>is_comple</find>
       <find>qu</find>
       <find>remove_pkg</find>
@@ -146,11 +129,20 @@
       <find>class session</find>
       <find>class Course</find>
       <find>CLASS COURSE</find>
-      <find>prereq</find>
       <find>class INstructor</find>
-      <find>prereqs</find>
       <find>Session</find>
       <find>instructor</find>
+      <find>pre</find>
+      <find>prereq</find>
+      <find>empty_buffer()</find>
+      <find>delete</find>
+      <find>prereqs</find>
+      <find>met_p</find>
+      <find>select_</find>
+      <find>choose_session</find>
+      <find>wishlist</find>
+      <find>get_schedule</find>
+      <find>select_buffer_pkgs</find>
     </findStrings>
     <replaceStrings>
       <replace>, {</replace>
@@ -181,11 +173,13 @@
         <option value="$PROJECT_DIR$/src/backend/utils/__init__.py" />
         <option value="$PROJECT_DIR$/src/backend/utils/printing.py" />
         <option value="$PROJECT_DIR$/src/backend/utils/time_utils.py" />
-        <option value="$PROJECT_DIR$/src/backend/student.py" />
-        <option value="$PROJECT_DIR$/src/backend/course.py" />
-        <option value="$PROJECT_DIR$/src/backend/schedule.py" />
         <option value="$PROJECT_DIR$/src/backend/main.py" />
         <option value="$PROJECT_DIR$/src/backend/DB/dbModels.py" />
+        <option value="$PROJECT_DIR$/src/backend/course.py" />
+        <option value="$PROJECT_DIR$/src/backend/get_instance.py" />
+        <option value="$PROJECT_DIR$/src/backend/student.py" />
+        <option value="$PROJECT_DIR$/src/backend/schedule.py" />
+        <option value="$PROJECT_DIR$/src/backend/backendAPI.py" />
       </list>
     </option>
   </component>
@@ -387,7 +381,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.76337117" visible="true" weight="0.27919462" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.76337117" visible="true" weight="0.28322148" />
       <window_info id="Structure" order="1" sideWeight="0.23688969" side_tool="true" weight="0.27114093" />
       <window_info id="Favorites" order="2" sideWeight="0.2358643" side_tool="true" weight="0.27114093" />
       <window_info id="Project Explorer" order="3" />
@@ -446,16 +440,6 @@
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python38/Lib/datetime.py" />
     <entry file="file://$PROJECT_DIR$/src/__init__.py" />
     <entry file="file://$PROJECT_DIR$/src/backend/__init__.py" />
-    <entry file="file://$PROJECT_DIR$/src/backend/student.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/database/README.md" />
     <entry file="file://$PROJECT_DIR$/database/database.db" />
     <entry file="file://$PROJECT_DIR$/database/dbModels.py" />
@@ -505,39 +489,72 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/backend/course.py">
+    <entry file="file://$PROJECT_DIR$/src/backend/DB/dbModels.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2754">
+          <caret line="109" column="4" selection-start-line="109" selection-start-column="4" selection-end-line="109" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/backend/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="565">
-          <caret line="222" column="24" selection-start-line="222" selection-start-column="24" selection-end-line="222" selection-end-column="24" />
+          <caret line="69" selection-start-line="69" selection-end-line="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/backend/course.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="54">
+          <caret line="5" column="17" lean-forward="true" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/backend/student.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="139" column="23" lean-forward="true" selection-start-line="139" selection-start-column="23" selection-end-line="139" selection-end-column="23" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/backend/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-7238">
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/backend/get_instance.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="372">
+          <caret line="100" column="26" lean-forward="true" selection-start-line="100" selection-start-column="26" selection-end-line="100" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/backend/schedule.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="107">
-          <caret line="373" column="72" selection-start-line="373" selection-start-column="65" selection-end-line="373" selection-end-column="72" />
+        <state relative-caret-position="196">
+          <caret line="373" column="26" selection-start-line="373" selection-start-column="8" selection-end-line="373" selection-end-column="26" />
           <folding>
             <element signature="e#0#46#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/backend/main.py">
+    <entry file="file://$PROJECT_DIR$/src/backend/backendAPI.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2509">
-          <caret line="143" lean-forward="true" selection-start-line="143" selection-end-line="143" />
+        <state relative-caret-position="156">
+          <caret line="360" column="8" lean-forward="true" selection-start-line="360" selection-start-column="8" selection-end-line="360" selection-end-column="8" />
           <folding>
-            <element signature="e#0#29#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/backend/DB/dbModels.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="243">
-          <caret line="129" lean-forward="true" selection-start-line="129" selection-end-line="129" />
-          <folding>
-            <element signature="e#17#31#0" expanded="true" />
+            <element signature="e#26#59#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -133,6 +133,12 @@ class Student:
     def has_taken(self, course_code: str):
         return course_code in self.studied_courses
 
+    def met_all_prereqs(self, course: Course):
+        return all(self.has_taken(p) for p in course.prereqs)
+
+    def met_prereqs(self, prereqs: List[str]):
+        return [self.has_taken(p) for p in prereqs]
+
     def add_studied_courses(self, course_code: str):
         if self.has_taken(course_code):
             print('[WARN] The course is in the studied list already!')

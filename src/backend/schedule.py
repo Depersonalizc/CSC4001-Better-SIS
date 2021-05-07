@@ -178,21 +178,28 @@ class Schedule:
         print(f'Package of the course {full_code} cannot be found!')
         return -1
 
-    def remove_pkg(self, pkg_idx: int) -> bool:
-        """
-        Remove package given package index.
+    def remove_selected_pkg(self, full_code: str):
+        for pkg in self.selected_pkgs:
+            if pkg.course.full_code == full_code:
+                credits = pkg.course.credit_units
+                del pkg
+                self.selected_credits -= credits
 
-        :param pkg_idx: (int) Package index
-        :return: (bool) Success status
-        """
-        credits = self.selected_pkgs[pkg_idx].course.credit_units
-        try:
-            del self.selected_pkgs[pkg_idx]
-            self.selected_credits -= credits
-        except Exception as e:
-            print(e)
-            return False
-        return True
+    # def remove_pkg(self, pkg_idx: int) -> bool:
+    #     """
+    #     Remove package given package index.
+    #
+    #     :param pkg_idx: (int) Package index
+    #     :return: (bool) Success status
+    #     """
+    #     credits = self.selected_pkgs[pkg_idx].course.credit_units
+    #     try:
+    #         del self.selected_pkgs[pkg_idx]
+    #         self.selected_credits -= credits
+    #     except Exception as e:
+    #         print(e)
+    #         return False
+    #     return True
 
     def course_selected(self, course: Course) -> bool:
         """
@@ -201,7 +208,7 @@ class Schedule:
         return any(True for selected in self.selected_pkgs
                    if course.eq_course(selected.course))
 
-    def choose_session(self,
+    def buffer_session(self,
                        course: Course,
                        lec_idx: int = None,
                        tut_idx: int = None):
@@ -212,10 +219,21 @@ class Schedule:
         :param lec_idx: Lecture index
         :param tut_idx: Tutorial index
         """
-        pkg = self.buffer_pkgs[0]  # Could be incomplete
+        pkg = Package()#self.buffer_pkgs[0]  # Could be incomplete
         if lec_idx is not None:
             pkg.lec_sess = course.lec_sessions[lec_idx]
         if tut_idx is not None:
+            pkg.tut_sess = course.tut_sessions[tut_idx]
+
+    def buffer_session_by_sno(self, course: Course,
+                              lec_sno: int = None,
+                              tut_sno: int = None):
+        pkg = Package()#self.buffer_pkgs[0]  # Could be incomplete
+        if lec_sno is not None:
+            lec_idx = course.find_session('lec', lec_sno)
+            pkg.lec_sess = course.lec_sessions[lec_idx]
+        if tut_sno is not None:
+            tut_idx = course.find_session('tut', tut_sno)
             pkg.tut_sess = course.tut_sessions[tut_idx]
 
     # TODO: Need Test
@@ -266,21 +284,38 @@ class Schedule:
             print(e)
             return False
 
-    def add_course_to_wishlist(self, course: Course):
+    def can_buffer_session(self, ss: Session):
         """
-        Add course to wish list.
-        If adding succeeds, return an empty list
-        Else, return a list of all failing prerequisites
+        (Assume in course page, only one package in buffer)
+        Return True iff:
+        1. session has no time conflict with current selected+buffer area
+        2. student has taken all the prereqs of the course
+        3. any other session (same type) of the same course has not been buffered.
         """
-        wishes = self.preference.course_wishlist
-        assert course not in wishes, \
-            f"ERROR: Course {course.full_code} already in wish list!"
+        # pkg = self.buffer_pkgs[0]
+        # other_ss = pkg.lec_sess is not None if ss.session_type == 'lec' \
+        #            else pkg.tut_sess is not None
+        return (
+                not self.session_time_conflicts(ss, True)
+                and self.student.met_all_prereqs(ss.course)
+                and not ss.is_full()
+                # and not other_ss
+        )
 
-        prereq_fails = [p for p in course.prereqs
-                        if not self.student.has_taken(p)]
-        if not prereq_fails:
-            self.preference.course_wishlist.append(course)
-        return prereq_fails
+    def can_wishlist_course(self, course: Course):
+        return (
+                self.student.met_all_prereqs(course) and
+                course not in self.preference.course_wishlist
+        )
+
+    def add_course_to_wishlist(self, course: Course):
+        assert self.can_wishlist_course(course)
+        # prereq_fails = [p for p in course.prereqs
+        #                 if not self.student.has_taken(p)]
+        # if not prereq_fails:
+        #     self.preference.course_wishlist.append(course)
+        self.preference.course_wishlist.append(course)
+        # return prereq_fails
 
     # TODO: Need Test
     def _auto_schedule(self, course_idx: int) -> bool:

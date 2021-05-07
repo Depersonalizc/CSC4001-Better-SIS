@@ -99,20 +99,22 @@ def signin_stu():
         return json.dumps(rtdata)
 
 ### 3 get student info
-# @app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
-# def getStuInfo(stuid:str):
-@app.route('/getStudentInfo', methods=['GET'])
-def getStuInfo():
+@app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
+def getStuInfo(stuid:str):
+# @app.route('/getStudentInfo', methods=['GET'])
+# def getStuInfo():
     
-    stuid = request.cookies.get('studentID')
+    # stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     wkSchdlData = {'confirmed': None, 'added': None}
     if stu:
         schdlInst = get_schedule(stuid)
         sesData = [[], []]
-        pkgLs = [schdlInst.selected_pkgs, schdlInst.buffer_pkgs]
-        for i in range(2):
-            for pkg in pkgLs[i]:
+        for i, pkgs in enumerate(
+            [schdlInst.selected_pkgs, schdlInst.buffer_pkgs]
+        ):
+            for pkg in pkgs:
+                # print(pkg)
                 for sno in [pkg.lec_sess.session_no, pkg.tut_sess.session_no]:
                     ses = dbMdl.Session.query.filter_by(sno=sno).first()
                     instr = dbMdl.Instructor.query.filter_by(
@@ -186,7 +188,8 @@ def searchCourse():
     pre = request.form['coursePrefix']     #CSC
     code = request.form['courseCode']      #1001
     school = request.form['school']        #SSE
-    stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
+    # stuid = request.cookies.get('studentID')
     stuInst = get_student(stuid)
 
     courses = dbMdl.Course.query
@@ -291,12 +294,19 @@ def getInstr(courseCode: str):
 def addClass():
     data = json.loads(request.get_data(as_text=True))
     snos = data['sessionNo']
+    stuid = data['studentID']
+    print(snos)
     try:
-        stuid = request.cookies.get('studentID')
+
         sche = get_schedule(stuid)
-        for s in snos:
-            sche.buffer_session_by_sno(int(s))
-            sche.select_buffer_pkgs()
+        sche.init_buffer()
+        
+
+        sess = dbMdl.Session.query.filter_by(sno=snos[0]).first()
+        c = get_course(sess.course)
+        sche.buffer_session_by_sno(c,int(snos[0]),int(snos[1]))
+        sche.select_buffer_pkgs()
+        print(sche)
         return json.dumps({'added' : True})
     except:
         print('Failed to add class')
@@ -306,7 +316,8 @@ def addClass():
 @app.route('/removeOneCourse', methods=['POST'])
 def removeOneCourse():
     code = request.form['courseCode']
-    stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
+    # stuid = request.cookies.get('studentID')
     try:
         sche = get_schedule(stuid)
         sche.remove_selected_pkg(code)
@@ -318,7 +329,8 @@ def removeOneCourse():
 @app.route('/removeAllCourse', methods=['GET'])
 def removeAllCourse():
     # code = request.form['courseCode']
-    stuid = request.cookies.get('studentID')
+    # stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
     try:
         sche = get_schedule(stuid)
         sche.empty_selected()
@@ -331,19 +343,20 @@ def removeAllCourse():
 def canBufferSession():
     data = json.loads(request.get_data(as_text=True))
     snos = data['sessionNo']
-    stuid = request.cookies.get('studentID')
+    stuid = data['studentID']
+    # stuid = request.cookies.get('studentID')
 
     ret = dict()
-    #try:
-    sche = get_schedule(stuid)
-    for sno in snos:
-        s = dbMdl.Session.query.filter_by(sno=sno).first()
-        course = get_course(s.course)
-        sess = course.find_session_instance(s.type, s.sno)
-        ret[sno] = sche.can_buffer_session(sess)
-    return json.dumps({'able' : ret})
-    #except:
-    #    return json.dumps({'able' : False})
+    try:
+        sche = get_schedule(stuid)
+        for sno in snos:
+            s = dbMdl.Session.query.filter_by(sno=sno).first()
+            course = get_course(s.course)
+            sess = course.find_session_instance(s.type, s.sno)
+            ret[sno] = sche.can_buffer_session(sess)
+        return json.dumps({'able' : ret})
+    except:
+        return json.dumps({'able' : False})
 
 
 ### 10.1 get course comment
@@ -389,12 +402,14 @@ def setPreference():
     noMorning = request.form['noMorning']
     noNoon = request.form['noNoon']
     noFriday = request.form['noFriday']
-    stuid = request.cookies.get('studentID')
+    # stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
     try:
         student = get_student(stuid)
         student.preference.no_morning = noMorning
-        student.preference.noNoon = noNoon
-        student.preference.noFriday = noFriday
+        student.preference.no_noon = noNoon
+        student.preference.no_friday = noFriday
+        print(student.preference)
         return json.dumps({'seted': True})
     except:
         return json.dumps({'seted': False})
@@ -403,7 +418,8 @@ def setPreference():
 @app.route('/canWishlistCourse', methods=['POST'])
 def canWishlistCourse():
     full_code = request.form['courseCode']
-    stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
+
     try:
         sche = get_schedule(stuid)
         course = get_course(full_code)
@@ -416,10 +432,12 @@ def canWishlistCourse():
 ### 14. auto schedule confirm
 @app.route('/autoScheduleConfirm', methods=['GET'])
 def autoScheduleConfirm():
-    stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
+
     try:
         sche = get_schedule(stuid)
         sche.select_buffer_pkgs()
+        print(sche)
         return json.dumps({'confirmed' : True})
     except:
         return json.dumps({'confirmed' : False})

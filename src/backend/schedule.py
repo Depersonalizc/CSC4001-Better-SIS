@@ -98,6 +98,10 @@ class Schedule:
     @property
     def buffer_pkgs(self) -> List[Package]:
         return self._buffer_pkgs
+    
+    @buffer_pkgs.setter
+    def buffer_pkgs(self, buffer: List[Package]) -> None:
+        self._buffer_pkgs = buffer
 
     @property
     def preference(self):
@@ -219,7 +223,7 @@ class Schedule:
         :param lec_idx: Lecture index
         :param tut_idx: Tutorial index
         """
-        pkg = Package()#self.buffer_pkgs[0]  # Could be incomplete
+        pkg = self.buffer_pkgs[0]  # Could be incomplete
         if lec_idx is not None:
             pkg.lec_sess = course.lec_sessions[lec_idx]
         if tut_idx is not None:
@@ -228,7 +232,7 @@ class Schedule:
     def buffer_session_by_sno(self, course: Course,
                               lec_sno: int = None,
                               tut_sno: int = None):
-        pkg = Package()#self.buffer_pkgs[0]  # Could be incomplete
+        pkg = self.buffer_pkgs[0]  # Could be incomplete
         if lec_sno is not None:
             lec_idx = course.find_session('lec', lec_sno)
             pkg.lec_sess = course.lec_sessions[lec_idx]

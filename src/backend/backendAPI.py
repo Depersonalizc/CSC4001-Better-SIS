@@ -14,6 +14,10 @@ from calendar import day_name
 from get_instance import get_course, get_student, get_schedule
 CORS(app, supports_credentials=True, resources=r"/*")
 
+cookies_stuid = request.cookies.get('studentID')
+if cookies_stuid:
+    get_student(cookies_stuid)
+
 ### 1.5 search stu
 # @app.route('/searchStu/<string:stuid>', methods=['GET'])
 # def find_stu(stuid: str):
@@ -282,7 +286,8 @@ def getInstr(courseCode: str):
 ### 7 add class to confirmed list (manual)
 @app.route('/addClass', methods=['POST'])
 def addClass():
-    snos = request.form['sessionNo']
+    data = json.loads(request.get_data(as_text=True))
+    snos = data['sessionNo']
     try:
         stuid = request.cookies.get('studentID')
         sche = get_schedule(stuid)

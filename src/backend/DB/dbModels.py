@@ -184,6 +184,7 @@ class Session(db.Model):
         self.curEnroll = curEnroll
         if not capacity:
             capacity = [30,150][type=='lec']
+        if not curEnroll:
             self.curEnroll = random.randint(0,capacity)
         self.class1 = class1
         self.class2 = class2

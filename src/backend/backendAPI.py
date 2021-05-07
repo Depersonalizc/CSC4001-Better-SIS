@@ -19,11 +19,11 @@ if cookies_stuid:
     get_student(cookies_stuid)
 
 ### 1.5 search stu
-# @app.route('/searchStu/<string:stuid>', methods=['GET'])
-# def find_stu(stuid: str):
-@app.route('/searchStu', methods=['GET'])
-def find_stu():
-    stuid = request.cookies.get('studentID')
+@app.route('/searchStu/<string:stuid>', methods=['GET'])
+def find_stu(stuid: str):
+# @app.route('/searchStu', methods=['GET'])
+# def find_stu():
+#     stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     if stu:
         print("stu exist")
@@ -99,11 +99,11 @@ def signin_stu():
         return json.dumps(rtdata)
 
 ### 3 get student info
-# @app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
-# def getStuInfo(stuid:str):
-@app.route('/getStudentInfo', methods=['GET'])
-def getStuInfo():
-    stuid = request.cookies.get('studentID')
+@app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
+def getStuInfo(stuid:str):
+# @app.route('/getStudentInfo', methods=['GET'])
+# def getStuInfo():
+#     stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     wkSchdlData = {'confirmed': None, 'added': None}
     if stu:
@@ -185,7 +185,8 @@ def searchCourse():
     pre = request.form['coursePrefix']     #CSC
     code = request.form['courseCode']      #1001
     school = request.form['school']        #SSE
-    stuid = request.cookies.get('studentID')
+    # stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']      #118
     stuInst = get_student(stuid)
 
     courses = dbMdl.Course.query

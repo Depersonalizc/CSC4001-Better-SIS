@@ -10,7 +10,7 @@ import './index.less';
 import { getTermList } from '../api/api';
 
 /* 引入组件 */
-import Navigator from './Navigator';
+import NavigatorWithTime from '../GeneralComponents/NavigatorWithTime';
 import RegistrationMenu from './Menu';
 import Breadcrumb from '../GeneralComponents/Breadcrumb';
 
@@ -39,6 +39,7 @@ import {
 
 
 export default function Registration(props) {
+  const [ term, setTerm ] = React.useState(null);
   const [ TermList, setTermList ] = React.useState([]);
 
   React.useEffect(() => {
@@ -60,7 +61,7 @@ export default function Registration(props) {
     const fetchTermList = async () => {
       let returnTermList = await( getTermList() );
       setTermList(returnTermList);
-    }
+    };
 
     fetchTermList();
   }, []);
@@ -71,14 +72,22 @@ export default function Registration(props) {
       dataIndex: "term",
     },
     // {
-    //   title: "name",
-    //   dataIndex: "name",
+    //   title: "TargetStudent",
+    //   dataIndex: "targetStudent",
     // },
   ];
 
+  const onRowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      console.log(`onChange`);
+      console.log(`selectedRowKeys = ${selectedRowKeys}`);
+      console.log(`selectedRows = ${ JSON.stringify(selectedRows) }`);
+    },
+  };
+
   return (
     <div className="course-registration">
-      <Navigator />
+      <NavigatorWithTime />
       {/* <RegistrationMenu /> */}
       <div className="course-registration-body">
         <Breadcrumb 
@@ -118,14 +127,16 @@ export default function Registration(props) {
             bordered
             // style={{width: "70%",}}
             rowSelection={{
-              type: "radio"
+              type: "radio",
+              ...onRowSelection,
             }}
             columns={TermTableColumns}
-            dataSource={TermList.map((ele) => {
+            dataSource={TermList.map((ele, index) => {
               return {
+                key: index + 1,
                 term: ele,
-                name: "hello world!",
-              }
+                // name: "hello world!",
+              };
             })}
             pagination={false}
           />

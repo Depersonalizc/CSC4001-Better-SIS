@@ -1,5 +1,11 @@
 import react, { useState, useEffect } from 'react';
 
+/* 引入通用及api函数 */
+import { getRepoCommitInfo } from '../api/github';
+import {
+	dateFormat,
+} from '../../utils/GeneralFunctions';
+
 import { Comment, Tooltip, List, Divider } from 'antd';
 import moment from 'moment';
 
@@ -7,46 +13,54 @@ export default function ChangeLog(props) {
 	const [ commitArray, setCommitArray ] = useState([]);
 
   useEffect( () => {
-		const getRepoCommitInfo = async () => {
-			const baseURL = "https://api.github.com";
+		const fetchCommitArray = async () => {
 			const repoOwner = "Depersonalizc";
 			const repoName = "CSC4001-Better-SIS";
-			const targetURL = `${baseURL}/repos/${repoOwner}/${repoName}/commits`;
-			console.log(`targetURL = ${ targetURL }`);
+			let outputArray = await( getRepoCommitInfo(repoName, repoOwner) );
 
-			try {
-				let resp = await( fetch(targetURL, {
-					method: "GET",
-					mode: "cors",
-				}) );
-				let json = await( resp.json() );
-				console.log(`typeof json = ${ Object.prototype.toString.call(json) }`);
-
-				// here, json is an array type
-				let outputArray = [];
-				for (let index in json) {
-					if (!json[index]["author"]) {
-						continue;
-					}
-					let obj = json[index]["commit"]
-					outputArray.push( {
-						author: obj["author"]["name"],
-						time: obj["author"]["date"],
-						email: obj["author"]["email"],
-						avatar_url: json[index]["author"]["avatar_url"],
-						mesg: obj["message"],
-						url: obj["url"],
-					} );
-				}
-				console.log(`outputArray = ${ JSON.stringify(outputArray) }`);
-				setCommitArray(outputArray);
-			}
-			catch(error) {
-				console.log(error);
-			}
+			setCommitArray(outputArray);
 		};
-		getRepoCommitInfo();
-	}, [] )
+		fetchCommitArray();
+
+		// const getRepoCommitInfo = async () => {
+		// 	const baseURL = "https://api.github.com";
+		// 	const repoOwner = "Depersonalizc";
+		// 	const repoName = "CSC4001-Better-SIS";
+		// 	const targetURL = `${baseURL}/repos/${repoOwner}/${repoName}/commits`;
+
+		// 	try {
+		// 		let resp = await( fetch(targetURL, {
+		// 			method: "GET",
+		// 			mode: "cors",
+		// 		}) );
+		// 		let json = await( resp.json() );
+		// 		// console.log(`typeof json = ${ Object.prototype.toString.call(json) }`);
+
+		// 		// here, json is an array type
+		// 		let outputArray = [];
+		// 		for (let index in json) {
+		// 			if (!json[index]["author"]) {
+		// 				continue;
+		// 			}
+		// 			let obj = json[index]["commit"]
+		// 			outputArray.push( {
+		// 				author: obj["author"]["name"],
+		// 				time: obj["author"]["date"],
+		// 				email: obj["author"]["email"],
+		// 				avatar_url: json[index]["author"]["avatar_url"],
+		// 				mesg: obj["message"],
+		// 				url: obj["url"],
+		// 			} );
+		// 		}
+		// 		// console.log(`outputArray = ${ JSON.stringify(outputArray) }`);
+		// 		setCommitArray(outputArray);
+		// 	}
+		// 	catch(error) {
+		// 		console.log(error);
+		// 	}
+		// };
+		// getRepoCommitInfo();
+	}, [] );
 
 	return (
 		<div className="home-page-change-log">
@@ -90,7 +104,7 @@ function ChangeLogItem(props) {
 				<p>{props.data[index].mesg}</p>
 			),
 			datetime: (
-				<span>{props.data[index].time}</span>
+				<span>{ dateFormat(new Date(props.data[index].time)) }</span>
 			),
 		});
 	}

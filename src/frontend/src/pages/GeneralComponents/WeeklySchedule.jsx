@@ -94,13 +94,13 @@ export default function WeeklySchedule(props) {
             );
           })
         }
-        {
+        {/* {
           props.timeSlots && props.timeSlots.addedNotConfirmed && props.timeSlots.addedNotConfirmed.show && props.timeSlots.addedNotConfirmed.data.map((ele, index) => {
             return (
               <TimeSlot data={ele} key={index} type={"addedNotConfirmed"} />
             );
           })
-        }
+        } */}
         {
           props.timeSlots && props.timeSlots.comingLectures && props.timeSlots.comingLectures.show && props.timeSlots.comingLectures.data.map((ele, index) => {
             return (
@@ -143,8 +143,8 @@ export default function WeeklySchedule(props) {
       <div className="weekly-schedule-prompt">
         <div>
           <Badge className="weekly-schedule-prompt-badge" color={ColorList.confirmed} text={"Confirmed"} />
-          <Badge className="weekly-schedule-prompt-badge" color={ColorList.addedNotConfirmed} text={"Added But Not Confirmed"} />
-          <Badge className="weekly-schedule-prompt-badge" color={ColorList.toAdd} text={"to add"} />
+          {/* <Badge className="weekly-schedule-prompt-badge" color={ColorList.addedNotConfirmed} text={"Added But Not Confirmed"} /> */}
+          <Badge className="weekly-schedule-prompt-badge" color={ColorList.toAdd} text={"To Add"} />
         </div>
       </div>
     </div>

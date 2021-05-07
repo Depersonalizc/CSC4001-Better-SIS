@@ -215,7 +215,7 @@ export default (props) => {
           onCancel={handleModalCancel}
         >
           <p className="sub-title">Your Weekly Schedule</p>
-          <div style={{transform: "scale(0.55)", transformOrigin: "50% 0%", textAlign: "center", border: "1px solid red",}}>
+          <div style={{transform: "scale(0.55)", transformOrigin: "80% 0%", textAlign: "center", width: "120rem",}}>
             <WeeklySchedule 
               existsCourseList={CourseTimeSlotList}
               // comingCourseList={ComingTimeSlotList}

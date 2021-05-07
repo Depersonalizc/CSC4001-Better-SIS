@@ -1,10 +1,75 @@
+import React from 'react';
+
 /* 引入图片 */
 import CUHKSZLogo from '@/static/images/CUHKSZ_logo.png';
 
-import { Menu, Button } from 'antd';
+/* 引入通用及api函数 */
+import { getStudentInfo } from '../api/api';
+import {
+  getCookie,
+  setCookie,
+  deleteCookie,
+} from '../../utils/GeneralFunctions';
+
+/* 引入Ant Design */
+import { 
+  Menu, 
+  Button,
+  Spin,
+  Dropdown,
+} from 'antd';
 
 
 export default function Header(props) {
+  const [ userName, setUserName ] = React.useState(null);
+
+
+  React.useEffect(() => {
+    const fetchStudentInfo = async () => {
+      let studentID = getCookie("studentID");
+      console.log(`student id cookie data = ${studentID}`);
+      if (studentID) {
+        let returnJSON = await( getStudentInfo(studentID) );
+        console.log(`return studentInfo = ${ JSON.stringify(returnJSON) }`);
+        
+        console.log(`student name = ${returnJSON["name"]}`);
+        setUserName( returnJSON["name"] );
+        props.setIsSpinning && props.setIsSpinning(false);
+        console.log(`set isSpinning to false`);
+      } else {
+        // window.location.pathname;
+        // console.log(`window.location.pathname = ${ window.location.pathname }`);
+        alert("Your login has been expired, please login again.");
+        if ( window.location.pathname !== "/login" ) {
+          window.location.href = "/login";
+        }
+      }
+    };
+    fetchStudentInfo();
+  }, []);
+
+
+  const menu = (
+    <Menu>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="/user">
+          个人主页
+        </a>
+      </Menu.Item>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="/">
+          登出
+        </a>
+      </Menu.Item>
+      {/* <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+          3rd menu item
+        </a>
+      </Menu.Item> */}
+    </Menu>
+  );
+
+
 	return (
 		<div className="home-page-navigator">
         <img src={CUHKSZLogo} className="home-page-navigator-logo" />
@@ -27,9 +92,18 @@ export default function Header(props) {
             </Menu.Item>
           </Menu>
         </div>
-        <Button type="primary" shape="round" className="home-page-navigator-login" href="/login">
-          登录/注册
-        </Button>
+        {
+          userName?
+          <Dropdown overlay={menu} placement="bottomLeft">
+            <Button type="primary" shape="round" className="home-page-navigator-login" href="/login">
+              {`你好，${userName}`}
+            </Button>
+          </Dropdown>
+          :
+          <Button type="primary" shape="round" className="home-page-navigator-login" href="/login">
+            {"登录/注册"}
+          </Button>
+        }
       </div>
 	);
 }

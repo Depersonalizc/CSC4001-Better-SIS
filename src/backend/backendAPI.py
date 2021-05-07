@@ -324,9 +324,9 @@ def removeAllCourse():
         return json.dumps({'removed' : False})
 
 ### 8. test if session is conflict, used to button, use can buffer session
-@app.route('/canBufferSession', methods=['GET'])
+@app.route('/canBufferSession', methods=['POST'])
 def canBufferSession():
-    code = request.form['courseCode']
+    # code = request.form['courseCode']
     snos = request.form['sessionNo']
     stuid = request.cookies.get('studentID')
 

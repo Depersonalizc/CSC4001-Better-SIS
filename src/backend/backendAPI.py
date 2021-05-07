@@ -314,7 +314,7 @@ def removeOneCourse():
 ### 7.3 remove all confirmed list
 @app.route('/removeAllCourse', methods=['GET'])
 def removeAllCourse():
-    code = request.form['courseCode']
+    # code = request.form['courseCode']
     stuid = request.cookies.get('studentID')
     try:
         sche = get_schedule(stuid)

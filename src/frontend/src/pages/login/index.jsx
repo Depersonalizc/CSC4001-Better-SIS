@@ -3,8 +3,13 @@ import React from 'react';
 /* 引入样式表 */
 import './index.less';
 
-/* 引入api函数 */
+/* 引入通用及api函数 */
 import { SignIn } from '../api/api';
+import {
+  getCookie,
+  setCookie,
+  deleteCookie,
+} from '../../utils/GeneralFunctions';
 
 /* 引入组件 */
 import NavigatorWithTime from '../GeneralComponents/NavigatorWithTime';
@@ -60,12 +65,27 @@ export default (props) => {
     const formData = new FormData();
     formData.append("studentID", studentID);
     formData.append("password", password);
-    let json = await( SignIn(formData) );
+    try {
+      let json = await( SignIn(formData) );
 
-    if ( json["exist"] && json["correctPwd"] ) {
-      alert("Success");
-    } else {
-      alert("login failed");
+      if ( json["exist"] && json["correctPwd"] ) {
+        alert("Success");
+        // setCookie("studentID", studentID, {
+        //   domain: "http://175.24.4.124/",
+        //   secure: true,
+        //   "max-age": 7200,
+        // });
+        setCookie("studentID", studentID, {
+          secure: true,
+          "max-age": 7200,
+        });
+        window.location.href = "/";
+      } else {
+        alert("login failed");
+      }
+    }
+    catch(error) {
+      window.location.href = "/";
     }
   };
 

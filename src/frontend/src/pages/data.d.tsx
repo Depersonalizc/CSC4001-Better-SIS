@@ -205,9 +205,9 @@ export const SearchData = {
 	courseTargetStudent: {
 		title: "目标学生",
 		data: [
-			"本科生",
-			"硕士生",
-			"博士生",
+			"Undergraduate",
+			"Master",
+			"Doctor",
 		],
 	},
 };

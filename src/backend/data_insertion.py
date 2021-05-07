@@ -96,50 +96,50 @@ def data_insert():
 
 
     # add session
-    db.session.add(
+    db.session.add(#1
         dbMdl.Session(course_code='CSC4001',
                     type='lec', instr='1', venue='TA101',
                     class1='4 15:30-4 16:50',
                     class2='5 14:30-5 15:50')
                 )
-    db.session.add(
+    db.session.add(#2
         dbMdl.Session(course_code='CSC4001',
                     type='tut', instr='2', venue='CD202',
                     class1='4 18:00-4 18:50')
                 )
-    db.session.add(
+    db.session.add(#3
         dbMdl.Session(course_code='CSC4001',
                     type='tut', instr='2', venue='CD202',
                     class1='5 18:00-5 18:50')
                 )
-    db.session.add(
+    db.session.add(#4
         dbMdl.Session(course_code='CSC4001',
                     type='tut', instr='2', venue='CD202',
                     class1='5 20:00-5 20:50')
                 )
-    db.session.add(
+    db.session.add(#5
         dbMdl.Session(course_code='CSC1001',
                     type='lec', instr='3', venue='TD101',
                     class1='1 08:30-1 09:50',
                     class2='3 08:30-3 09:50')
                 )
-    db.session.add(
+    db.session.add(#6
         dbMdl.Session(course_code='CSC1001',
                     type='lec', instr='4', venue='TD101',
                     class1='2 08:30-2 09:50',
                     class2='4 08:30-4 09:50')
                 )
-    db.session.add(
+    db.session.add(#7
         dbMdl.Session(course_code='CSC1001',
                     type='tut', instr='5', venue='TD110',
                     class1='1 18:00-1 18:50')
                 )
-    db.session.add(
+    db.session.add(#8
         dbMdl.Session(course_code='CSC1001',
                     type='tut', instr='6', venue='TD110',
                     class1='1 19:00-1 19:50')
                 )
-    db.session.add(
+    db.session.add(#9
         dbMdl.Session(course_code='CSC3100',
                     type='lec', instr='1', venue='TB102',
                     class1='1 08:30-1 09:50',

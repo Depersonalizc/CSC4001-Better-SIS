@@ -7,7 +7,7 @@ from DB.dbModels import app
 # import hashlib
 import json
 import random
-from flask import request
+from flask import make_response, request
 from get_instance import get_course, get_schedule, get_student
 from flask_cors import cross_origin, CORS
 from calendar import day_name
@@ -77,6 +77,8 @@ def signin_stu():
         "correctPwd": False
     }
     if stu:
+        resp = make_response('success')
+        resp.set_cookie('studentID', '118010158')
         get_student(stuid)
         get_schedule(stuid)
         rtdata["exist"] = True

@@ -14,9 +14,9 @@ from calendar import day_name
 from get_instance import get_course, get_student, get_schedule
 CORS(app, supports_credentials=True, resources=r"/*")
 
-cookies_stuid = request.cookies.get('studentID')
-if cookies_stuid:
-    get_student(cookies_stuid)
+# cookies_stuid = request.cookies.get('studentID')
+# if cookies_stuid:
+#     get_student(cookies_stuid)
 
 ### 1.5 search stu
 @app.route('/searchStu/<string:stuid>', methods=['GET'])
@@ -82,7 +82,7 @@ def signin_stu():
     }
     if stu:
         resp = make_response('success')
-        resp.set_cookie('studentID', '118010158')
+        resp.set_cookie('studentID', '118010154')
         get_student(stuid)
         get_schedule(stuid)
         rtdata["exist"] = True
@@ -329,8 +329,8 @@ def removeAllCourse():
 ### 8. test if session is conflict, used to button, use can buffer session
 @app.route('/canBufferSession', methods=['POST'])
 def canBufferSession():
-    # code = request.form['courseCode']
-    snos = request.form['sessionNo']
+    data = json.loads(request.get_data(as_text=True))
+    snos = data['sessionNo']
     stuid = request.cookies.get('studentID')
 
     ret = dict()

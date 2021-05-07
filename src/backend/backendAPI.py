@@ -241,7 +241,7 @@ def searchCourse():
                                 'timeSlots': timesltData,
                                 "location": ses.venue,
                                 "currentEnrollment": ses.curEnroll,
-                                "classCapacity": ses.capacity,
+                                "classCapacity": 120,#ses.capacity,
                                 })
         
         coursesData.append({
@@ -414,6 +414,51 @@ def setPreference():
     except:
         return json.dumps({'seted': False})
 
+#### 12. One click auto schedule, return a schedule
+@app.route('/autoSchedule', methods=['GET'])
+def autoSchedule():
+    stuid = request.form['studentID']
+    sche = get_schedule(stuid)
+    sche.auto_schedule()
+    wkSchdlData = {'confirmed': None, 'added': None}
+    sesData = [[], []]
+    
+    for i, pkgs in enumerate(
+                [sche.selected_pkgs, sche.buffer_pkgs]
+            ):
+        for pkg in pkgs:
+            # print(pkg)
+            for sno in [pkg.lec_sess.session_no, pkg.tut_sess.session_no]:
+                ses = dbMdl.Session.query.filter_by(sno=sno).first()
+                instr = dbMdl.Instructor.query.filter_by(
+                    id=int(ses.instr.split(' ')[0])).first()
+                timesltData = []
+                if ses.class1:
+                    timesltData.append({
+                        "weekday": day_name[int(ses.class1[0])-1],
+                        "beginTime": ses.class1[2:7],
+                        "endTime": ses.class1[10:],
+                    })
+                if ses.class2:
+                    timesltData.append({
+                        "weekday": day_name[int(ses.class2[0])-1],
+                        "beginTime": ses.class2[2:7],
+                        "endTime": ses.class2[10:],
+                    })
+                sesData[i].append({"sessionNumber": ses.sno,
+                                    "courseCode": ses.course,
+                                    "isLecture": ses.type == 'lec',
+                                    "instructor": instr.name,
+                                    'timeSlots': timesltData,
+                                    "location": ses.venue,
+                                    "currentEnrollment": ses.curEnroll,
+                                    "classCapacity": ses.capacity,
+                                    })
+    wkSchdlData['confirmed'] = sesData[0]
+    wkSchdlData['added'] = sesData[1]
+
+    return json.dumps({'schedule':wkSchdlData})
+
 #### 13. can add wishlist
 @app.route('/canWishlistCourse', methods=['POST'])
 def canWishlistCourse():
@@ -442,6 +487,19 @@ def autoScheduleConfirm():
     except:
         return json.dumps({'confirmed' : False})
 
+#### 15. add wishlist
+@app.route('/addWishlist', methods=['POST'])
+def addWishlist():
+    data = json.loads(request.get_data(as_text=True))
+    courses = data['courseCodes']
+    stuid = data['studentID']
+    stu = get_student(stuid)
+    sche = get_schedule(stuid)
+    for c in courses:
+        cour = get_course(c)
+        stu.preference.course_wishlist.append(cour)
+    print(stu.preference)
+    return json.dumps({'added' : True})
 
 # def delete_stu(stuid:str):
 #     stu = dbMdl.Student.query.filter_by(id = stuid).first()

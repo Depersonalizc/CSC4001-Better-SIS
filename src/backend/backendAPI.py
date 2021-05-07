@@ -334,16 +334,16 @@ def canBufferSession():
     stuid = request.cookies.get('studentID')
 
     ret = dict()
-    try:
-        sche = get_schedule(stuid)
-        for sno in snos:
-            s = dbMdl.Session.query.filter_by(sno=sno).first()
-            course = get_course(s.course)
-            sess = course.find_session_instance()
-            ret[sno] = sche.can_buffer_session(sess)
-        return json.dumps({'able' : ret})
-    except:
-        return json.dumps({'able' : False})
+    #try:
+    sche = get_schedule(stuid)
+    for sno in snos:
+        s = dbMdl.Session.query.filter_by(sno=sno).first()
+        course = get_course(s.course)
+        sess = course.find_session_instance(s.type, s.sno)
+        ret[sno] = sche.can_buffer_session(sess)
+    return json.dumps({'able' : ret})
+    #except:
+    #    return json.dumps({'able' : False})
 
 
 ### 10.1 get course comment

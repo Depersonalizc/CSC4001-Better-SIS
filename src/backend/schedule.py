@@ -188,6 +188,7 @@ class Schedule:
                 credits = pkg.course.credit_units
                 del pkg
                 self.selected_credits -= credits
+        return True
 
     # def remove_pkg(self, pkg_idx: int) -> bool:
     #     """
@@ -299,6 +300,7 @@ class Schedule:
         # pkg = self.buffer_pkgs[0]
         # other_ss = pkg.lec_sess is not None if ss.session_type == 'lec' \
         #            else pkg.tut_sess is not None
+        print('in buffer',self.student.met_all_prereqs(ss.course))
         return (
                 not self.session_time_conflicts(ss, True)
                 and self.student.met_all_prereqs(ss.course)
@@ -313,7 +315,8 @@ class Schedule:
         )
 
     def add_course_to_wishlist(self, course: Course):
-        assert self.can_wishlist_course(course)
+        if not self.can_wishlist_course(course):
+            return False
         # prereq_fails = [p for p in course.prereqs
         #                 if not self.student.has_taken(p)]
         # if not prereq_fails:
@@ -498,12 +501,12 @@ if __name__ == '__main__':
     # Remove package
     pkg_to_remove = sche.find_selected_pkg(pkg_toswap)
     print('Removing FIN4060 package...')
-    print('Successful!' if sche.remove_pkg(pkg_to_remove) else 'Failed!')
+    print('Successful!' if sche.remove_selected_pkg(pkg_to_remove) else 'Failed!')
     print(sche)
 
     # Manual add (say FIN4060)
     sche.init_buffer()
-    sche.choose_session(FIN4060, lec_idx=lec_idx)
+    sche.buffer_session(FIN4060, lec_idx=lec_idx)
     # Cannot select package cuz it is incomplete
     print('Selecting package...')
     incomplete = sche.select_buffer_pkgs()
@@ -512,7 +515,7 @@ if __name__ == '__main__':
     else:
         print("Successful!")
     # Now it is complete
-    sche.choose_session(FIN4060, tut_idx=tut_idx)
+    sche.buffer_session(FIN4060, tut_idx=tut_idx)
     print('Selecting package...')
     incomplete = sche.select_buffer_pkgs()
     if incomplete:

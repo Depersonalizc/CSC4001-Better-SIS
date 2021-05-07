@@ -238,15 +238,15 @@ class ProjectUnitTest(unittest.TestCase):
         sche = Schedule(stud)
         # Student wishes to add the following courses:
         # print('Check Add wish list')
-        for course in FIN4060, DDA4250, CSC4008:
-            fails = sche.add_course_to_wishlist(course)
-            if fails:
-                self.assertEqual(course.full_code, 'DDA4250')
-                self.assertEqual(str(fails),'[\'CSC4001\']')
-                # print(f"Failed to wish-list {course.full_code}. Prerequisites {fails} not met.")
-            else:
-                # print(f"Wish-listed course {course.full_code}.")
-                self.assertIn(course.full_code,['FIN4060', 'CSC4008'])
+        # for course in FIN4060, DDA4250, CSC4008:
+        #     fails = sche.add_course_to_wishlist(course)
+        #     if fails:
+        #         self.assertEqual(course.full_code, 'DDA4250')
+        #         self.assertEqual(str(fails),'[\'CSC4001\']')
+        #         # print(f"Failed to wish-list {course.full_code}. Prerequisites {fails} not met.")
+        #     else:
+        #         # print(f"Wish-listed course {course.full_code}.")
+        #         self.assertIn(course.full_code,['FIN4060', 'CSC4008'])
         sche.preference.no_friday = True
         time.sleep(0.2)
         '''//// Schedule Class Test ////'''
@@ -300,14 +300,14 @@ class ProjectUnitTest(unittest.TestCase):
         print('Check Remove package...')
         # print('Successful!' if sche.remove_pkg(pkg_to_remove) else 'Failed!')
         # print(sche)
-        self.assertTrue(sche.remove_pkg(pkg_to_remove))
+        self.assertTrue(sche.remove_selected_pkg(pkg_to_remove))
         time.sleep(0.2)
         '''//// Remove Package Test ////'''
         
         '''//// Manual Add Test ////'''
         # Manual add (say FIN4060)
         sche.init_buffer()
-        sche.choose_session(FIN4060, lec_idx=lec_idx)
+        sche.buffer_session(FIN4060, lec_idx=lec_idx)
         # Cannot select package cuz it is incomplete
         print('Check Manual Add...')
         incomplete = sche.select_buffer_pkgs()
@@ -319,7 +319,7 @@ class ProjectUnitTest(unittest.TestCase):
             # print("Successful!")
             pass
         # Now it is complete
-        sche.choose_session(FIN4060, tut_idx=tut_idx)
+        sche.buffer_session(FIN4060, tut_idx=tut_idx)
         # print('Selecting package...')
         incomplete = sche.select_buffer_pkgs()
         self.assertFalse(incomplete)

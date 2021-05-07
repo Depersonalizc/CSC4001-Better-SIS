@@ -353,10 +353,12 @@ def canBufferSession():
             s = dbMdl.Session.query.filter_by(sno=sno).first()
             course = get_course(s.course)
             sess = course.find_session_instance(s.type, s.sno)
+            print(sess.class1, ' ', sess.class2)
             ret[sno] = sche.can_buffer_session(sess)
         return json.dumps({'able' : ret})
-    except:
-        return json.dumps({'able' : False})
+    except Exception as e:
+        print(e)
+        return json.dumps({'able' : None})
 
 
 ### 10.1 get course comment

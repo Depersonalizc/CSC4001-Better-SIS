@@ -22,9 +22,9 @@ def data_insert():
     # add user
     # for specific user
     db.session.add(dbMdl.Student(id='118010158', name='Zeyu Li', pwd='123abc',gender = True, school='SDS', college='Harmonia',
-                   major='CSE', year=3, totcrdt=108, studied_courses='CSC1001 CSC3002 CSC4001 CSC3050 EIE4007 ECO2011', permission=1))
+                   major='CSE', year=3, totcrdt=108, studied_courses='CSC1001 CSC3002 CSC3050', permission=1))
     db.session.add(dbMdl.Student(id='118010154', name='Yihan Li', pwd='123', gender=True, school='SDS', college='Shaw',
-                   major='CSE', year=3, totcrdt=90, studied_courses='CSC1001 CSC3002 CSC4001 CSC3050 CSC4020', permission=1))
+                   major='CSE', year=3, totcrdt=90, studied_courses='CSC1001 CSC3002 CSC4001 CSC3050', permission=1))
  
     # for default user
     db.session.add(dbMdl.Student(id='117010000', name='abc',
@@ -99,7 +99,7 @@ def data_insert():
     db.session.add(#1
         dbMdl.Session(course_code='CSC4001',
                     type='lec', instr='1', venue='TA101',
-                    class1='4 15:30-4 16:50',
+                    class1='5 10:30-5 11:50',
                     class2='5 14:30-5 15:50')
                 )
     db.session.add(#2
@@ -159,18 +159,18 @@ def data_insert():
     db.session.add(
         dbMdl.Session(course_code='CSC3170',
                     type='tut', instr='9', venue='TA305',
-                    class1='4 19:00-3 20:50')
+                    class1='4 19:00-4 20:50')
                 )
     db.session.add(
         dbMdl.Session(course_code='CSC3002',
                     type='lec', instr='10', venue='TB201',
-                    class1='2 10:30-1 11:50',
-                    class2='4 10:30-3 11:50')
+                    class1='2 10:30-2 11:50',
+                    class2='4 10:30-4 11:50')
                 )
     db.session.add(
         dbMdl.Session(course_code='CSC3002',
                     type='tut', instr='11', venue='TA304',
-                    class1='4 18:30-3 18:50')
+                    class1='4 18:30-4 18:50')
                 )
     db.session.add(
         dbMdl.Session(course_code='BIM3001',

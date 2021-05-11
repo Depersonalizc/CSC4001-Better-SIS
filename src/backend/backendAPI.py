@@ -80,13 +80,13 @@ def signin_stu():
         "exist": False,
         "correctPwd": False
     }
-    if stu:
+    if stu: # found student in db
         resp = make_response('success')
         resp.set_cookie('studentID', '118010154')
         get_student(stuid)
         get_schedule(stuid)
         rtdata["exist"] = True
-        if stu.check_password(pwd):
+        if stu.check_password(pwd): # check password
             print("corrent pwd")
             rtdata["correctPwd"] = True
             get_student(stuid)
@@ -101,26 +101,23 @@ def signin_stu():
 ### 3 get student info
 @app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
 def getStuInfo(stuid:str):
-# @app.route('/getStudentInfo', methods=['GET'])
-# def getStuInfo():
-    
     # stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     wkSchdlData = {'confirmed': None, 'added': None}
     if stu:
-        schdlInst = get_schedule(stuid)
+        schdlInst = get_schedule(stuid) # get schedule of the student
         sesData = [[], []]
         for i, pkgs in enumerate(
             [schdlInst.selected_pkgs, schdlInst.buffer_pkgs]
         ):
-            for pkg in pkgs:
-                # print(pkg)
+            for pkg in pkgs: 
+                # if any selected/buffer_pkgs, query course, session, instructor data and return to front end
                 for sno in [pkg.lec_sess.session_no, pkg.tut_sess.session_no]:
                     ses = dbMdl.Session.query.filter_by(sno=sno).first()
                     instr = dbMdl.Instructor.query.filter_by(
                         id=int(ses.instr.split(' ')[0])).first()
                     timesltData = []
-                    if ses.class1:
+                    if ses.class1: # check classes in the session
                         timesltData.append({
                             "weekday": day_name[int(ses.class1[0])-1],
                             "beginTime": ses.class1[2:7],
@@ -167,7 +164,7 @@ def getStuInfo(stuid:str):
             'weeklySchedule': None
         })
 
-### 4 get term info
+### 4 get term info, we temporary consider only one semester
 @app.route('/getTermInfo', methods=['GET'])
 def getTermInfo():
     return json.dumps([
@@ -192,7 +189,7 @@ def searchCourse():
     stuid = request.form['studentID']      #118
     stuInst = get_student(stuid)
 
-    courses = dbMdl.Course.query
+    courses = dbMdl.Course.query # query by the criteria
     if code:
         courses = courses.filter_by(suffix=code)
     if pre:
@@ -207,7 +204,7 @@ def searchCourse():
         prereqsData = crs.prereqs.split(' ')
         prereqsStfyData = []
 
-        if prereqsData == ['']:
+        if prereqsData == ['']: # check prerequisite status and return
             prereqsData = ["No prerequisite course"]
             prereqsStfyData = [True]
         else:
@@ -297,19 +294,17 @@ def addClass():
     stuid = data['studentID']
     print(snos)
     try:
-
         sche = get_schedule(stuid)
         sche.init_buffer()
-        
-
         sess = dbMdl.Session.query.filter_by(sno=snos[0]).first()
         c = get_course(sess.course)
         sche.buffer_session_by_sno(c,int(snos[0]),int(snos[1]))
         sche.select_buffer_pkgs()
+        # db.session.add()
         print(sche)
         return json.dumps({'added' : True})
-    except:
-        print('Failed to add class')
+    except Exception as e:
+        print('Failed to add class, error: ', e)
         return json.dumps({'added' : False})
 
 ### 7.2 remove one course (pkg) in confirmed list
@@ -417,11 +412,12 @@ def setPreference():
         return json.dumps({'seted': False})
 
 #### 12. One click auto schedule, return a schedule
-@app.route('/autoSchedule', methods=['GET'])
-def autoSchedule():
-    stuid = request.form['studentID']
+@app.route('/autoSchedule/<string:stuid>', methods=['GET'])
+def autoSchedule(stuid: str):
+    # stuid = request.form['studentID']
     sche = get_schedule(stuid)
     sche.auto_schedule()
+    print(sche)
     wkSchdlData = {'confirmed': None, 'added': None}
     sesData = [[], []]
     

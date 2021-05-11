@@ -234,12 +234,18 @@ class Schedule:
                               lec_sno: int = None,
                               tut_sno: int = None):
         pkg = self.buffer_pkgs[0]  # Could be incomplete
-        if lec_sno is not None:
+        if lec_sno :
             lec_idx = course.find_session('lec', lec_sno)
-            pkg.lec_sess = course.lec_sessions[lec_idx]
-        if tut_sno is not None:
+            if lec_idx:
+                pkg.lec_sess = course.lec_sessions[lec_idx]
+            else:
+                print('Wrong lecture session number')
+        if tut_sno :
             tut_idx = course.find_session('tut', tut_sno)
-            pkg.tut_sess = course.tut_sessions[tut_idx]
+            if tut_idx:
+                pkg.tut_sess = course.tut_sessions[tut_idx]
+            else:
+                print('Wrong lecture session number')
 
     # TODO: Need Test
     def swap_session(self,
@@ -360,6 +366,7 @@ class Schedule:
                 self.buffer_pkgs.pop()
 
         # Auto-scheduling fails pathetically.
+        print('auto sched fails!!!')
         return False
 
     def auto_schedule(self, verbose=False) -> bool:

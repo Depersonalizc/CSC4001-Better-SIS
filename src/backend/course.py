@@ -389,7 +389,7 @@ class Course:
         for idx, s in enumerate(ss):
             if s.session_no == session_no:
                 return idx
-        return -1
+        return None # -1    cannot return -1, because list[-1] do make sense
 
     def find_session_instance(self, session_type: str, session_no: int) -> int:
         """

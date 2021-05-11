@@ -15,6 +15,7 @@ class Preference:
         self.course_wishlist = list()
         if course_wishlist is not None:
             self.course_wishlist = course_wishlist
+
         # Constraints
         self.no_morning = no_morning
         self.no_noon = no_noon

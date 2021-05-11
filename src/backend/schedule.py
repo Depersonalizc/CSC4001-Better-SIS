@@ -234,22 +234,25 @@ class Schedule:
                               lec_sno: int = None,
                               tut_sno: int = None):
         pkg = self.buffer_pkgs[0]  # Could be incomplete
-        if lec_sno :
+        if lec_sno is not None :
             lec_idx = course.find_session('lec', lec_sno)
-            if lec_idx:
+            if lec_idx is not None:
                 pkg.lec_sess = course.lec_sessions[lec_idx]
-                return True
+                print(lec_idx)
             else:
                 print('Wrong lecture session number')
                 return False
-        if tut_sno :
+        if tut_sno is not None :
             tut_idx = course.find_session('tut', tut_sno)
-            if tut_idx:
+            print('tut ',tut_sno)
+            if tut_idx is not None:
                 pkg.tut_sess = course.tut_sessions[tut_idx]
+                print(tut_idx)
                 return True
             else:
                 print('Wrong lecture session number')
                 return False
+        return False
 
     # TODO: Need Test
     def swap_session(self,

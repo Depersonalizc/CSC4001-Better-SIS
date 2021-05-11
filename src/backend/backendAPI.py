@@ -111,8 +111,13 @@ def getStuInfo(stuid:str):
             [schdlInst.selected_pkgs, schdlInst.buffer_pkgs]
         ):
             for pkg in pkgs: 
+                snos = []
+                if pkg.lec_sess is not None:
+                    snos.append(pkg.lec_sess.session_no)
+                if pkg.tut_sess is not None:
+                    snos.append(pkg.tut_sess.session_no)
                 # if any selected/buffer_pkgs, query course, session, instructor data and return to front end
-                for sno in [pkg.lec_sess.session_no, pkg.tut_sess.session_no]:
+                for sno in snos:
                     ses = dbMdl.Session.query.filter_by(sno=sno).first()
                     instr = dbMdl.Instructor.query.filter_by(
                         id=int(ses.instr.split(' ')[0])).first()
@@ -292,22 +297,39 @@ def addClass():
     data = json.loads(request.get_data(as_text=True))
     snos = data['sessionNo']
     stuid = data['studentID']
+    error = ''
     print(snos)
     try:
         sche = get_schedule(stuid)
         sche.init_buffer()
         sess = dbMdl.Session.query.filter_by(sno=snos[0]).first()
         c = get_course(sess.course)
+
+        for pkg in sche.selected_pkgs:
+            if pkg.lec_sess is not None:
+                if pkg.lec_sess.session_no == int(snos[0]):
+                    error = 'Has selected a lecture for this course'
+                    print(error, ' ',int(snos[0]))
+                    return json.dumps({'added' : False, 'error': error})
+            if pkg.tut_sess is not None:
+                if pkg.tut_session.sess_no == int(snos[1]):
+                    error = 'Has selected a tutorial for this course'
+                    print(error, ' ', int(snos[1]))                
+                return json.dumps({'added' : False, 'error': error})
+
         if not sche.buffer_session_by_sno(c,int(snos[0]),int(snos[1])):
-            print('Failed to add class, error: wrong session number',)
-            return json.dumps({'added' : False})
+            error = 'Failed to add class, error: wrong session number'
+            print(error)
+            return json.dumps({'added' : False, 'error': error})
+        print('Hey')
         sche.select_buffer_pkgs()
         # db.session.add()
         print(sche)
-        return json.dumps({'added' : True})
+        return json.dumps({'added' : True, 'error': error})
     except Exception as e:
         print('Failed to add class, error: ', e)
-        return json.dumps({'added' : False})
+        error = 'exception'
+        return json.dumps({'added' : False, 'error': error})
 
 ### 7.2 remove one course (pkg) in confirmed list
 @app.route('/removeOneCourse', methods=['POST'])

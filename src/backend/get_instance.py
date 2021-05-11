@@ -39,7 +39,7 @@ def get_course(full_code: str):
         ss_ins = set()
         for id in ins_id:
             if id in instructors:
-                ss_ins.add(instructors[i-1])            # idx in db begins from 1, but list starts from 0
+                ss_ins.add(instructors[id])
             else:
                 # Fetch info from db
                 ins = dbMdl.Instructor.query.filter_by(id=id).first()

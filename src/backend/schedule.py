@@ -238,14 +238,18 @@ class Schedule:
             lec_idx = course.find_session('lec', lec_sno)
             if lec_idx:
                 pkg.lec_sess = course.lec_sessions[lec_idx]
+                return True
             else:
                 print('Wrong lecture session number')
+                return False
         if tut_sno :
             tut_idx = course.find_session('tut', tut_sno)
             if tut_idx:
                 pkg.tut_sess = course.tut_sessions[tut_idx]
+                return True
             else:
                 print('Wrong lecture session number')
+                return False
 
     # TODO: Need Test
     def swap_session(self,

@@ -298,7 +298,9 @@ def addClass():
         sche.init_buffer()
         sess = dbMdl.Session.query.filter_by(sno=snos[0]).first()
         c = get_course(sess.course)
-        sche.buffer_session_by_sno(c,int(snos[0]),int(snos[1]))
+        if not sche.buffer_session_by_sno(c,int(snos[0]),int(snos[1])):
+            print('Failed to add class, error: wrong session number',)
+            return json.dumps({'added' : False})
         sche.select_buffer_pkgs()
         # db.session.add()
         print(sche)

@@ -18,6 +18,9 @@ CORS(app, supports_credentials=True, resources=r"/*")
 # if cookies_stuid:
 #     get_student(cookies_stuid)
 
+def check_studied(course, stu):
+    return course.full_code in stu.studied_courses
+
 
 ### 1 signin
 @app.route('/signin', methods=['POST'])
@@ -308,6 +311,10 @@ def addClass():
     c = get_course(sess.course)
 
     for pkg in sche.selected_pkgs:
+        if check_studied(c, get_student(stuid)):
+            error = 'You have studied this course!'
+            print(error)
+            return json.dumps({'added' : False, 'error': error})
         if pkg.lec_sess is not None:
             if pkg.lec_sess.session_no == int(snos[0]):
                 error = 'Has selected a lecture for this course'
@@ -334,7 +341,7 @@ def addClass():
 
 ### 7.2 remove one course (pkg) in confirmed list
 @app.route('/removeOneCourse', methods=['POST'])
-def removeOneCourse(stuid: str):
+def removeOneCourse():
     code = request.form['courseCode']
     stuid = request.form['studentID']
     # stuid = request.cookies.get('studentID')
@@ -367,7 +374,7 @@ def canBufferSession():
     # stuid = request.cookies.get('studentID')
 
     ret = dict()
-
+    # error = ''
     # try:
     sche = get_schedule(stuid)
     for sno in snos:
@@ -381,6 +388,8 @@ def canBufferSession():
             if pkg.course.full_code == course.full_code:
                 ret[sno] = False
                 selected = True
+        if check_studied(pkg.course, get_student(stuid)):
+            ret[sno] = False
         print('enroll: ',sess.cur_enroll,'capacity: ', sess.capacity)
         if not selected:
             ret[sno] = sche.can_buffer_session(sess)
@@ -501,6 +510,8 @@ def canWishlistCourse():
         sche = get_schedule(stuid)
         course = get_course(full_code)
         ret = sche.can_wishlist_course(course)
+        if check_studied(course, get_student(stuid)):
+            ret = False
         return json.dumps({'able' : ret})
     except:
         return json.dumps({'able' : None})
@@ -527,11 +538,30 @@ def addWishlist():
     stuid = data['studentID']
     stu = get_student(stuid)
     sche = get_schedule(stuid)
-    for c in courses:
+
+    added = [False] * len(courses)
+    error = [''] * len(courses)
+    print(sche.preference)
+    for idx, c in enumerate(courses):
         cour = get_course(c)
-        stu.preference.course_wishlist.append(cour)
+        if check_studied(cour, stu):
+            added[idx] = False
+            error[idx] = 'has_taken'
+            continue
+        elif not sche.add_course_to_wishlist(cour):
+            added[idx] = False
+            if cour in sche.preference.course_wishlist:
+                error[idx] = 'Already in wishlist'
+            else:
+                error[idx] = 'Prerequisite not satisfied'
+        else:
+            added[idx] = True
+        print(sche.preference)
     print(stu.preference)
-    return json.dumps({'added' : True})
+    return json.dumps({'added' : added, "error": error})
+
+
+
 
 # def delete_stu(stuid:str):
 #     stu = dbMdl.Student.query.filter_by(id = stuid).first()

@@ -186,7 +186,8 @@ class Schedule:
         for pkg in self.selected_pkgs:
             if pkg.course.full_code == full_code:
                 credits = pkg.course.credit_units
-                del pkg
+                self.selected_pkgs.remove(pkg)
+                # del pkg
                 self.selected_credits -= credits
         return True
 
@@ -241,7 +242,7 @@ class Schedule:
                 print(lec_idx)
             else:
                 print('Wrong lecture session number')
-                return False
+                return 'Wrong lecture session number'
         if tut_sno is not None :
             tut_idx = course.find_session('tut', tut_sno)
             print('tut ',tut_sno)
@@ -250,9 +251,12 @@ class Schedule:
                 print(tut_idx)
                 return True
             else:
-                print('Wrong lecture session number')
-                return False
+                print('Wrong tutorial session number')
+                return 'Wrong tutorial session number'
         return False
+
+    def check_studied(self, course: Course, stu: Student):
+        return course.full_code in stu.studied_courses
 
     # TODO: Need Test
     def swap_session(self,
@@ -328,6 +332,8 @@ class Schedule:
         )
 
     def add_course_to_wishlist(self, course: Course):
+        print('1',self.student.met_all_prereqs(course))
+        print('2',course not in self.preference.course_wishlist)
         if not self.can_wishlist_course(course):
             return False
         # prereq_fails = [p for p in course.prereqs
@@ -335,6 +341,7 @@ class Schedule:
         # if not prereq_fails:
         #     self.preference.course_wishlist.append(course)
         self.preference.course_wishlist.append(course)
+        return True
         # return prereq_fails
 
     # TODO: Need Test

@@ -70,7 +70,7 @@ def get_student(stuid: str) -> Student:
         return students[stuid]
     s = dbMdl.Student.query.filter_by(id=stuid).first()
     studied_courses = set(s.studied_courses.split(' '))
-    pref = Preference([get_course('CSC3100'), get_course('CSC3002'), get_course('CSC3170'), get_course('CSC1001')])
+    pref = Preference()
     stud = Student(s.id, s.name, s.school, s.major, s.year,
                    s.tot_credit, studied_courses, pref)
     students[stuid] = stud

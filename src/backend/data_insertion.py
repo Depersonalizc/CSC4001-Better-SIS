@@ -24,7 +24,7 @@ def data_insert():
     db.session.add(dbMdl.Student(id='118010158', name='Zeyu Li', pwd='123abc',gender = True, school='SDS', college='Harmonia',
                    major='CSE', year=3, totcrdt=108, studied_courses='CSC1001 CSC3002 CSC3050', permission=1))
     db.session.add(dbMdl.Student(id='118010154', name='Yihan Li', pwd='123', gender=True, school='SDS', college='Shaw',
-                   major='CSE', year=3, totcrdt=90, studied_courses='CSC1001 CSC3002 CSC4001 CSC3050', permission=1))
+                   major='CSE', year=3, totcrdt=90, studied_courses='', permission=1))
  
     # for default user
     db.session.add(dbMdl.Student(id='117010000', name='abc',
@@ -38,7 +38,7 @@ def data_insert():
 
     # add course
     db.session.add(dbMdl.Course(code='CSC4001', name='Software Engineering', school='SDS',
-                                units=3, prereqs='CSC1001 CSC3002', intro="The main goal of this course is to illustrate the basic concepts, knowledge framework and life cycle model \
+                                units=3, prereqs='CSC3002', intro="The main goal of this course is to illustrate the basic concepts, knowledge framework and life cycle model \
                                     of software engineering from an engineering practitioner’s point of view. The topics include: software processes, agile software development, requirement \
                                         engineering, system modelling, architectural design, design and implementation, software testing, software evolution, software measurement, software reuse, \
                                             etc. The course also illustrates and practices with common CASE tools used in software engineering and software management.\

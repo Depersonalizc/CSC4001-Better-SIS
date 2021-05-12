@@ -138,7 +138,11 @@ class Session:
         self.__instructors = instructors
         self.__venue = venue
         self.__session_no = session_no
+        if capacity is None:
+            capacity =  120
         self.capacity = capacity
+        if cur_enroll is None:
+            cur_enroll =  50
         self.cur_enroll = cur_enroll
 
     @property

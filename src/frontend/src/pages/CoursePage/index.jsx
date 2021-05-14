@@ -4,8 +4,11 @@ import React from 'react';
 import './index.less';
 
 /* 引入通用和api函数 */
-import { getURLParameter } from '../../utils/GeneralFunctions';
-import { SearchCourse } from '../api/api';
+import { getCookie, getURLParameter } from '../../utils/GeneralFunctions';
+import { 
+  SearchCourse,
+  canBufferSession,
+} from '../api/api';
 
 /* 引入组件 */
 import NavigatorWithTime from '../GeneralComponents/NavigatorWithTime';
@@ -87,22 +90,53 @@ export default function CoursePage(props) {
   React.useEffect(() => {
     const fetchCourseData = async () => {
       let currentURL = window.location.href;
-      let courseTitle = getURLParameter(currentURL, "courseTitle");
-      
+      let courseTitle = decodeURI( getURLParameter(currentURL, "courseTitle") );
+      console.log(`decoded courseTitle = ${ courseTitle }`);
       let coursePrefix = courseTitle.replace(/[^a-zA-Z]/g, '');
       let courseCode= courseTitle.replace(/[^0-9]/ig,"");
       console.log(`coursePrefix = ${coursePrefix}`);
       console.log(`courseCode = ${courseCode}`);
 
+      let studentID = getCookie("studentID");
+
       let formData = new FormData();
+      formData.append("studentID", studentID);
       formData.append("coursePrefix", coursePrefix);
       formData.append("courseCode", courseCode);
-      formData.append("school", null);
-      formData.append("targetStudent", null);
+      formData.append("school", "");
+      formData.append("targetStudent", "");
 
       let returnJSON = await( SearchCourse(formData) );
       console.log(`coursePageData = ${ JSON.stringify(returnJSON[0]) }`);
       setCoursePageData( returnJSON[0] );
+
+
+      // check if the sessions are conflict or not
+      let canBufferSessionObj = {};
+      canBufferSessionObj.studentID = studentID;
+      canBufferSessionObj.courseCodes = [ returnJSON[0].title ],
+      canBufferSessionObj.sessionNo = returnJSON[0].session.map((ele) => ele.sessionNumber);
+      console.log(`canBufferSessionObj = ${ JSON.stringify(canBufferSessionObj) }`);
+
+      let canBufferSessionReturnJSON = await( canBufferSession(canBufferSessionObj) );
+      let ableList = canBufferSessionReturnJSON["able"];
+      console.log(`able list = ${ JSON.stringify(ableList) } with type = ${ Object.prototype.toString.call(ableList) }`);
+
+      for ( let sessionNo in ableList ) {
+        for (let i = 0; i < returnJSON[0].session.length; ++i) {
+          console.log(`this session = ${ JSON.stringify(returnJSON[0].session[i]) }`);
+          console.log(`sessionNo = ${sessionNo} with type = ${typeof sessionNo}`);
+          console.log(`this session number = ${ returnJSON[0].session[i].sessionNumber } with type = ${typeof returnJSON[0].session[i].sessionNumber}`)
+          if ( returnJSON[0].session[i].sessionNumber == sessionNo ) {
+            console.log(`ableList[sessionNo] = ${ ableList[sessionNo] }`);
+            returnJSON[0].session[i].conflict = !ableList[sessionNo];
+            console.log(`set conflict = ${ !ableList[sessionNo] }`)
+            break;
+          }
+        }
+      }
+
+      console.log(`!!! Important !!!: session list = ${ JSON.stringify(returnJSON[0].session) }`);
 
       setIsSpinning(false);
       console.log(`set isSpinning to false`);
@@ -111,6 +145,17 @@ export default function CoursePage(props) {
     fetchCourseData();
   }, []);
   
+
+  const courseCodeToSyllabusLink = (courseTitle) => {
+    switch(courseTitle) {
+      case "CSC4001":
+        return "https://bb.cuhk.edu.cn/bbcswebdav/pid-143870-dt-content-rid-2287111_1/courses/CSC400120201628/CSC4001syllabus.pdf";
+      default: 
+        return null;
+    }
+  };
+
+
   const CourseMarkingCriteriaColumns = [
     {
       title: "Marking Item",
@@ -134,7 +179,7 @@ export default function CoursePage(props) {
                 text: "Home",
               },
               {
-                href: "",
+                href: "/registration",
                 icon: <HomeOutlined className="breadcrumb-icon" />,
                 text: "选课系统",
               },
@@ -156,9 +201,24 @@ export default function CoursePage(props) {
                 <span className="small-title">Prerequisites: </span>
                 <br />
                 <ul>
-                  <li>CSC1001 <CheckCircleTwoTone twoToneColor="#52c41a"/></li>
+                  {
+                    coursePageData && coursePageData.prerequisite && coursePageData.prerequisite.map((ele, index) => {
+                      return (
+                        <li>
+                          {ele}
+                          {" "}
+                          {coursePageData.prereqSatisfied[index]?
+                            <CheckCircleTwoTone twoToneColor="#52c41a" />
+                            :
+                            <CloseCircleTwoTone twoToneColor="#eb2f96" />
+                          }
+                        </li>
+                      );
+                    })
+                  }
+                  {/* <li>CSC1001 <CheckCircleTwoTone twoToneColor="#52c41a"/></li>
                   <li>CSC3002 <CheckCircleTwoTone twoToneColor="#52c41a"/></li>
-                  <li>CSC3010 <CloseCircleTwoTone twoToneColor="#eb2f96"/></li>
+                  <li>CSC3010 <CloseCircleTwoTone twoToneColor="#eb2f96"/></li> */}
                 </ul>
               </div>
               {/* <p className="main-title">CSC4001: Software Engineering</p> */}
@@ -168,11 +228,11 @@ export default function CoursePage(props) {
               </div>
               <p className="sub-title" style={{marginTop: "8rem",}}>Lectures</p>
               {
-                coursePageData && coursePageData.session.map((ele, index) => {
+                coursePageData && coursePageData.session.filter((ele) => ele.isLecture === true).map((ele, index) => {
                   ele.courseTitle = coursePageData.title;
                   let sessionObjWithCourseTitle = ele;
                   sessionObjWithCourseTitle.courseTitle = coursePageData.title;
-                  return ele.isLecture && (
+                  return (
                     <CourseInfoTable 
                       key={index}
                       data={sessionObjWithCourseTitle}
@@ -247,7 +307,25 @@ export default function CoursePage(props) {
               <div>
                 <p className="sub-title">Syllabus</p>
                 <p className="indent-paragraph">
-                  <a href="">Click here for the course syllabus</a>
+                  <a
+                    onClick={() => {
+                      // console.log(`!!! coursePageData of syllabus = ${ JSON.stringify(coursePageData) }`);
+                      // if ( courseCodeToSyllabusLink(coursePageData.title) ) {
+                      //   window.location.href = courseCodeToSyllabusLink(coursePageData.title);
+                      // } else {
+                      //   alert(`Sorry, we don't have the course syllabus for course ${coursePageData.title}`);
+                      // }
+                      if ( coursePageData.syllabus ) {
+                        window.location.href = coursePageData.syllabus;
+                      } else {
+                        alert(`Sorry, we don't have the course syllabus for course ${coursePageData.title}`);
+                      }
+                    }}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Click here for the course syllabus
+                  </a>
                 </p>
               </div>
             </div>

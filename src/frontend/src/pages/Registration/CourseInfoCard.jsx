@@ -1,18 +1,50 @@
+import React from 'react';
+
+import { PropertySafetyFilled } from '@ant-design/icons';
 import { Descriptions, Badge, Button } from 'antd';
 
+/* 引入通用函数 */
+import { instructorNameToPageURL } from '../../utils/GeneralFunctions';
 
 
 export default function CourseInfoCard(props) {
+  const [ lectureNum, setLectureNum ] = React.useState(0);
+  const [ tutorialNum, setTutorialNum ] = React.useState(0);
+  const [ instructorList, setInstructorList ] = React.useState([]); 
+  
+  React.useEffect(() => {
+    let tempInstructorList = [];
+    Array.isArray(props.data.session) && props.data.session.forEach((ele) => {
+      if ( ele.isLecture === true ) {
+        setLectureNum((value) => value + 1);
+      } else {
+        setTutorialNum((value) => value + 1);
+      }
+      
+      if ( tempInstructorList.indexOf(ele.instructor) === -1 ) {
+        tempInstructorList.push(ele.instructor);
+      }
+    });
+    setInstructorList(tempInstructorList);
+  }, []);
+
   return (
     <div className="course-info-card">
-      <p className="main-title text-highlight">
-        <a href={props.data.coursePageLink}>{props.data.title}</a>
-      </p>
+      <div>
+        <p className="main-title text-highlight">
+          <a href={props.data.coursePageLink}>{props.data.fullname}</a>
+        </p>
+        <Button
+          type="primary"
+        >
+          Add to Auto-Schedule Wish List
+        </Button>
+      </div>
       <Descriptions bordered column={3} style={{width: "80%",}}>
         <Descriptions.Item label="Sessions" span={1}>
-          <span>2 Lectures</span>
+          <span>{lectureNum} Lectures</span>
           <br />
-          <span>4 Tutorials</span>
+          <span>{tutorialNum} Tutorials</span>
         </Descriptions.Item>
         <Descriptions.Item label="状态">
           <Badge status="success" text="有余位" />
@@ -33,30 +65,32 @@ export default function CourseInfoCard(props) {
           </div>
         </Descriptions.Item>
         <Descriptions.Item label="授课教师">
-          <a>Jane You</a>
+          {/* <a>Jane You</a> */}
+          {
+            (instructorList.length > 0)? instructorList.map((ele, index) => {
+              return (
+                <div>
+                  <a 
+                    key={index}
+                    onClick={() => {
+                      if ( instructorNameToPageURL(ele) ) {
+                        window.location.href = instructorNameToPageURL(ele);
+                      } else {
+                        alert(`Sorry, we don't have the page for this professor ${ele}`);
+                      }
+                    }}  
+                  >
+                    {ele}
+                  </a>
+                </div>
+              )
+            })
+            :
+            <div>null</div>
+          }
         </Descriptions.Item>
         <Descriptions.Item label="授课方式">{props.data.mode}</Descriptions.Item>
       </Descriptions>
-
-      {/* <Descriptions bordered column={3}>
-        <Descriptions.Item label="Session" span={1}>Lecture-01</Descriptions.Item>
-        <Descriptions.Item label="状态">
-          <Badge status="success" text="有余位" />
-        </Descriptions.Item>
-        <Descriptions.Item label="添加课程入口">
-          <a>添加课程</a>
-        </Descriptions.Item>
-        <Descriptions.Item label="已选人数/总位置数">129/150</Descriptions.Item>
-        <Descriptions.Item label="授课教师">
-          <a>Jane You</a>
-        </Descriptions.Item>
-        <Descriptions.Item label="学分">3</Descriptions.Item>
-        <Descriptions.Item label="课程时间" span={2} className="course-info-card-classtime">
-          <span>Thursday 14:30-15:50PM</span> 
-          <span>Friday 14:00-15:20PM</span>
-        </Descriptions.Item>
-        <Descriptions.Item label="教室">Online Zoom</Descriptions.Item>
-      </Descriptions> */}
     </div>
   )
 }

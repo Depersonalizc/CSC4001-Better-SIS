@@ -1,6 +1,10 @@
 import React from 'react';
 
 import {
+  addClass,
+} from '../api/api';
+
+import {
   Button,
   Table,
   Badge,
@@ -19,6 +23,10 @@ import {
   CourseMarkingCriteriaData
 } from '../data.d';
 import WeeklySchedule from '../GeneralComponents/WeeklySchedule';
+import { 
+  getCookie,
+  instructorNameToPageURL, 
+} from '../../utils/GeneralFunctions';
 
 
 
@@ -26,6 +34,59 @@ export default (props) => {
   const [ isModalVisible, setIsModalVisible ] = React.useState(false);
   const [ comingTutorial, setComingTutorial ] = React.useState([]);
   const [ showComingTutorial, setShowComingTutorial ] = React.useState(false);
+  const [ isAddSessionButtonLoading, setIsAddSessionButtonLoading ] = React.useState(false);
+
+  // const instructorNameToPageURL = (instructor) => {
+  //   switch(instructor) {
+  //     case "Han Xiaoguang":
+  //       return "https://mypage.cuhk.edu.cn/academics/hanxiaoguang/";
+  //     case "Zhao Junhua":
+  //       return "https://www.zhaojunhua.org/";
+  //     case "Cai Wei":
+  //       return "https://mypage.cuhk.edu.cn/academics/caiwei/";
+  //     default:
+  //       // return "https://sse.cuhk.edu.cn/teacher-search?keywords=&alphabet=All&category=All&academic=All&class_type=All&page=3";
+  //       return null;
+  //   }
+  // };
+
+
+  const addClassToCart = async () => {
+    // 按钮进入loading状态
+    setIsAddSessionButtonLoading(true);
+    
+    let studentID = getCookie("studentID");
+    let sessionNo = [];
+    console.log(`!!! comingLecture = ${ JSON.stringify( props.comingLecture ) }`);
+    for ( let i = 0; i < props.comingLecture.length; ++i ) {
+      if ( sessionNo.indexOf(props.comingLecture[i].sessionNumber) == -1 ) {
+        sessionNo.push( props.comingLecture[i].sessionNumber );
+      }
+    }
+    for ( let i = 0; i < comingTutorial.length; ++i ) {
+      if ( sessionNo.indexOf(comingTutorial[i].sessionNumber) == -1 ) {
+        sessionNo.push( comingTutorial[i].sessionNumber );
+      }
+    }
+    
+    let inputObj = {
+      studentID: studentID,
+      sessionNo: sessionNo,
+    };
+    console.log(`!!! inputObj = ${ JSON.stringify(inputObj) }`);
+
+    let returnJSON = await( addClass(inputObj) );
+    console.log(`!!! addClass: return JSON = ${ JSON.stringify(returnJSON) }`);
+
+    if ( returnJSON.added === true ) {
+      // 按钮接触loading状态
+      setIsAddSessionButtonLoading(false);
+      alert("You have added this course successfully!");
+      window.location.href = "";
+    } else {
+      alert("Sorry, there was something wrong and you failed to add this course.");
+    }
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -33,6 +94,7 @@ export default (props) => {
   };
   const handleModalOK = () => {
     setIsModalVisible(false);
+    // addClassToCart();
     props.setKeepShowingComingCourses(false);
   };
   const handleModalCancel = () => {
@@ -45,7 +107,7 @@ export default (props) => {
     setComingTutorial( this.timeSlots.map((ele) => {
       return {
         courseTitle: this.courseTitle,
-        session: this.sessionNumber,
+        sessionNumber: this.sessionNumber,
         isLecture: this.isLecture,
         beginTime: ele.beginTime,
         endTime: ele.endTime,
@@ -69,7 +131,7 @@ export default (props) => {
     let comingLecturList = comingLectureSession.timeSlots.map((ele, index) => {
       return {
         courseTitle: comingLectureSession.courseTitle,
-        session: comingLectureSession.sessionNumber,
+        sessionNumber: comingLectureSession.sessionNumber,
         isLecture: comingLectureSession.isLecture,
         beginTime: ele.beginTime,
         endTime: ele.endTime,
@@ -134,6 +196,23 @@ export default (props) => {
     }, {
       title: "Instructor",
       dataIndex: "instructor",
+      render: (instructor) => {
+        return (
+          <a 
+            // href={instructorNameToPageURL(instructor)} 
+            target="_blank" rel="noreferrer"
+            onClick={() => {
+              if ( instructorNameToPageURL(instructor) ) {
+                window.location.href = instructorNameToPageURL(instructor);
+              } else {
+                alert(`Sorry, we don't have the page for this professor ${instructor}`);
+              }
+            }}
+          >
+            {instructor}
+          </a>
+        );
+      },
     },
   ];
 
@@ -203,6 +282,7 @@ export default (props) => {
             onClick={ showModal }
             onMouseOver={handleAddToCartMouseOver}
             onMouseLeave={handleAddToCartMouseLeave}
+            disabled={props.data.conflict}
           >Add to Cart</Button>
         </div>
         <Modal 
@@ -273,6 +353,8 @@ export default (props) => {
                     type="primary"
                     onMouseMove={handleModalAddSessionMouseOver.bind(ele)}
                     onMouseLeave={handleModalAddSessionMouseLeave.bind(ele)}
+                    onClick={addClassToCart}
+                    loading={isAddSessionButtonLoading}
                   >
                     {"Add Session"}
                   </Button>

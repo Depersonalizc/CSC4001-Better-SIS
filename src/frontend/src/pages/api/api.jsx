@@ -76,7 +76,7 @@ export async function getTermList() {
   
   return new Promise((resolve, reject) => {
     resolve(array);
-  })
+  });
 }
 
 
@@ -93,4 +93,52 @@ export async function SearchCourse(formData) {
   return new Promise((resolve, reject) => {
     resolve(json);
   });
+}
+
+
+
+export async function canBufferSession(inputObj) {
+  const targetURL = `${baseURL}/canBufferSession`;
+  console.log(`canBufferSession: inputObj = ${JSON.stringify(inputObj)}`);
+  let resp = await(fetch(targetURL, {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(inputObj),
+  }));
+  let json = await( resp.json() );
+  console.log(`canBufferSession: return JSON = ${ JSON.stringify(json) }`);
+
+  return new Promise((resolve, reject) => {
+    resolve(json);
+  });
+}
+
+
+export async function addClass(inputObj) {
+  const targetURL = `${baseURL}/addClass`;
+  console.log(`!!! addClass: inputObj = ${ JSON.stringify(inputObj) }`);
+
+  try {
+    let resp = await(fetch(targetURL, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(inputObj),
+    }));
+    console.log(`!!! addClass: resp status = ${resp.status}`);
+    let json = await( resp.json() );
+    console.log(`!!! addClass: return JSON = ${ JSON.stringify(json) }`);
+  
+    return new Promise((resolve, reject) => {
+      resolve(json);
+    });
+  }
+  catch(error) {
+    throw new Error(error);
+  }
 }

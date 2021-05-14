@@ -31,17 +31,22 @@ export default function NavigatorWithTime(props) {
       let studentID = getCookie("studentID");
       console.log(`student id cookie data = ${studentID}`);
       if (studentID) {
-        let returnJSON = await( getStudentInfo(studentID) );
-        console.log(`return studentInfo = ${ JSON.stringify(returnJSON) }`);
-        
-        console.log(`student name = ${returnJSON["name"]}`);
-        setUserName( returnJSON["name"] );
-        props.setIsSpinning && props.setIsSpinning(false);
-        console.log(`set isSpinning to false`);
+        try {
+          let returnJSON = await( getStudentInfo(studentID) );
+          console.log(`return studentInfo = ${ JSON.stringify(returnJSON) }`);
+          
+          console.log(`student name = ${returnJSON["name"]}`);
+          setUserName( returnJSON["name"] );
+          props.setIsSpinning && props.setIsSpinning(false);
+          console.log(`set isSpinning to false`);
+        }
+        catch(error) {
+          throw new Error(error);
+        }
       } else {
         // window.location.pathname;
         // console.log(`window.location.pathname = ${ window.location.pathname }`);
-        if ( window.location.pathname !== "/login" ) {
+        if ( window.location.pathname !== "/" && window.location.pathname !== "/login" && window.location.pathname !== "/createAccount" ) {
           alert("Your login has been expired, please login again.");
           window.location.href = "/login";
         }

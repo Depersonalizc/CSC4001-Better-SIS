@@ -43,8 +43,20 @@ export default function CourseDisplay(props) {
       formData.append("school", school);
       formData.append("targetStudent", targetStudent);
 
+      // console.log(`searchCourse formData = ${formData.get("studentID")}`);
+
       let returnJSON = await( SearchCourse(formData) );
+
       setCourseData( returnJSON );
+
+      // console.log(`!!! return JSON = ${ JSON.stringify(returnJSON) }`);
+
+      let sortedArray = returnJSON.sort((a,b) => {
+        // console.log(`a = ${ JSON.stringify(a) } and b = ${ JSON.stringify(b) }`);
+        // console.log(`!!! a < b = ${ a.title < b.title }`);
+        return a.title < b.title;
+      });
+      // console.log(`sortedArray = ${ JSON.stringify(sortedArray) }`);
 
       setIsSpinning(false);
     };
@@ -66,7 +78,7 @@ export default function CourseDisplay(props) {
                 text: "Home",
               },
               {
-                href: "",
+                href: "/registration",
                 icon: <HomeOutlined className="breadcrumb-icon" />,
                 text: "选课系统",
               },
@@ -80,13 +92,17 @@ export default function CourseDisplay(props) {
           <div>
             {
               CourseData.map((ele, index) => {
-                const data = {
-                  title: ele.fullname,
-                  coursePageLink: `/coursepage?courseTitle=${ele.title}`,
-                  credit: ele.credit,
-                  mode: ele.mode,
-                };
-                return <CourseInfoCard key={index} data={data} />;
+                // const data = {
+                //   title: ele.fullname,
+                //   coursePageLink: `/coursepage?courseTitle=${ele.title}`,
+                //   credit: ele.credit,
+                //   mode: ele.mode,
+                // };
+                const courseInfoCardDataObj = ele;
+                courseInfoCardDataObj.coursePageLink = `/coursepage?courseTitle=${ele.title}`;
+              
+                // console.log(`!!! courseInfocardDataObj = ${ JSON.stringify(courseInfoCardDataObj) }`);
+                return <CourseInfoCard key={index} data={courseInfoCardDataObj} />;
               })
             }
           </div>

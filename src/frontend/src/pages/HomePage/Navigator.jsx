@@ -39,9 +39,12 @@ export default function Header(props) {
       } else {
         // window.location.pathname;
         // console.log(`window.location.pathname = ${ window.location.pathname }`);
-        alert("Your login has been expired, please login again.");
-        if ( window.location.pathname !== "/login" ) {
+        if ( window.location.pathname !== "/" && window.location.pathname !== "/login" ) {
+          alert("Your login has been expired, please login again.");
           window.location.href = "/login";
+        }
+        if ( window.location.pathname === "/" ) {
+          props.setIsSpinning && props.setIsSpinning(false);
         }
       }
     };

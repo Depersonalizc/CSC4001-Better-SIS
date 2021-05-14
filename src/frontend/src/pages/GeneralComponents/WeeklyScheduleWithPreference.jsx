@@ -25,8 +25,9 @@ export default function WeeklyScheduleWithPreference(props) {
           timeSlots={{
             confirmed: {
               show: true,
-              // data: CourseTimeSlotList,
-              data: props.weeklyScheduleData.confirmed? props.weeklyScheduleData.confirmed : CourseTimeSlotList,
+              data: CourseTimeSlotList,
+              // data: props.weeklyScheduleData? (props.weeklyScheduleData.confirmed? props.weeklyScheduleData.confirmed : CourseTimeSlotList) : CourseTimeSlotList,
+              // data: props.weeklyScheduleData.confirmed? props.weeklyScheduleData.confirmed : CourseTimeSlotList,
             },
             // addedNotConfirmed: {
             //   show: true,

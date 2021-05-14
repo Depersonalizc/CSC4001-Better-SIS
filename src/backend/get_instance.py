@@ -29,7 +29,7 @@ def get_course(full_code: str):
         print("not found")
         return None
     # create Course instance
-    prereqs = {p for p in c.prereqs.split(' ')}
+    prereqs = {p for p in c.prereqs.split(' ')} if c.prereqs else {}
     comment = None  # TODO: Fetch and create Comment instance
     course = Course(dept, code, c.name, c.units, prereqs, comment)
     courses[full_code] = course
@@ -39,7 +39,7 @@ def get_course(full_code: str):
         ss_ins = set()
         for id in ins_id:
             if id in instructors:
-                ss_ins.add(instructors[i-1])            # idx in db begins from 1, but list starts from 0
+                ss_ins.add(instructors[id])
             else:
                 # Fetch info from db
                 ins = dbMdl.Instructor.query.filter_by(id=id).first()
@@ -50,7 +50,7 @@ def get_course(full_code: str):
                 ss_ins.add(instr)
 
         class1 = tuple(t for t in s.class1.split('-'))
-        class2 = tuple(t for t in s.class1.split('-')) if s.class2 else None
+        class2 = tuple(t for t in s.class2.split('-')) if s.class2 else None
         course.add_session(session_no=s.sno,
                            instructors=ss_ins,
                            venue=s.venue,

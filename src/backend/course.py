@@ -138,7 +138,11 @@ class Session:
         self.__instructors = instructors
         self.__venue = venue
         self.__session_no = session_no
+        if capacity is None:
+            capacity =  120
         self.capacity = capacity
+        if cur_enroll is None:
+            cur_enroll =  50
         self.cur_enroll = cur_enroll
 
     @property
@@ -389,9 +393,9 @@ class Course:
         for idx, s in enumerate(ss):
             if s.session_no == session_no:
                 return idx
-        return -1
+        return None # -1    cannot return -1, because list[-1] do make sense
 
-    def find_session_instance(self, session_type: str, session_no: int) -> int:
+    def find_session_instance(self, session_type: str, session_no: int) -> Session/None:
         """
         Find session index given session type and number
         """

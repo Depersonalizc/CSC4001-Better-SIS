@@ -18,6 +18,40 @@ CORS(app, supports_credentials=True, resources=r"/*")
 # if cookies_stuid:
 #     get_student(cookies_stuid)
 
+def check_studied(course, stu):
+    return course.full_code in stu.studied_courses
+
+
+### 1 signin
+@app.route('/signin', methods=['POST'])
+def signin_stu():
+    # stu = dbMdl.Student.query.filter(
+    #     dbMdl.Student.id == stuid).first()
+    stuid = request.form['studentID']
+    pwd = request.form['password']
+    stu = dbMdl.Student.query.filter_by(id = stuid).first()
+    rtdata = {
+        "exist": False,
+        "correctPwd": False
+    }
+    if stu: # found student in db
+        resp = make_response('success')
+        resp.set_cookie('studentID', '118010154')
+        get_student(stuid)
+        get_schedule(stuid)
+        rtdata["exist"] = True
+        if stu.check_password(pwd): # check password
+            print("corrent pwd")
+            rtdata["correctPwd"] = True
+            get_student(stuid)
+            return json.dumps(rtdata)
+        else:
+            print("wrong pwd")
+            return json.dumps(rtdata)
+    else:
+        print("No such student")
+        return json.dumps(rtdata)
+
 ### 1.5 search stu
 @app.route('/searchStu/<string:stuid>', methods=['GET'])
 def find_stu(stuid: str):
@@ -68,56 +102,31 @@ def create_stu():
     print("add stu done")
     return json.dumps(rtdata)
 
-### 1 signin
-@app.route('/signin', methods=['POST'])
-def signin_stu():
-    # stu = dbMdl.Student.query.filter(
-    #     dbMdl.Student.id == stuid).first()
-    stuid = request.form['studentID']
-    pwd = request.form['password']
-    stu = dbMdl.Student.query.filter_by(id = stuid).first()
-    rtdata = {
-        "exist": False,
-        "correctPwd": False
-    }
-    if stu:
-        resp = make_response('success')
-        resp.set_cookie('studentID', '118010154')
-        get_student(stuid)
-        get_schedule(stuid)
-        rtdata["exist"] = True
-        if stu.check_password(pwd):
-            print("corrent pwd")
-            rtdata["correctPwd"] = True
-            get_student(stuid)
-            return json.dumps(rtdata)
-        else:
-            print("wrong pwd")
-            return json.dumps(rtdata)
-    else:
-        print("No such student")
-        return json.dumps(rtdata)
-
 ### 3 get student info
 @app.route('/getStudentInfo/<string:stuid>', methods=['GET'])
 def getStuInfo(stuid:str):
-# @app.route('/getStudentInfo', methods=['GET'])
-# def getStuInfo():
-#     stuid = request.cookies.get('studentID')
+    # stuid = request.cookies.get('studentID')
     stu = dbMdl.Student.query.filter_by(id=stuid).first()
     wkSchdlData = {'confirmed': None, 'added': None}
     if stu:
-        schdlInst = get_schedule(stuid)
+        schdlInst = get_schedule(stuid) # get schedule of the student
         sesData = [[], []]
-        pkgLs = [schdlInst.selected_pkgs, schdlInst.buffer_pkgs]
-        for i in range(2):
-            for pkg in pkgLs[i]:
-                for sno in [pkg.lec_sess.session_no, pkg.tut_sess.session_no]:
+        for i, pkgs in enumerate(
+            [schdlInst.selected_pkgs, schdlInst.buffer_pkgs]
+        ):
+            for pkg in pkgs: 
+                snos = []
+                if pkg.lec_sess is not None:
+                    snos.append(pkg.lec_sess.session_no)
+                if pkg.tut_sess is not None:
+                    snos.append(pkg.tut_sess.session_no)
+                # if any selected/buffer_pkgs, query course, session, instructor data and return to front end
+                for sno in snos:
                     ses = dbMdl.Session.query.filter_by(sno=sno).first()
                     instr = dbMdl.Instructor.query.filter_by(
                         id=int(ses.instr.split(' ')[0])).first()
                     timesltData = []
-                    if ses.class1:
+                    if ses.class1: # check classes in the session
                         timesltData.append({
                             "weekday": day_name[int(ses.class1[0])-1],
                             "beginTime": ses.class1[2:7],
@@ -164,7 +173,7 @@ def getStuInfo(stuid:str):
             'weeklySchedule': None
         })
 
-### 4 get term info
+### 4 get term info, we temporary consider only one semester
 @app.route('/getTermInfo', methods=['GET'])
 def getTermInfo():
     return json.dumps([
@@ -186,10 +195,11 @@ def searchCourse():
     code = request.form['courseCode']      #1001
     school = request.form['school']        #SSE
     # stuid = request.cookies.get('studentID')
+    target = request.form['targetStudent']
     stuid = request.form['studentID']      #118
     stuInst = get_student(stuid)
 
-    courses = dbMdl.Course.query
+    courses = dbMdl.Course.query # query by the criteria
     if code:
         courses = courses.filter_by(suffix=code)
     if pre:
@@ -204,7 +214,7 @@ def searchCourse():
         prereqsData = crs.prereqs.split(' ')
         prereqsStfyData = []
 
-        if prereqsData == ['']:
+        if prereqsData == ['']: # check prerequisite status and return
             prereqsData = ["No prerequisite course"]
             prereqsStfyData = [True]
         else:
@@ -238,7 +248,7 @@ def searchCourse():
                                 'timeSlots': timesltData,
                                 "location": ses.venue,
                                 "currentEnrollment": ses.curEnroll,
-                                "classCapacity": ses.capacity,
+                                "classCapacity": 120,#ses.capacity,
                                 })
         
         coursesData.append({
@@ -291,22 +301,50 @@ def getInstr(courseCode: str):
 def addClass():
     data = json.loads(request.get_data(as_text=True))
     snos = data['sessionNo']
-    try:
-        stuid = request.cookies.get('studentID')
-        sche = get_schedule(stuid)
-        for s in snos:
-            sche.buffer_session_by_sno(int(s))
-            sche.select_buffer_pkgs()
-        return json.dumps({'added' : True})
-    except:
-        print('Failed to add class')
-        return json.dumps({'added' : False})
+    stuid = data['studentID']
+    error = ''
+    print(snos)
+    # try:
+    sche = get_schedule(stuid)
+    sche.init_buffer()
+    sess = dbMdl.Session.query.filter_by(sno=snos[0]).first()
+    c = get_course(sess.course)
+
+    for pkg in sche.selected_pkgs:
+        if check_studied(c, get_student(stuid)):
+            error = 'You have studied this course!'
+            print(error)
+            return json.dumps({'added' : False, 'error': error})
+        if pkg.lec_sess is not None:
+            if pkg.lec_sess.session_no == int(snos[0]):
+                error = 'Has selected a lecture for this course'
+                print(error, ' ',int(snos[0]))
+                return json.dumps({'added' : False, 'error': error})
+        if pkg.tut_sess is not None:
+            if pkg.tut_sess.session_no == int(snos[1]):
+                error = 'Has selected a tutorial for this course'
+                print(error, ' ', int(snos[1]))                
+                return json.dumps({'added' : False, 'error': error})
+
+    if not sche.buffer_session_by_sno(c,int(snos[0]),int(snos[1])):
+        error = 'Failed to add class, error: wrong session number'
+        print(error)
+        return json.dumps({'added' : False, 'error': error})
+    sche.select_buffer_pkgs()
+    # db.session.add()
+    print(sche)
+    return json.dumps({'added' : True, 'error': error})
+    # except Exception as e:
+    #     print('Failed to add class, error: ', e)
+    #     error = 'exception'
+    #     return json.dumps({'added' : False, 'error': error})
 
 ### 7.2 remove one course (pkg) in confirmed list
 @app.route('/removeOneCourse', methods=['POST'])
 def removeOneCourse():
     code = request.form['courseCode']
-    stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
+    # stuid = request.cookies.get('studentID')
     try:
         sche = get_schedule(stuid)
         sche.remove_selected_pkg(code)
@@ -315,10 +353,11 @@ def removeOneCourse():
         return json.dumps({'removed' : False})
 
 ### 7.3 remove all confirmed list
-@app.route('/removeAllCourse', methods=['GET'])
-def removeAllCourse():
+@app.route('/removeAllCourse/<string:stuid>', methods=['GET'])
+def removeAllCourse(stuid: str):
     # code = request.form['courseCode']
-    stuid = request.cookies.get('studentID')
+    # stuid = request.cookies.get('studentID')
+    # stuid = request.form['studentID']
     try:
         sche = get_schedule(stuid)
         sche.empty_selected()
@@ -331,19 +370,33 @@ def removeAllCourse():
 def canBufferSession():
     data = json.loads(request.get_data(as_text=True))
     snos = data['sessionNo']
-    stuid = request.cookies.get('studentID')
+    stuid = data['studentID']
+    # stuid = request.cookies.get('studentID')
 
     ret = dict()
-    #try:
+    # error = ''
+    # try:
     sche = get_schedule(stuid)
     for sno in snos:
+        selected = False
         s = dbMdl.Session.query.filter_by(sno=sno).first()
+        print('here')
         course = get_course(s.course)
         sess = course.find_session_instance(s.type, s.sno)
-        ret[sno] = sche.can_buffer_session(sess)
+
+        for pkg in sche.selected_pkgs:                          # if this course is selected, then cannot buffer
+            if pkg.course.full_code == course.full_code:
+                ret[sno] = False
+                selected = True
+            if check_studied(pkg.course, get_student(stuid)):
+                ret[sno] = False
+        print('enroll: ',sess.cur_enroll,'capacity: ', sess.capacity)
+        if not selected:
+            ret[sno] = sche.can_buffer_session(sess)
     return json.dumps({'able' : ret})
-    #except:
-    #    return json.dumps({'able' : False})
+    # except Exception as e:
+    #     print(e)
+    #     return json.dumps({'able' : None})
 
 
 ### 10.1 get course comment
@@ -389,40 +442,125 @@ def setPreference():
     noMorning = request.form['noMorning']
     noNoon = request.form['noNoon']
     noFriday = request.form['noFriday']
-    stuid = request.cookies.get('studentID')
+    # stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
     try:
         student = get_student(stuid)
         student.preference.no_morning = noMorning
-        student.preference.noNoon = noNoon
-        student.preference.noFriday = noFriday
+        student.preference.no_noon = noNoon
+        student.preference.no_friday = noFriday
+        print(student.preference)
         return json.dumps({'seted': True})
     except:
         return json.dumps({'seted': False})
+
+#### 12. One click auto schedule, return a schedule
+@app.route('/autoSchedule/<string:stuid>', methods=['GET'])
+def autoSchedule(stuid: str):
+    # stuid = request.form['studentID']
+    sche = get_schedule(stuid)
+    sche.auto_schedule()
+    print(sche)
+    wkSchdlData = {'confirmed': None, 'added': None}
+    sesData = [[], []]
+    
+    for i, pkgs in enumerate(
+                [sche.selected_pkgs, sche.buffer_pkgs]
+            ):
+        for pkg in pkgs:
+            # print(pkg)
+            for sno in [pkg.lec_sess.session_no, pkg.tut_sess.session_no]:
+                ses = dbMdl.Session.query.filter_by(sno=sno).first()
+                instr = dbMdl.Instructor.query.filter_by(
+                    id=int(ses.instr.split(' ')[0])).first()
+                timesltData = []
+                if ses.class1:
+                    timesltData.append({
+                        "weekday": day_name[int(ses.class1[0])-1],
+                        "beginTime": ses.class1[2:7],
+                        "endTime": ses.class1[10:],
+                    })
+                if ses.class2:
+                    timesltData.append({
+                        "weekday": day_name[int(ses.class2[0])-1],
+                        "beginTime": ses.class2[2:7],
+                        "endTime": ses.class2[10:],
+                    })
+                sesData[i].append({"sessionNumber": ses.sno,
+                                    "courseCode": ses.course,
+                                    "isLecture": ses.type == 'lec',
+                                    "instructor": instr.name,
+                                    'timeSlots': timesltData,
+                                    "location": ses.venue,
+                                    "currentEnrollment": ses.curEnroll,
+                                    "classCapacity": ses.capacity,
+                                    })
+    wkSchdlData['confirmed'] = sesData[0]
+    wkSchdlData['added'] = sesData[1]
+
+    return json.dumps({'schedule':wkSchdlData})
 
 #### 13. can add wishlist
 @app.route('/canWishlistCourse', methods=['POST'])
 def canWishlistCourse():
     full_code = request.form['courseCode']
-    stuid = request.cookies.get('studentID')
+    stuid = request.form['studentID']
+
     try:
         sche = get_schedule(stuid)
         course = get_course(full_code)
         ret = sche.can_wishlist_course(course)
+        if check_studied(course, get_student(stuid)):
+            ret = False
         return json.dumps({'able' : ret})
     except:
         return json.dumps({'able' : None})
 
 
 ### 14. auto schedule confirm
-@app.route('/autoScheduleConfirm', methods=['GET'])
-def autoScheduleConfirm():
-    stuid = request.cookies.get('studentID')
+@app.route('/autoScheduleConfirm/<string:stuid>', methods=['GET'])
+def autoScheduleConfirm(stuid: str):
+    # stuid = request.form['studentID']
+
     try:
         sche = get_schedule(stuid)
         sche.select_buffer_pkgs()
+        print(sche)
         return json.dumps({'confirmed' : True})
     except:
         return json.dumps({'confirmed' : False})
+
+#### 15. add wishlist
+@app.route('/addWishlist', methods=['POST'])
+def addWishlist():
+    data = json.loads(request.get_data(as_text=True))
+    courses = data['courseCodes']
+    stuid = data['studentID']
+    stu = get_student(stuid)
+    sche = get_schedule(stuid)
+
+    added = [False] * len(courses)
+    error = [''] * len(courses)
+    print(sche.preference)
+    for idx, c in enumerate(courses):
+        cour = get_course(c)
+        if check_studied(cour, stu):
+            added[idx] = False
+            error[idx] = 'has_taken'
+            continue
+        elif not sche.add_course_to_wishlist(cour):
+            added[idx] = False
+            if cour in sche.preference.course_wishlist:
+                error[idx] = 'Already in wishlist'
+            else:
+                error[idx] = 'Prerequisite not satisfied'
+        else:
+            added[idx] = True
+        print(sche.preference)
+    print(stu.preference)
+    return json.dumps({'added' : added, "error": error})
+
+
 
 
 # def delete_stu(stuid:str):

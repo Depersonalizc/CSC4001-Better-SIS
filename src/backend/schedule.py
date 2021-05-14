@@ -98,6 +98,10 @@ class Schedule:
     @property
     def buffer_pkgs(self) -> List[Package]:
         return self._buffer_pkgs
+    
+    @buffer_pkgs.setter
+    def buffer_pkgs(self, buffer: List[Package]) -> None:
+        self._buffer_pkgs = buffer
 
     @property
     def preference(self):
@@ -182,8 +186,10 @@ class Schedule:
         for pkg in self.selected_pkgs:
             if pkg.course.full_code == full_code:
                 credits = pkg.course.credit_units
-                del pkg
+                self.selected_pkgs.remove(pkg)
+                # del pkg
                 self.selected_credits -= credits
+        return True
 
     # def remove_pkg(self, pkg_idx: int) -> bool:
     #     """
@@ -219,7 +225,7 @@ class Schedule:
         :param lec_idx: Lecture index
         :param tut_idx: Tutorial index
         """
-        pkg = Package()#self.buffer_pkgs[0]  # Could be incomplete
+        pkg = self.buffer_pkgs[0]  # Could be incomplete
         if lec_idx is not None:
             pkg.lec_sess = course.lec_sessions[lec_idx]
         if tut_idx is not None:
@@ -228,13 +234,29 @@ class Schedule:
     def buffer_session_by_sno(self, course: Course,
                               lec_sno: int = None,
                               tut_sno: int = None):
-        pkg = Package()#self.buffer_pkgs[0]  # Could be incomplete
-        if lec_sno is not None:
+        pkg = self.buffer_pkgs[0]  # Could be incomplete
+        if lec_sno is not None :
             lec_idx = course.find_session('lec', lec_sno)
-            pkg.lec_sess = course.lec_sessions[lec_idx]
-        if tut_sno is not None:
+            if lec_idx is not None:
+                pkg.lec_sess = course.lec_sessions[lec_idx]
+                print(lec_idx)
+            else:
+                print('Wrong lecture session number')
+                return 'Wrong lecture session number'
+        if tut_sno is not None :
             tut_idx = course.find_session('tut', tut_sno)
-            pkg.tut_sess = course.tut_sessions[tut_idx]
+            print('tut ',tut_sno)
+            if tut_idx is not None:
+                pkg.tut_sess = course.tut_sessions[tut_idx]
+                print(tut_idx)
+                return True
+            else:
+                print('Wrong tutorial session number')
+                return 'Wrong tutorial session number'
+        return False
+
+    def check_studied(self, course: Course, stu: Student):
+        return course.full_code in stu.studied_courses
 
     # TODO: Need Test
     def swap_session(self,
@@ -295,6 +317,7 @@ class Schedule:
         # pkg = self.buffer_pkgs[0]
         # other_ss = pkg.lec_sess is not None if ss.session_type == 'lec' \
         #            else pkg.tut_sess is not None
+        print('in buffer',self.student.met_all_prereqs(ss.course))
         return (
                 not self.session_time_conflicts(ss, True)
                 and self.student.met_all_prereqs(ss.course)
@@ -309,12 +332,16 @@ class Schedule:
         )
 
     def add_course_to_wishlist(self, course: Course):
-        assert self.can_wishlist_course(course)
+        print('1',self.student.met_all_prereqs(course))
+        print('2',course not in self.preference.course_wishlist)
+        if not self.can_wishlist_course(course):
+            return False
         # prereq_fails = [p for p in course.prereqs
         #                 if not self.student.has_taken(p)]
         # if not prereq_fails:
         #     self.preference.course_wishlist.append(course)
         self.preference.course_wishlist.append(course)
+        return True
         # return prereq_fails
 
     # TODO: Need Test
@@ -353,6 +380,7 @@ class Schedule:
                 self.buffer_pkgs.pop()
 
         # Auto-scheduling fails pathetically.
+        print('auto sched fails!!!')
         return False
 
     def auto_schedule(self, verbose=False) -> bool:
@@ -494,12 +522,12 @@ if __name__ == '__main__':
     # Remove package
     pkg_to_remove = sche.find_selected_pkg(pkg_toswap)
     print('Removing FIN4060 package...')
-    print('Successful!' if sche.remove_pkg(pkg_to_remove) else 'Failed!')
+    print('Successful!' if sche.remove_selected_pkg(pkg_to_remove) else 'Failed!')
     print(sche)
 
     # Manual add (say FIN4060)
     sche.init_buffer()
-    sche.choose_session(FIN4060, lec_idx=lec_idx)
+    sche.buffer_session(FIN4060, lec_idx=lec_idx)
     # Cannot select package cuz it is incomplete
     print('Selecting package...')
     incomplete = sche.select_buffer_pkgs()
@@ -508,7 +536,7 @@ if __name__ == '__main__':
     else:
         print("Successful!")
     # Now it is complete
-    sche.choose_session(FIN4060, tut_idx=tut_idx)
+    sche.buffer_session(FIN4060, tut_idx=tut_idx)
     print('Selecting package...')
     incomplete = sche.select_buffer_pkgs()
     if incomplete:

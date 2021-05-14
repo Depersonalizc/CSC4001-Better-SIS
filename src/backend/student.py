@@ -15,6 +15,7 @@ class Preference:
         self.course_wishlist = list()
         if course_wishlist is not None:
             self.course_wishlist = course_wishlist
+
         # Constraints
         self.no_morning = no_morning
         self.no_noon = no_noon
@@ -134,6 +135,9 @@ class Student:
         return course_code in self.studied_courses
 
     def met_all_prereqs(self, course: Course):
+        print('course prereqs, should be empty', course.prereqs)
+        print('studied courses', self.studied_courses)
+        if not course.prereqs: return True
         return all(self.has_taken(p) for p in course.prereqs)
 
     def met_prereqs(self, prereqs: List[str]):

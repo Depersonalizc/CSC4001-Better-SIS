@@ -38,6 +38,9 @@ class Preference:
     def no_constraints(self):
         self.no_morning = self.no_noon = self.no_friday = False
 
+    def to_dict(self):
+        return {'noMorning': self.no_morning, 'noNoon': self.no_noon,
+                'noFriday': self.no_friday, 'wishlist': [c.full_code for c in self.course_wishlist]}
 
 class Student:
     """

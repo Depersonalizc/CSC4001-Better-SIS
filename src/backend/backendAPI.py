@@ -158,7 +158,8 @@ def getStuInfo(stuid:str):
             "college":    stu.college,
             "major":      stu.major,
             "tot_creidt": stu.tot_credit,
-            'weeklySchedule': wkSchdlData
+            'weeklySchedule': wkSchdlData,
+            'preference': get_student(stuid).preference.to_dict()
         })
     else:
         return json.dumps({

@@ -351,7 +351,6 @@ class Schedule:
         courses in `preference.course_wishlist`, in compliance with
         `preference.no_xx`. A boolean is returned indicating whether the
         auto-schedule was successful.
-
         :param course_idx: Index of the course in the wish list in current recursive step
         :return (bool): Whether auto-schedule was successful
         """
@@ -379,7 +378,6 @@ class Schedule:
                 # Scheduling fails with this package, BACKTRACK.
                 self.buffer_pkgs.pop()
 
-        # Auto-scheduling fails pathetically.
         print('auto sched fails!!!')
         return False
 

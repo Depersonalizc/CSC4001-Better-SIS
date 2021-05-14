@@ -31,6 +31,27 @@ const oneStudentData = StudentData[0];
 export default function UserPage(props) {
   const [ isSpinning, setIsSpinning ] = React.useState(true);
   const [ userInfo, setUserInfo ] = React.useState(null);
+  // const [ userInfo, setUserInfo ] = React.useState( () => {
+  //   const fetchUserInfo = async () => {
+  //     let studentID = getCookie("studentID");
+
+  //     if (studentID) {
+  //       try {
+  //         let studentInfo = await( getStudentInfo(studentID) );
+  //         console.log(`return studentInfo = ${ JSON.stringify(studentInfo) }`);
+
+  //         // setUserInfo(studentInfo);
+  //         setIsSpinning(false);
+  //         return studentInfo;
+  //       }
+  //       catch(error) {
+  //         throw new Error(error);
+  //       }
+  //     }
+  //   };
+
+  //   fetchUserInfo();
+  // } );
 
   React.useEffect(() => {
     const fetchUserInfo = async () => {
@@ -99,7 +120,8 @@ export default function UserPage(props) {
             <p className="user-page-title">课程时间安排表</p>
             <WeeklyScheduleWithPreference 
               weeklyScheduleData={userInfo? userInfo.weeklySchedule : null}
-            />
+              preferenceData={userInfo && userInfo.preference}
+            />s
           </div>
         </div>
       </div>

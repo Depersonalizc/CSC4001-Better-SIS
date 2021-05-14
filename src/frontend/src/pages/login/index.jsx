@@ -85,7 +85,8 @@ export default (props) => {
       }
     }
     catch(error) {
-      window.location.href = "/";
+      alert(`!!! Error: ${ error }`);
+      // window.location.href = "/";
     }
   };
 

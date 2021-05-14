@@ -19,7 +19,7 @@ export async function SignIn(formData) {
   }
   catch(error) {
     return new Promise((resolve, reject) => {
-      reject("signin api failed");
+      reject(`signin api failed with error = ${error}`);
     });
   }
 }
@@ -59,7 +59,10 @@ export async function getStudentInfo(studentID) {
     });
   }
   catch(error) {
-    throw new Error(error);
+    // throw new Error(error);
+    return new Promise((resolve, reject) => {
+      reject(error);
+    });
   }
 }
 
@@ -134,6 +137,51 @@ export async function addClass(inputObj) {
     let json = await( resp.json() );
     console.log(`!!! addClass: return JSON = ${ JSON.stringify(json) }`);
   
+    return new Promise((resolve, reject) => {
+      resolve(json);
+    });
+  }
+  catch(error) {
+    throw new Error(error);
+  }
+}
+
+
+
+export async function addCourseToWishlist(inputObj) {
+  let targetURL = `${baseURL}/addWishlist`;
+  try {
+    let resp = await( fetch(targetURL, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(inputObj),
+    }) );
+    let json = await( resp.json() );
+    console.log(`addCourseToWishlist: returnJSON = ${ JSON.stringify(json) }`);
+    return new Promise((resolve, reject) => {
+      resolve(json);
+    });
+  }
+  catch(error) {
+    throw new Error(error);
+  }
+}
+
+
+
+export async function setPreference(formData) {
+  let targetURL = `${baseURL}/setPreference`;
+  try {
+    let resp = await( fetch(targetURL, {
+      method: "POST",
+      mode: "cors",
+      body: formData,
+    }) );
+    let json = await( resp.json() );
+    console.log(`setPreference: return JSON = ${ JSON.stringify(json) }`);
     return new Promise((resolve, reject) => {
       resolve(json);
     });

@@ -38,7 +38,21 @@ export default (props) => {
   const [ school, setSchool ] = React.useState("SDS");
   const [ college, setCollege ] = React.useState("Shaw");
 
-  const handleOk = () => {
+  const handleOk = async () => {
+    let formData = new FormData();
+    formData.append("userName", userName);
+    formData.append("password", password);
+    formData.append("name", studentName);
+    formData.append("studentID", studentID);
+    formData.append("gender", gender);
+    formData.append("year", year);
+    formData.append("school", school);
+    formData.append("college", college);
+    formData.append("major", major);
+
+    let json = await( SignUp(formData) );
+    console.log(`signup return json = ${ JSON.stringify(json) }`);
+
     setIsModalVisible(false);
   };
   const handleCancel = () => {
@@ -74,19 +88,19 @@ export default (props) => {
   // };
 
   const onFormFinish = async () => {
-    let formData = new FormData();
-    formData.append("userName", userName);
-    formData.append("password", password);
-    formData.append("name", studentName);
-    formData.append("studentID", studentID);
-    formData.append("gender", gender);
-    formData.append("year", year);
-    formData.append("school", school);
-    formData.append("college", college);
-    formData.append("major", major);
+    // let formData = new FormData();
+    // formData.append("userName", userName);
+    // formData.append("password", password);
+    // formData.append("name", studentName);
+    // formData.append("studentID", studentID);
+    // formData.append("gender", gender);
+    // formData.append("year", year);
+    // formData.append("school", school);
+    // formData.append("college", college);
+    // formData.append("major", major);
 
-    let json = await( SignUp(formData) );
-    console.log(`signup return json = ${ JSON.stringify(json) }`);
+    // let json = await( SignUp(formData) );
+    // console.log(`signup return json = ${ JSON.stringify(json) }`);
   }
 
   const onFormFinishFailed = () => {

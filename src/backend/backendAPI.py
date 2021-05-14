@@ -388,8 +388,8 @@ def canBufferSession():
             if pkg.course.full_code == course.full_code:
                 ret[sno] = False
                 selected = True
-        if check_studied(pkg.course, get_student(stuid)):
-            ret[sno] = False
+            if check_studied(pkg.course, get_student(stuid)):
+                ret[sno] = False
         print('enroll: ',sess.cur_enroll,'capacity: ', sess.capacity)
         if not selected:
             ret[sno] = sche.can_buffer_session(sess)

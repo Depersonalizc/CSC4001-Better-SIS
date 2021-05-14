@@ -395,7 +395,7 @@ class Course:
                 return idx
         return None # -1    cannot return -1, because list[-1] do make sense
 
-    def find_session_instance(self, session_type: str, session_no: int) -> int:
+    def find_session_instance(self, session_type: str, session_no: int) -> Session/None:
         """
         Find session index given session type and number
         """

@@ -37,11 +37,16 @@ export default function UserPage(props) {
       let studentID = getCookie("studentID");
 
       if (studentID) {
-        let studentInfo = await( getStudentInfo(studentID) );
-        console.log(`return studentInfo = ${ JSON.stringify(studentInfo) }`);
+        try {
+          let studentInfo = await( getStudentInfo(studentID) );
+          console.log(`return studentInfo = ${ JSON.stringify(studentInfo) }`);
 
-        setUserInfo(studentInfo);
-        setIsSpinning(false);
+          setUserInfo(studentInfo);
+          setIsSpinning(false);
+        }
+        catch(error) {
+          throw new Error(error);
+        }
       }
     };
 
@@ -93,7 +98,7 @@ export default function UserPage(props) {
           <div>
             <p className="user-page-title">课程时间安排表</p>
             <WeeklyScheduleWithPreference 
-              weeklyScheduleData={userInfo.weeklySchedule}
+              weeklyScheduleData={userInfo? userInfo.weeklySchedule : null}
             />
           </div>
         </div>

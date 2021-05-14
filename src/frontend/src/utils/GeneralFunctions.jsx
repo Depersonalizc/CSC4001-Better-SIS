@@ -32,6 +32,24 @@ export function getURLParameter(url, paramName) {
 }
 
 
+/* --------------------------
+ * !!! 教师个人网站URL信息 !!!
+ * -------------------------- */
+export const instructorNameToPageURL = (instructor) => {
+  switch(instructor) {
+    case "Han Xiaoguang":
+      return "https://mypage.cuhk.edu.cn/academics/hanxiaoguang/";
+    case "Zhao Junhua":
+      return "https://www.zhaojunhua.org/";
+    case "Cai Wei":
+      return "https://mypage.cuhk.edu.cn/academics/caiwei/";
+    default:
+      // return "https://sse.cuhk.edu.cn/teacher-search?keywords=&alphabet=All&category=All&academic=All&class_type=All&page=3";
+      return null;
+  }
+};
+
+
 /* -----------------------
  * !!! Cookie 相关函数 !!!
  * ----------------------- */

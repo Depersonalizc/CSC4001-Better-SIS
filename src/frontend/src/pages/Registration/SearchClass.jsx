@@ -46,10 +46,10 @@ const { Option } = Select;
 
 export default function SearchClass(props) {
   const [ isSpinning, setIsSpinning ] = React.useState(true);
-  const [ coursePrefix, setCoursePrefix ] = React.useState(null);
-  const [ courseCode, setCourseCode ] = React.useState(null);
-  const [ courseSchool, setCourseSchool ] = React.useState(null);
-  const [ courseTargetStudent, setCourseTargetStudent ] = React.useState(null);
+  const [ coursePrefix, setCoursePrefix ] = React.useState("");
+  const [ courseCode, setCourseCode ] = React.useState("");
+  const [ courseSchool, setCourseSchool ] = React.useState("");
+  const [ courseTargetStudent, setCourseTargetStudent ] = React.useState("");
 
   const handleCoursePrefixChnage = (value) => {
     setCoursePrefix(value);
@@ -95,7 +95,7 @@ export default function SearchClass(props) {
                 text: "Home",
               },
               {
-                href: "",
+                href: "/registration",
                 icon: <HomeOutlined className="breadcrumb-icon" />,
                 text: "选课系统",
               },

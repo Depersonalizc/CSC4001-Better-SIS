@@ -15,7 +15,7 @@ import RegistrationMenu from './Menu';
 import Breadcrumb from '../GeneralComponents/Breadcrumb';
 
 /* 引入图片 */
-import { Menu, Button, Dropdown, Steps, Divider, Table } from 'antd';
+import { Menu, Button, Dropdown, Steps, Divider, Table, Spin } from 'antd';
 const { SubMenu } = Menu;
 const { Step } = Steps;
 
@@ -41,6 +41,7 @@ import {
 export default function Registration(props) {
   const [ term, setTerm ] = React.useState(null);
   const [ TermList, setTermList ] = React.useState([]);
+  const [ isSpinning, setIsSpinning ] = React.useState(true);
 
   React.useEffect(() => {
     // const fetchTermList = async () => {
@@ -59,8 +60,14 @@ export default function Registration(props) {
     // };
 
     const fetchTermList = async () => {
-      let returnTermList = await( getTermList() );
-      setTermList(returnTermList);
+      try {
+        let returnTermList = await( getTermList() );
+        setTermList(returnTermList);
+        setIsSpinning(false);
+      }
+      catch(error) {
+        throw new Error(error);
+      }
     };
 
     fetchTermList();
@@ -86,70 +93,72 @@ export default function Registration(props) {
   };
 
   return (
-    <div className="course-registration">
-      <NavigatorWithTime />
-      {/* <RegistrationMenu /> */}
-      <div className="course-registration-body">
-        <Breadcrumb 
-          data={[
-            {
-              href: "/",
-              icon: <HomeOutlined className="breadcrumb-icon" />,
-              text: "Home",
-            },
-            {
-              href: "",
-              icon: <HomeOutlined className="breadcrumb-icon" />,
-              text: "选课系统",
-            },
-            {
-              href: null,
-              icon: null,
-              text: "选择课程",
-            },
-          ]}
-        />
-        <div className="registration-progress">
-          <p className="sub-title">添加课程流程须知</p>
-          {/* <Divider /> */}
-          <Steps current={1} style={{width: "70%",}}>
-            <Step title="选择学期" description="This is a description." />
-            <Step title="选择课程" description="This is a description." />
-            <Step title="到点抢课" description="This is a description." />
-            <Step title="确定课程" description="This is a description." />
-          </Steps>
-          <Divider />
-        </div>
-        <div style={{width: "50%",}}>
-          <p className="sub-title">当前步骤：选择学期</p>
-          <Table 
-            className="select-term-table"
-            bordered
-            // style={{width: "70%",}}
-            rowSelection={{
-              type: "radio",
-              ...onRowSelection,
-            }}
-            columns={TermTableColumns}
-            dataSource={TermList.map((ele, index) => {
-              return {
-                key: index + 1,
-                term: ele,
-                // name: "hello world!",
-              };
-            })}
-            pagination={false}
+    <Spin spinning={isSpinning}>
+      <div className="course-registration">
+        <NavigatorWithTime />
+        {/* <RegistrationMenu /> */}
+        <div className="course-registration-body">
+          <Breadcrumb 
+            data={[
+              {
+                href: "/",
+                icon: <HomeOutlined className="breadcrumb-icon" />,
+                text: "Home",
+              },
+              {
+                href: "/registration",
+                icon: <HomeOutlined className="breadcrumb-icon" />,
+                text: "选课系统",
+              },
+              {
+                href: null,
+                icon: null,
+                text: "选择课程",
+              },
+            ]}
           />
-          <div className="select-term-button">
-            <Button
-              href="/registration/searchClass"
-              type="primary"  
-            >
-              下一步
-            </Button>
+          <div className="registration-progress">
+            <p className="sub-title">添加课程流程须知</p>
+            {/* <Divider /> */}
+            <Steps current={1} style={{width: "70%",}}>
+              <Step title="选择学期" description="This is a description." />
+              <Step title="选择课程" description="This is a description." />
+              <Step title="到点抢课" description="This is a description." />
+              <Step title="确定课程" description="This is a description." />
+            </Steps>
+            <Divider />
+          </div>
+          <div style={{width: "50%",}}>
+            <p className="sub-title">当前步骤：选择学期</p>
+            <Table 
+              className="select-term-table"
+              bordered
+              // style={{width: "70%",}}
+              rowSelection={{
+                type: "radio",
+                ...onRowSelection,
+              }}
+              columns={TermTableColumns}
+              dataSource={TermList.map((ele, index) => {
+                return {
+                  key: index + 1,
+                  term: ele,
+                  // name: "hello world!",
+                };
+              })}
+              pagination={false}
+            />
+            <div className="select-term-button">
+              <Button
+                href="/registration/searchClass"
+                type="primary"  
+              >
+                下一步
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Spin>
   )
 }

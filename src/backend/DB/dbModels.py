@@ -199,7 +199,6 @@ class Course(db.Model):
     code = db.Column(db.String(10), primary_key=True, nullable=False) 
     prefix = db.Column(db.String(5))
     suffix = db.Column(db.Integer)
-    units = db.Column(db.Integer)
     name = db.Column(db.String(50))
     school = db.Column(db.String(10))
     units = db.Column(db.Integer)
@@ -243,25 +242,27 @@ class Course(db.Model):
 
 class MajorCourse(db.Model):
     __tablename__ = 'MajorCourse'
-    major = db.Column(db.String(10), primary_key=True, nullable=False)
-    year = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    major = db.Column(db.String(10))
+    year = db.Column(db.String(10))
     required = db.Column(db.Text)
-    elective = db.Column(db.Text)
-    package = db.Column(db.Text)
+    # elective = db.Column(db.Text)
+    # package = db.Column(db.Text)
     # school = db.Column(db.String(10))
 
     def __init__(self,
-                 major,
-                 year,
+                 major = 'CSC',
+                 year = '32',
                  required = None,
-                 elective = None,
-                 package = None):
+                #  elective = None,
+                #  package = None
+                 ):
         super().__init__()
         self.major = major
         self.year = year
         self.required = required
-        self.elective = elective
-        self.package = package
+        # self.elective = elective
+        # self.package = package
 
     def __repr__(self):
         return f'<Database Table {self.__tablename__}>'

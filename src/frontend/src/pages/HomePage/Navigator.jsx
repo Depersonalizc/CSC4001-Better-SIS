@@ -52,6 +52,11 @@ export default function Header(props) {
   }, []);
 
 
+  const logout = () => {
+    deleteCookie("studentID");
+    window.location.href = "/";
+  };
+
   const menu = (
     <Menu>
       <Menu.Item>
@@ -60,7 +65,7 @@ export default function Header(props) {
         </a>
       </Menu.Item>
       <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="/">
+        <a target="_blank" rel="noopener noreferrer" onClick={logout}>
           登出
         </a>
       </Menu.Item>

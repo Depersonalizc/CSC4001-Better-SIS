@@ -360,6 +360,7 @@ class Schedule:
             return True
 
         course = wishlist[course_idx]
+        print(course.full_code)
         # Skip if wished course already in selected package.
         if any(True for pkg in self.selected_pkgs
                if course.eq_course(pkg.course)):
@@ -368,16 +369,23 @@ class Schedule:
         # Search valid packages of wished course.
         def no_conflicts(ss):
             return not (self.session_time_conflicts(ss, True) or
-                        self.session_violates_constraints(ss))
+                        self.session_violates_constraints(ss) or ss == [])
         for lec in filter(no_conflicts, course.lec_sessions):
-            for tut in filter(no_conflicts, course.tut_sessions):
-                # Found valid package, append to auto-schedule.
-                self.buffer_pkgs.append(Package(lec, tut))
+            if course.tut_sessions != []:
+                for tut in filter(no_conflicts, course.tut_sessions):
+                    # Found valid package, append to auto-schedule.
+                    self.buffer_pkgs.append(Package(lec, tut))
+                    print('auto: ', self.buffer_pkgs[-1].lec_sess.course.full_code)
+                    if self._auto_schedule(course_idx+1):
+                        return True
+                    # Scheduling fails with this package, BACKTRACK.
+                    self.buffer_pkgs.pop()
+            else:
+                self.buffer_pkgs.append(Package(lec, None))
                 if self._auto_schedule(course_idx+1):
-                    return True
-                # Scheduling fails with this package, BACKTRACK.
+                        return True
+                    # Scheduling fails with this package, BACKTRACK.
                 self.buffer_pkgs.pop()
-
         print('auto sched fails!!!')
         return False
 
@@ -385,6 +393,7 @@ class Schedule:
         """
         Wrapper function of the auto-scheduling routine
         """
+        print('??? in')
         # Empty auto-scheduled packages
         self.empty_buffer()
         ret = self._auto_schedule(course_idx=0)

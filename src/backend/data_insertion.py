@@ -24,7 +24,7 @@ def data_insert():
     db.session.add(dbMdl.Student(id='118010158', name='Zeyu Li', pwd='123abc',gender = True, school='SDS', college='Harmonia',
                    major='CSE', year=3, totcrdt=108, studied_courses='CSC1001 CSC3002 CSC3050', permission=1))
     db.session.add(dbMdl.Student(id='118010154', name='Yihan Li', pwd='123', gender=True, school='SDS', college='Shaw',
-                   major='CSE', year=3, totcrdt=90, studied_courses='', permission=1))
+                   major='CSE', year=3, totcrdt=90, studied_courses='CSC3002', permission=1))
  
     # for default user
     db.session.add(dbMdl.Student(id='117010000', name='abc',

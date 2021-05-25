@@ -25,8 +25,6 @@ def check_studied(course, stu):
 ### 1 signin
 @app.route('/signin', methods=['POST'])
 def signin_stu():
-    # stu = dbMdl.Student.query.filter(
-    #     dbMdl.Student.id == stuid).first()
     stuid = request.form['studentID']
     pwd = request.form['password']
     stu = dbMdl.Student.query.filter_by(id = stuid).first()
@@ -443,8 +441,8 @@ def setPreference():
     noMorning = request.form['noMorning']
     noNoon = request.form['noNoon']
     noFriday = request.form['noFriday']
-    # stuid = request.cookies.get('studentID')
     stuid = request.form['studentID']
+    # stuid = request.cookies.get('studentID')
     try:
         student = get_student(stuid)
         student.preference.no_morning = noMorning
@@ -470,7 +468,10 @@ def autoSchedule(stuid: str):
             ):
         for pkg in pkgs:
             # print(pkg)
-            for sno in [pkg.lec_sess.session_no, pkg.tut_sess.session_no]:
+            snos = [pkg.lec_sess.session_no]
+            if pkg.tut_sess is not None:
+                snos.append(pkg.tut_sess.session_no)
+            for sno in snos:
                 ses = dbMdl.Session.query.filter_by(sno=sno).first()
                 instr = dbMdl.Instructor.query.filter_by(
                     id=int(ses.instr.split(' ')[0])).first()
